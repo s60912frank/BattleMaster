@@ -10,9 +10,9 @@ var cookieParser = require('cookie-parser');
 var bodyParser   = require('body-parser');
 var session      = require('express-session');
 
-var configDB = require('./config/database.js');
+var configDB = require('./config/database.js'); //db位置
 
-var battle = require('./app/battle');
+var battle = require('./app/battle'); //server端的戰鬥邏輯
 
 // configuration ===============================================================
 mongoose.connect(configDB.url); // connect to our database
@@ -22,12 +22,12 @@ require('./config/passport')(passport); // pass passport for configuration
 // set up our express application
 app.use(morgan('dev')); // log every request to the console
 app.use(cookieParser()); // read cookies (needed for auth)
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true })); //讀取請求的body資料
 app.use(bodyParser.json());
 
 // required for passport
 app.use(session({ 
-    secret: 'gminissosmart',
+    secret: 'gminissosmart', //???
     resave: true,
     saveUninitialized: false
 })); // session secret

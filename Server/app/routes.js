@@ -1,4 +1,4 @@
-var User = require('./models/user');
+var User = require('./models/user'); //資料庫USER的shema
 module.exports = function(app, passport, battle) {
     //跟AI打
     app.post('/battle', isLoggedIn, function(req, res) {
@@ -14,16 +14,14 @@ module.exports = function(app, passport, battle) {
         res.send("OK");
       });
     });
-
-    // =====================================
-    // LOGOUT ==============================
-    // =====================================
+    
+    //登出
     app.get('/logout', function(req, res) {
         req.logout();
         res.send('你已經成功登出');
     });
 
-    //login
+    //登入
     app.post('/login', passport.authenticate('local-login') ,function(req, res){
         if(req.user){
           res.send(req.user); //登入成功
@@ -33,7 +31,7 @@ module.exports = function(app, passport, battle) {
         }
       });
 
-    //signup
+    //註冊
     app.post('/signup', passport.authenticate('local-signup') ,function(req, res){
         if(req.user){
           res.send(req.user); //註冊成功
@@ -50,7 +48,7 @@ function isLoggedIn(req, res, next) {
     // if user is authenticated in the session, carry on
     if (req.isAuthenticated())
         return next();
-    // if they aren't redirect them to the home page
+    //如果他沒登入就告訴他沒登入
     res.status(401);
     res.send('You are not logged in!');
 }

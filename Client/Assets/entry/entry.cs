@@ -14,8 +14,7 @@ public class entry : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         WWWForm form = new WWWForm();
-        form.AddField("token", SystemInfo.deviceUniqueIdentifier);
-        form.AddField("name", "WHEEEEEEE");
+        form.AddField("token", SystemInfo.deviceUniqueIdentifier); //用deviceID登入
         WWW w = new WWW(SERVER_URL + "/login", form);
         StartCoroutine(WaitForLogin(w));
 	}
@@ -25,9 +24,9 @@ public class entry : MonoBehaviour {
         yield return w;
         if (!string.IsNullOrEmpty(w.error))
         {
-            if (w.error.Contains("refused"))
+            if (w.error.Contains("refused")) //無法連接伺服器
             {
-                if (retryCount > 4)
+                if (retryCount > 4) //失敗超過5次就顯示無法連線
                 {
                     isLoaded = "connectionRefused";
                     retryCount = 0;
@@ -35,13 +34,13 @@ public class entry : MonoBehaviour {
                 else
                 {
                     Debug.Log("無法連接");
-                    Start();
+                    Start(); //重新嘗試連機接
                     retryCount++;
                 }
             }
             else
             {
-                //進入註冊畫面
+                //無法登入導向註冊畫面
                 Debug.Log("導向註冊畫面");
                 isLoaded = "signup";
             }
@@ -50,15 +49,15 @@ public class entry : MonoBehaviour {
         {
             Debug.Log(w.text);
             JSONObject response = new JSONObject(w.text);
-            string[] data = w.responseHeaders["SET-COOKIE"].Split(";"[0]);
+            string[] data = w.responseHeaders["SET-COOKIE"].Split(";"[0]); //取出登入後的cookie就不用一直登入了
             if (data.Length > 0)
             {
-                response.AddField("cookie", data[0]);
+                response.AddField("cookie", data[0]); 
             }
             //進入可戰鬥畫面
             Debug.Log("登入成功");
             isLoaded = "login";
-            PlayerPrefs.SetString("userData", response.ToString());
+            PlayerPrefs.SetString("userData", response.ToString()); //將使用者資料與cookie存入playerPrefs
         }
     }
 

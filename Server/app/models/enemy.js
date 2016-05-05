@@ -1,7 +1,7 @@
 // load the things we need
 var mongoose = require('mongoose');
 
-// define the schema for our user model
+// define the schema for our enemy model
 var enemySchema = mongoose.Schema({
   name: String,
   stamina: Number,

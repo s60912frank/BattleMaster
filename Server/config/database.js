@@ -1,3 +1,4 @@
+//openshift上的db
 var getDBAddr = function(){
   if(process.env.OPENSHIFT_MONGODB_DB_PASSWORD){
     connection_string = process.env.OPENSHIFT_MONGODB_DB_USERNAME + ":" +

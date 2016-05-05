@@ -25,30 +25,26 @@ module.exports = function(passport) {
     });
   });
 
-  // =========================================================================
-  // LOCAL SIGNUP ============================================================
-  // =========================================================================
-  // we are using named strategies since we have one for login and one for signup
-  // by default, if there was no name, it would just be called 'local'
+  //本地資料庫註冊
   passport.use('local-signup', new LocalStrategy({
-    usernameField: 'name',
-    passwordField: 'token',
+    usernameField: 'name', //使用者輸入的暱稱
+    passwordField: 'token' //這個使用unity提供的deviceID
   },function (name, token, done) {
+    //搜尋這個使用者是否在資料庫內
     User.findOne({ 'token': token }, function(err, user) {
       // if there are any errors, return the error
       if (err){
         return done(err);
       }
-      // check to see if theres already a user with that email
       if (user) {
         return done(null, flase, "You already have an account!");
-      } else {
+      } 
+      else {
         var newUser = new User();
-        // set the user's local credentials
         newUser.name = name;
         newUser.token = token;
         newUser.provider = "local";
-        newUser.pet = {
+        newUser.pet = { //這是目前的初始數值
           "name": name,
           stamina: 50,
           attack: 12,
@@ -57,7 +53,7 @@ module.exports = function(passport) {
           skillCD: {
             ID: 1,
             CD: 3,
-            params: undefined
+            params: undefined //技能還有待設計
           }
         };
         // save the user
@@ -67,30 +63,25 @@ module.exports = function(passport) {
           console.log(newUser.name + "created!");
           return done(null, newUser);
         });
-        return done(null, newUser);
       }
     });
   }));
 
+  //本地資料庫登入
   passport.use('local-login', new LocalStrategy({
-      // by default, local strategy uses username and password, we will override with email
       usernameField: 'name',
-      passwordField: 'token',
-      passReqToCallback: true // allows us to pass back the entire request to the callback
+      passwordField: 'token'
     },
-    function(req, name, token, done) {
+    function(name, token, done) {
       // asynchronous
-      // User.findOne wont fire unless data is sent back
       process.nextTick(function() {
-        // find a user whose email is the same as the forms email
-        // we are checking to see if the user trying to login already exists
+        //同上搜尋資料庫
         User.findOne({
           'token': token
         }, function(err, user) {
           // if there are any errors, return the error
           if (err)
             return done(err);
-
           // check to see if theres already a user with that email
           if (user) {
             console.log(user.name + " logged in!");

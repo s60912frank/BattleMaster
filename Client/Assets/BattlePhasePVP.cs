@@ -52,31 +52,19 @@ public class BattlePhasePVP : MonoBehaviour {
         //set status from scripts
         enemyData = Object.Instantiate(Enemy.GetComponent<EnemyData>());
         partnerData = Object.Instantiate(Partner.GetComponent<PartnerData>());
-        //EnemyHP.text = "Enemy HP:" + enemyData.stamina;
-        //PartnerHP.text = "Partner HP:" + partnerData.stamina;
         socket = GameObject.Find("SocketIO").GetComponent<SocketIOComponent>();
+        //socket事件們
         socket.On("enemyMovement", OnEnemyMoveMent);
         socket.On("attackStart", OnAttackStart);
         socket.On("enemyMovementResult", OnEnemyMoveMentResult);
         socket.On("enemyData", OnReceiveEnemyData);
         socket.On("enemyLeave", OnEnemyLeave);
-        socket.Emit("battleSceneReady");
+        socket.Emit("battleSceneReady"); //告訴server我準備好了
 	}
 
-    private void SetInitinalData()
-    {
-        JSONObject data = new JSONObject(PlayerPrefs.GetString("userData"));
-        JSONObject partner = data["pet"];
-        Debug.Log("PartnerData:" + partner.ToString());
-        partnerData.stamina = int.Parse(partner["stamina"].ToString());
-        //partnerData.stamina = 1000;
-        partnerData.attack = int.Parse(partner["attack"].ToString());
-        partnerData.defense = int.Parse(partner["defense"].ToString());
-        partnerData.evade = int.Parse(partner["evade"].ToString());
-        //partnerData.skillCD = int.Parse(partner["skill"]["CD"].ToString());
-    }
 
     private void OnReceiveEnemyData(SocketIOEvent e)
+        //取得敵人資訊時存起來
     {
         SetInitinalData(); //先這樣吧
         JSONObject data = e.data;
@@ -85,10 +73,24 @@ public class BattlePhasePVP : MonoBehaviour {
         enemyData.attack = int.Parse(data["attack"].ToString());
         enemyData.defense = int.Parse(data["defense"].ToString());
         enemyData.evade = int.Parse(data["evade"].ToString());
-        //enemyData.skillCD = int.Parse(data["skill"]["CD"].ToString());
+        //enemyData.skillCD = int.Parse(data["skill"]["CD"].ToString()); //skill still buggy
+    }
+
+    private void SetInitinalData()
+        //讀取自己partner的資訊
+    {
+        JSONObject data = new JSONObject(PlayerPrefs.GetString("userData"));
+        JSONObject partner = data["pet"];
+        Debug.Log("PartnerData:" + partner.ToString());
+        partnerData.stamina = int.Parse(partner["stamina"].ToString());
+        partnerData.attack = int.Parse(partner["attack"].ToString());
+        partnerData.defense = int.Parse(partner["defense"].ToString());
+        partnerData.evade = int.Parse(partner["evade"].ToString());
+        //partnerData.skillCD = int.Parse(partner["skill"]["CD"].ToString()); //skill still buggy
     }
 
     private void OnEnemyMoveMent(SocketIOEvent e)
+        //當enemy選好動作時觸發
     {
         JSONObject data = e.data;
         string movement = data["movement"].ToString().Replace("\"", "");
@@ -110,7 +112,6 @@ public class BattlePhasePVP : MonoBehaviour {
                 break;
             case "Skill":
                 //enemyEvadeActivated = 1;
-
                 break;
         }
         enemyCritActivated = int.Parse(data["critical"].ToString().Replace("\"", ""));
@@ -144,12 +145,13 @@ public class BattlePhasePVP : MonoBehaviour {
         Dictionary<string, string> movement = new Dictionary<string, string>();
         movement.Add("movement", _yourNextMove);
         movement.Add("critical", partnerCritActivated.ToString());
-        socket.Emit("movement", new JSONObject(movement));
+        socket.Emit("movement", new JSONObject(movement)); //傳送自己的動作
         Debug.Log("YourMovement:" + _yourNextMove);
         switch (_yourNextMove)
         {
             case "Attack":
                 //nothing to do
+                //有critical的話剛剛已經傳出去了，這裡重置
                 partnerCritActivated = 0;
                 break;
             case "Defend":
@@ -171,6 +173,7 @@ public class BattlePhasePVP : MonoBehaviour {
     }
 
     private void OnAttackStart(SocketIOEvent e)
+        //當雙方都選好動作就會開始攻擊(?)
     {
         Debug.Log("BATTLE!");
         //you can't charge or launch skill at this point.
@@ -223,6 +226,7 @@ public class BattlePhasePVP : MonoBehaviour {
     }
 
     private void OnEnemyMoveMentResult(SocketIOEvent e)
+        //當對方計算好自己的傷害時會觸發這個
     {
         Debug.Log("EnemyMovementResult:" + e.data);
         JSONObject data = e.data;
@@ -247,19 +251,19 @@ public class BattlePhasePVP : MonoBehaviour {
         //set back variables
         partnerDefendActivated = 0;
         partnerEvadeActivated = 0;
-
         enemyDefendActivated = 0;
         enemyEvadeActivated = 0;
         enemyAttackActivated = 0;
     }
 
     private void OnEnemyLeave(SocketIOEvent e)
+        //敵人離開時觸發
     {
         messageEnemyMove.text = "The Enemy leave the battle...";
     }
 
     private void OnApplicaionQuit()
     {
-        socket.Close();
+        socket.Close();//關閉socket
     }
 }
