@@ -1,0 +1,24 @@
+{
+  "name": "openshift-cartridge-nodejs-template",
+  "version": "1.0.1",
+  "description": "Gmin's game server",
+  "private": true,
+  "main": "server.js",
+  "dependencies" : {
+    "express" : "latest",
+    "mongoose" : "latest",
+    "passport" : "latest",
+    "passport-local" : "latest",
+    "morgan": "latest",
+    "body-parser": "latest",
+    "cookie-parser": "latest",
+    "method-override": "latest",
+    "express-session": "latest",
+    "socket.io": "latest"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Ionut-Cristian Florescu <ionut.florescu@gmail.com>",
+  "license": "ISC"
+}
