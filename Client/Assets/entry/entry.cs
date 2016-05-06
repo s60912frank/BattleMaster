@@ -15,6 +15,7 @@ public class entry : MonoBehaviour {
 	void Start () {
         WWWForm form = new WWWForm();
         form.AddField("token", SystemInfo.deviceUniqueIdentifier); //用deviceID登入
+        form.AddField("name", "");
         WWW w = new WWW(SERVER_URL + "/login", form);
         StartCoroutine(WaitForLogin(w));
 	}

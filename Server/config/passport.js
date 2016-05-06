@@ -37,8 +37,8 @@ module.exports = function(passport) {
         return done(err);
       }
       if (user) {
-        return done(null, flase, "You already have an account!");
-      } 
+        return done(null, false, "You already have an account!");
+      }
       else {
         var newUser = new User();
         newUser.name = name;

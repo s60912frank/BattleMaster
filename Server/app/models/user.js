@@ -6,13 +6,15 @@ var userSchema = mongoose.Schema({
   provider: String,
   token: String,
   name: String,
+  abilityPoint: Number,
   pet: {
     name: String,
+    level: Number,
     stamina: Number,
     attack: Number,
     defense: Number,
     evade: Number,
-    skillCD: {
+    skill: {
       ID: Number,
       CD: Number,
       params: Array

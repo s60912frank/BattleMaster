@@ -39,6 +39,7 @@ public class BattlePhasePVP : MonoBehaviour {
     private int enemyEvadeActivated = 0;
     private int enemyAttackActivated = 0;
     private int enemyCritActivated = 0;
+    private int enemySkillActivated = 0;
     private int enemysRandomMove;//temp
 
     private int yourEvadeNumber;//to present rate of evasiveness when Enemy's atk lands
@@ -111,7 +112,7 @@ public class BattlePhasePVP : MonoBehaviour {
                 enemyData.charge++;
                 break;
             case "Skill":
-                //enemyEvadeActivated = 1;
+                enemySkillActivated = 1;
                 break;
         }
         enemyCritActivated = int.Parse(data["critical"].ToString().Replace("\"", ""));
@@ -165,8 +166,8 @@ public class BattlePhasePVP : MonoBehaviour {
                 break;
             case "Skill":
                 partnerData.charge = 0;
-                PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
-                Partner.GetComponent<PartnerData>().Skill();//SOMETHING IS WRONG
+                //PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
+                //Partner.GetComponent<PartnerData>().Skill();//SOMETHING IS WRONG
                 Debug.Log("hey! over here.");
                 break;
         }        
@@ -213,6 +214,11 @@ public class BattlePhasePVP : MonoBehaviour {
             }
             enemyCritActivated = 0;
         }
+        else if (enemySkillActivated == 1)
+        {
+            //attackResult.Add("skillActivated", "true");
+            EnemySkill();
+        }
         else
         {
             attackResult.Add("critical", "0");
@@ -254,16 +260,33 @@ public class BattlePhasePVP : MonoBehaviour {
         enemyDefendActivated = 0;
         enemyEvadeActivated = 0;
         enemyAttackActivated = 0;
+        enemySkillActivated = 0;
     }
 
     private void OnEnemyLeave(SocketIOEvent e)
         //敵人離開時觸發
     {
         messageEnemyMove.text = "The Enemy leave the battle...";
+        socket.Close();
     }
 
     private void OnApplicaionQuit()
     {
         socket.Close();//關閉socket
+    }
+
+
+    private void Skill()
+    {
+        partnerData.stamina += 15;
+        enemyData.stamina -= 15;
+        partnerData.attack += 5;
+    }
+
+    private void EnemySkill()
+    {
+        enemyData.stamina += 15;
+        partnerData.stamina -= 15;
+        enemyData.attack += 5;
     }
 }

@@ -8,7 +8,7 @@ var enemySchema = mongoose.Schema({
   attack: Number,
   defense: Number,
   evade: Number,
-  skillCD: {
+  skill: {
     ID: Number,
     CD: Number,
     params: Array

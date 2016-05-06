@@ -35,6 +35,5 @@ public class PartnerSkillEffectEntry : MonoBehaviour {
             transform.position = startPos;
             transform.localScale = startScale;
         }
-
 	}
 }
