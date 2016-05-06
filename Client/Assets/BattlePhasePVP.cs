@@ -9,6 +9,7 @@ public class BattlePhasePVP : MonoBehaviour {
     public GameObject Partner;
     public GameObject Enemy;
     public GameObject PartnerSkillEffect;
+    public GameObject EnemySkillEffect;
     public Text EnemyHP;
     public Text PartnerHP;
     public Text messageBoxText;
@@ -20,6 +21,7 @@ public class BattlePhasePVP : MonoBehaviour {
     public PartnerData partnerData;
 
     private SocketIOComponent socket;
+    private Dictionary<string, string> attackResult;
 
     private string _yourNextMove = "Attack";
     public string yourNextMove
@@ -49,6 +51,12 @@ public class BattlePhasePVP : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        attackResult = new Dictionary<string, string>();
+        attackResult.Add("nextCritical", "0");
+        attackResult.Add("damage", "0");
+        attackResult.Add("skillBoost", "false");
+
+
         Application.runInBackground = true;
         //set status from scripts
         enemyData = Object.Instantiate(Enemy.GetComponent<EnemyData>());
@@ -62,7 +70,6 @@ public class BattlePhasePVP : MonoBehaviour {
         socket.On("enemyLeave", OnEnemyLeave);
         socket.Emit("battleSceneReady"); //告訴server我準備好了
 	}
-
 
     private void OnReceiveEnemyData(SocketIOEvent e)
         //取得敵人資訊時存起來
@@ -115,7 +122,7 @@ public class BattlePhasePVP : MonoBehaviour {
                 enemySkillActivated = 1;
                 break;
         }
-        enemyCritActivated = int.Parse(data["critical"].ToString().Replace("\"", ""));
+        enemyCritActivated = int.Parse(data["nextCritical"].ToString().Replace("\"", ""));
         messageEnemyMove.text = "Enemy is ready.";
     }
 
@@ -178,7 +185,6 @@ public class BattlePhasePVP : MonoBehaviour {
     {
         Debug.Log("BATTLE!");
         //you can't charge or launch skill at this point.
-        Dictionary<string, string> attackResult = new Dictionary<string, string>();
         //Enemy's attack 為方便移到這邊分開寫
         if (enemyAttackActivated == 1)
         {
@@ -192,10 +198,10 @@ public class BattlePhasePVP : MonoBehaviour {
                 if (partnerDefendActivated == 1)
                 {
                     partnerData.charge++;//Defend success --> Skill boost
-                    attackResult.Add("skillBoost", "true");
+                    attackResult["skillBoost"] = "true";
                 }
-                attackResult.Add("damage", damage.ToString());
-                attackResult.Add("critical", "0");
+                attackResult["damage"] = damage.ToString();
+                attackResult["nextCritical"] = "0";
             }
             else
             {
@@ -204,48 +210,57 @@ public class BattlePhasePVP : MonoBehaviour {
                 if (partnerEvadeActivated == 1)
                 {
                     partnerCritActivated = 1;
-                    attackResult.Add("critical", "1");
+                    attackResult["nextCritical"] = "1";
                 }
                 else
                 {
-                    attackResult.Add("critical", "0");
+                    attackResult["nextCritical"] = "0";
                 }
-                attackResult.Add("damage", "0");
+                attackResult["damage"] = "0";
             }
             enemyCritActivated = 0;
         }
-        else if (enemySkillActivated == 1)
-        {
-            //attackResult.Add("skillActivated", "true");
-            EnemySkill();
-        }
+        //
         else
         {
-            attackResult.Add("critical", "0");
-            attackResult.Add("damage", "0");
-            attackResult.Add("skillBoost", "false");
+            attackResult["damage"] = "0";
+            attackResult["nextCritical"] = "0";
+            attackResult["skillBoost"] = "false";
+        }
+
+        if (_yourNextMove == "Skill")
+        {
+            Skill();
         }
 
         socket.Emit("result", new JSONObject(attackResult));
-        //Debug.Log((new JSONObject(attackResult)).ToString());
         Debug.Log("Partner Take " + attackResult["damage"] + " damage!");
+
+        //clear value
+        attackResult["damage"] = "0";
+        attackResult["nextCritical"] = "0";
+        attackResult["skillBoost"] = "false";
     }
 
     private void OnEnemyMoveMentResult(SocketIOEvent e)
         //當對方計算好自己的傷害時會觸發這個
     {
         Debug.Log("EnemyMovementResult:" + e.data);
+        if (enemySkillActivated == 1)
+        {
+            EnemySkill();
+        }
+
         JSONObject data = e.data;
         int damage = int.Parse(data["damage"].ToString().Replace("\"", ""));
         Debug.Log("Enemy Take " + damage.ToString() + "damage!");
         if (damage != 0)
         {
             enemyData.stamina -= damage;
-            EnemyHP.text = "Enemy HP:" + enemyData.stamina;
         }
         else
         {
-            if(_yourNextMove == "Attack")
+            //if(_yourNextMove == "Attack")
                 messageEnemyMove.text = "The Enemy evaded your attack...";
         }
         enemyCritActivated = int.Parse(data["critical"].ToString().Replace("\"", ""));
@@ -281,6 +296,8 @@ public class BattlePhasePVP : MonoBehaviour {
         partnerData.stamina += 15;
         enemyData.stamina -= 15;
         partnerData.attack += 5;
+        PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
+        print("Your skill activated!");
     }
 
     private void EnemySkill()
@@ -288,5 +305,7 @@ public class BattlePhasePVP : MonoBehaviour {
         enemyData.stamina += 15;
         partnerData.stamina -= 15;
         enemyData.attack += 5;
+        EnemySkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
+        print("Enemy skill activated!");
     }
 }
