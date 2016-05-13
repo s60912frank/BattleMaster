@@ -75,6 +75,18 @@ public class EnemyData : MonoBehaviour
             _evade = value;
         }
     }
+	private bool _nextCritical;
+	public bool NextCritical
+	{
+		get
+		{
+			return _nextCritical;
+		}
+		set
+		{
+			_nextCritical = value;
+		}
+	}
 	// Use this for initialization
 	void Start() 
     {

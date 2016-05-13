@@ -11,6 +11,7 @@ public class PartnerData : MonoBehaviour {
         }
         set
         {
+			//print ("PARTNER STA:" + value);
             _stamina = value;
         }
     }
@@ -74,6 +75,18 @@ public class PartnerData : MonoBehaviour {
             _evade = value;
         }
     }
+	private bool _nextCritical;
+	public bool NextCritical
+	{
+		get
+		{
+			return _nextCritical;
+		}
+		set
+		{
+			_nextCritical = value;
+		}
+	}
     public GameObject BattleManager;
     private string _textSkillDescription;
     public string textSkillDescription

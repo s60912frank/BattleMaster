@@ -30,9 +30,9 @@ public class ClickPVP : MonoBehaviour {
     public void action_4_btnSkill()
     {
         if (battlePhase.partnerData.charge < battlePhase.partnerData.skillCD)
-            battlePhase.yourNextMove = "Charge";
+			battlePhase.partnerMovement = BattlePhasePVP.Movement.Charge;
         if (battlePhase.partnerData.charge >= battlePhase.partnerData.skillCD)
-            battlePhase.yourNextMove = "Skill";
+			battlePhase.partnerMovement = BattlePhasePVP.Movement.Skill;
         if (battlePhase.partnerData.charge == battlePhase.partnerData.skillCD)
             messageBoxText.text = "Charge MAX!";
         messageBoxText.text = "Confirm to Activate Charge.";
@@ -40,19 +40,19 @@ public class ClickPVP : MonoBehaviour {
 
     public void action_4_btnAttack()
     {
-        battlePhase.yourNextMove = "Attack";
+		battlePhase.partnerMovement = BattlePhasePVP.Movement.Attack;
         messageBoxText.text = "Confirm to Activate Attack.";
     }
 
     public void action_4_btnDefend()
     {
-        battlePhase.yourNextMove = "Defend";
+		battlePhase.partnerMovement = BattlePhasePVP.Movement.Defense;
         messageBoxText.text = "Confirm to Activate Defend.";
     }
 
     public void action_4_btnEvade()
     {
-        battlePhase.yourNextMove = "Evade";
+		battlePhase.partnerMovement = BattlePhasePVP.Movement.Evade;
         messageBoxText.text = "Confirm to Activate Evade.";
     }
 }

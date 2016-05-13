@@ -18,7 +18,5 @@
   },
   "scripts": {
     "start": "node server.js"
-  },
-  "author": "Ionut-Cristian Florescu <ionut.florescu@gmail.com>",
-  "license": "ISC"
+  }
 }

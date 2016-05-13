@@ -3,7 +3,6 @@ var io = require('socket.io')({ //client跟server連接
 });
 var connections = []; //目前連上的clents存在這
 var waitingQueue = []; //等待戰鬥的clients
-//var rooms = []; //戰鬥中的房間
 var roomCount = 0;
 
 module.exports = {
@@ -53,7 +52,6 @@ var createRoom = function(){
 	room.userTwo = waitingQueue.shift().join(room.name);
   room.userOne["enemy"] = room.userTwo; //設定對方為敵人
   room.userTwo["enemy"] = room.userOne;
-	//rooms.push(room); //加入rooms array //這似乎可以不用
 	battle(room);
 }
 
@@ -67,7 +65,7 @@ var battlePhase = function (socket, room) {
 	socket.on("battleSceneReady", function(data){ //等client準備好了就把敵人資料給他
 		socket.emit("enemyData", socket.enemy.user.pet);
 	});
-  
+
   socket.on("movement", function(data){ //當client選好動作時觸發
     socket.enemy.emit("enemyMovement", data); //把動作傳給敵人(使用者在這時看不到)
 		console.log(data.movement);
@@ -94,22 +92,8 @@ var battlePhase = function (socket, room) {
       socket.enemy.emit("enemyLeave", {}); //告訴對方我離線了
       socket.enemy.leave(room.name); //把對方移出房間
       delete room; //刪除房間
-      //distroyRoom(room);
   });
 }
-
-/*var distroyRoom = function(room){
-  for(i = 0;i < rooms.length;i++){
-    if(rooms[i].name == room.name){
-      room.userOne.leave(room.name);
-      room.userTwo.leave(room.name);
-      console.log(room.name + " deleted!");
-      rooms.splice(i, 1);
-      delete room;
-      break;
-    }
-  }
-}*/
 
 var removeItemById = function(array, value){
   for(i = 0;i < array.length;i++){

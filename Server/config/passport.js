@@ -50,7 +50,7 @@ module.exports = function(passport) {
           attack: 12,
           defense: 2,
           evade: 30,
-          skillCD: {
+          skill: {
             ID: 1,
             CD: 3,
             params: undefined //技能還有待設計
