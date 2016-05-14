@@ -78,7 +78,7 @@ public class BattlePhasePVP : MonoBehaviour {
         partnerData.attack = int.Parse(partner["attack"].ToString());
         partnerData.defense = int.Parse(partner["defense"].ToString());
         partnerData.evade = int.Parse(partner["evade"].ToString());
-        partnerData.skillCD = int.Parse(partner["skill"]["CD"].ToString()); //skill still buggy
+        partnerData.skillCD = int.Parse(partner["skill"]["CD"].ToString());
     }
 
     private void OnEnemyMoveMent(SocketIOEvent e)

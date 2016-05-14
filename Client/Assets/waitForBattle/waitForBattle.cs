@@ -53,7 +53,7 @@ public class waitForBattle : MonoBehaviour {
         socket.Connect(); //加入等待前先連socket
         while (socket.sid == null)
         {
-            yield return null; // wait until sid! != null
+            yield return null; // wait until sid != null
         }
         Debug.Log(socket.sid);
         WWWForm form = new WWWForm();

@@ -92,6 +92,7 @@ var battlePhase = function (socket, room) {
       socket.enemy.emit("enemyLeave", {}); //告訴對方我離線了
       socket.enemy.leave(room.name); //把對方移出房間
       delete room; //刪除房間
+      //distroyRoom(room);
   });
 }
 
