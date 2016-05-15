@@ -14,28 +14,26 @@ public class ClickPVP : MonoBehaviour {
 	void Start ()
     {
         battlePhase = BattleManager.GetComponent<BattlePhasePVP>();
-        btnSkillText.text = "Charge:" + battlePhase.partnerData.charge + "/" + battlePhase.partnerData.skillCD;
+		btnSkillText.text = battlePhase.partner.ChargeText;
     }
 	
 	// Update is called once per frame
 	void Update () {
-        btnSkillText.text = "Charge:" + battlePhase.partnerData.charge + "/" + battlePhase.partnerData.skillCD;
-        if (battlePhase.partnerData.charge>= battlePhase.partnerData.skillCD)
-        {
-            battlePhase.partnerData.charge = battlePhase.partnerData.skillCD;
-            btnSkillText.text = "Skill";
-        }
+		btnSkillText.text = battlePhase.partner.ChargeText;
 	}
 
     public void action_4_btnSkill()
     {
-        if (battlePhase.partnerData.charge < battlePhase.partnerData.skillCD)
-			battlePhase.partnerMovement = BattlePhasePVP.Movement.Charge;
-        if (battlePhase.partnerData.charge >= battlePhase.partnerData.skillCD)
+		if (battlePhase.partner.IsSkillReady) 
+		{
 			battlePhase.partnerMovement = BattlePhasePVP.Movement.Skill;
-        if (battlePhase.partnerData.charge == battlePhase.partnerData.skillCD)
-            messageBoxText.text = "Charge MAX!";
-        messageBoxText.text = "Confirm to Activate Charge.";
+			messageBoxText.text = "Confirm to Activate Skill.";
+		}
+		else
+		{
+			battlePhase.partnerMovement = BattlePhasePVP.Movement.Charge;
+			messageBoxText.text = "Confirm to Activate Charge.";
+		}
     }
 
     public void action_4_btnAttack()

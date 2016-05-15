@@ -1,172 +1,174 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class BattlePhase : MonoBehaviour {
 
     public GameObject Partner;
     public GameObject Enemy;
     public GameObject PartnerSkillEffect;
+    public GameObject EnemySkillEffect;//<---
+    public MonsterData enemy;
+	public MonsterData partner;
     public Text EnemyHP;
     public Text PartnerHP;
     public Text messageBoxText;
     public Text messageEnemyMove;
     public Text EnemyCrit;
     public Text PartnerCrit;
+	public enum Movement
+	{
+		Attack,
+		Defense,
+		Evade,
+		Charge,
+		Skill
+	}
 
-    public EnemyData enemyData;
-    public PartnerData partnerData;
+	public Movement partnerMovement = Movement.Attack;
+	public Movement enemyMovement = Movement.Attack;
 
-    private string _yourNextMove = "Attack";
-    public string yourNextMove
-    {
-        get
-        {
-            return _yourNextMove;
-        }
-        set
-        {
-            _yourNextMove = value;
-        }
-    }
-
-    private int evadeNumber;//to present rate of evasiveness when Partner's atk lands
-    private int enemyDefendActivated = 0;
-    private int enemyEvadeActivated = 0;
-    private int enemyAttackActivated = 0;
-    private int enemyCritActivated = 0;
-    private int enemysRandomMove;//temp
-
-    private int yourEvadeNumber;//to present rate of evasiveness when Enemy's atk lands
-    private int partnerDefendActivated = 0;
-    private int partnerEvadeActivated = 0;
-    private int partnerCritActivated = 0;
-
-	// Use this for initialization
 	void Start () {
+		//Debug only
+		Dictionary<string, string> skillParam = new Dictionary<string, string> ();
+		skillParam.Add ("damage", "15");
+		skillParam.Add ("recover", "15");
+		skillParam.Add ("attIncrease", "5");
+		skillParam.Add ("burn", "0");
+		JSONObject skillll = new JSONObject (skillParam);
         //set status from scripts
-        enemyData = Object.Instantiate(Enemy.GetComponent<EnemyData>());
-        partnerData = Object.Instantiate(Partner.GetComponent<PartnerData>());
-        EnemyHP.text = "Enemy HP:" + enemyData.stamina;
-        PartnerHP.text = "Partner HP:" + partnerData.stamina;
+		enemy = new MonsterData();
+		enemy.Start();
+		enemy.SkillParams = skillll;
+		partner = new MonsterData();
+		partner.Start ();
+		partner.SkillParams = skillll;
+
+        EnemyHP.text = "Enemy HP:" + enemy.stamina;
+        PartnerHP.text = "Partner HP:" + partner.stamina;
 	}
 	
-	// Update is called once per frame
-	void Update ()//Show and hide critical hit hint
+	void Update ()//Update UI
     {
-        if (enemyCritActivated == 1){
-            EnemyCrit.text = "Next hit Critical";
-        }
-        else
-        {
-            EnemyCrit.text = "";
-        }
-        if (partnerCritActivated == 1){
-            PartnerCrit.text = "Next hit Critical";
-        }
-        else
-        {
-            PartnerCrit.text = "";
-        }
-        EnemyHP.text = "Enemy HP:" + enemyData.stamina;
-        PartnerHP.text = "Partner HP:" + partnerData.stamina;
+		if (enemy.NextCritical){
+			EnemyCrit.text = "Next hit Critical";
+		}
+		else
+		{
+			EnemyCrit.text = "";
+		}
+		if (partner.NextCritical){
+			PartnerCrit.text = "Next hit Critical";
+		}
+		else
+		{
+			PartnerCrit.text = "";
+		}
+		EnemyHP.text = "Enemy HP:" + enemy.stamina;
+		PartnerHP.text = "Partner HP:" + partner.stamina;
 	}
 
     public void enterBattlePhase()//Press Confirm button to enter battle phase
     {
-        //enemy won't charge or launch its skill at this point.
-        enemysRandomMove = Random.Range(0, 3);
+        //Enemy Movement
+        int enemysRandomMove = Random.Range(0, 3);
         switch (enemysRandomMove)
         {
-            case 0:
-                enemyDefendActivated = 1;
-                messageEnemyMove.text = "The enemy tried to defend your attack.";
+			case 0:
+				enemyMovement = Movement.Attack;
+                messageEnemyMove.text = "The enemy attacked!";
+                //yourEvadeNumber = Random.Range(0, 100);
+                /* See Enemy's attack below */
                 break;
             case 1:
-                enemyEvadeActivated = 1;
-                messageEnemyMove.text = "The enemy tried to evade your attack.";
+				enemyMovement = Movement.Defense;
+                messageEnemyMove.text = "The enemy tried to defend your attack.";
                 break;
             case 2:
-                enemyAttackActivated = 1;//see Enemy's attack below
-                messageEnemyMove.text = "The enemy attacked!";
-                yourEvadeNumber = Random.Range(0, 100);
+				enemyMovement = Movement.Evade;
+                messageEnemyMove.text = "The enemy tried to evade your attack.";
                 break;
-            //case 3:
-            //    enemyChargeActivated = 1;
-            //    break;
+            case 3:
+				if(enemy.IsSkillReady)
+					enemy.Skill (ref partner);
+				else
+					enemy.charge++;
+                break;
         }
 
-        //you can't charge or launch skill at this point.
-        switch (_yourNextMove)
+        //Partner Movement
+		switch (partnerMovement)
         {
-            case "Attack":
-                evadeNumber = Random.Range(0, 100);
-                Debug.Log(evadeNumber);
-                //迴避的話迴避加倍
-                if (enemyData.evade * (1 + enemyEvadeActivated) < evadeNumber)//update messageBox text
+			case Movement.Attack:
+                int evadeNumber = Random.Range(0, 100);
+				int evade = enemy.evade * (enemyMovement == Movement.Evade ? 2 : 1);
+				int defense = enemy.defense * (enemyMovement == Movement.Defense ? 2 : 1);
+				int attack = partner.attack * (partner.NextCritical ? 2 : 1);
+                if (evade < evadeNumber)//update messageBox text
                 {
-                    int damage = partnerData.attack * (1 + partnerCritActivated) - enemyData.defense * (1 + enemyDefendActivated);
-                    enemyData.stamina = enemyData.stamina - damage;
+					int damage = attack - defense;
+                    enemy.stamina -= damage;
                     messageBoxText.text = "Attack hit and dealt " + damage + " damage.";
-                    //Enemy HP update
-                    EnemyHP.text = "Enemy HP:" + enemyData.stamina;
                 }
                 else
                 {
                     messageBoxText.text = "The Enemy evaded your attack...";
-                    if (enemyEvadeActivated == 1)
-                        enemyCritActivated = 1;
+					if (enemyMovement == Movement.Evade)
+						enemy.NextCritical = true;
                 }
-                partnerCritActivated = 0;
+				partner.NextCritical = false;
                 break;
-            case "Defend":
-                partnerDefendActivated = 1;
+			case Movement.Defense:
+				if (enemyMovement != Movement.Attack)
+                {
+					partner.DropDefense ();
+					Debug.Log ("Parter的防禦降到" + partner.defense + "了!");
+                }
                 break;
-            case "Evade":
-                partnerEvadeActivated = 1;
+			case Movement.Evade:
+				partnerMovement = Movement.Evade;
                 break;
-            case "Charge":
-                partnerData.charge++;
+			case Movement.Charge:
+                partner.charge++;
                 break;
-            case "Skill":
-                partnerData.charge = 0;
-                PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
-                Partner.GetComponent<PartnerData>().Skill();//SOMETHING IS WRONG
-                Debug.Log("hey! over here.");
+			case Movement.Skill:
+                //partnerData.charge = 0;
+                //PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
+                //Partner.GetComponent<PartnerData>().Skill();
+				partner.Skill(ref enemy);
                 break;
         }
+		partner.Burn ();
         
-        //Enemy's attack 為方便移到這邊分開寫
-        if (enemyAttackActivated == 1)
+        /* Enemy's attack */
+		if (enemyMovement == Movement.Attack)
         {
-            if (partnerData.evade * (1 + partnerEvadeActivated) < yourEvadeNumber)
-            {
-                int damage = enemyData.attack * (1 + enemyCritActivated) - partnerData.defense * (1 + partnerDefendActivated);
-                partnerData.stamina = partnerData.stamina - damage;
-                messageBoxText.text = "You took " + damage + " damage";
-                PartnerHP.text = "Partner HP:" + partnerData.stamina;
-                if (partnerDefendActivated == 1)
-                {
-                    partnerData.charge++;//Defend success --> Skill boost
-                    
-                }
-            }
+			int yourEvadeNumber = Random.Range(0, 100);
+			int evade = partner.evade * (partnerMovement == Movement.Evade ? 2 : 1);
+			int defense = partner.defense * (partnerMovement == Movement.Defense ? 2 : 1);
+			int enemyAtt = enemy.attack * (enemy.NextCritical ? 2 : 1);
+			if (evade < yourEvadeNumber)
+			{
+				int damage = enemyAtt - defense;
+				partner.TakeDamage (damage);
+				messageBoxText.text = "You took " + damage + " damage";
+				if (partnerMovement == Movement.Defense)
+				{
+					//Defend success --> Skill boost
+					partner.charge++;
+					partner.RecoverDefense();
+				}
+			}
             else
             {
                 //Attack dodged
                 messageBoxText.text = "You dodged the enemy's attack.";
-                if (partnerEvadeActivated == 1)
-                    partnerCritActivated = 1;
+				if (partnerMovement == Movement.Evade)
+					partner.NextCritical = true;
             }
-            enemyCritActivated = 0;
+			enemy.NextCritical = false;
         }
-        
-        //set back variables
-        partnerDefendActivated = 0;
-        partnerEvadeActivated = 0;
-
-        enemyDefendActivated = 0;
-        enemyEvadeActivated = 0;
-        enemyAttackActivated = 0;
+		enemy.Burn ();
     }
 }

@@ -53,7 +53,13 @@ module.exports = function(passport) {
           skill: {
             ID: 1,
             CD: 3,
-            params: undefined //技能還有待設計
+            SkillDesc: "Drain 15 Hp from Enemy and boost 5 attack",
+            params: {
+              damage: 15,
+              recover: 15,
+              burn: 3,
+              attIncrease: 5
+            }
           }
         };
         // save the user

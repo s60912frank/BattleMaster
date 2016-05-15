@@ -17,7 +17,13 @@ var userSchema = mongoose.Schema({
     skill: {
       ID: Number,
       CD: Number,
-      params: Array
+      SkillDesc: String,
+      params: {
+        damage: Number,
+        recover: Number,
+        burn: Number,
+        attIncrease: Number
+      }
     }
   }
 });

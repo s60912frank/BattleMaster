@@ -3,7 +3,7 @@ module.exports = function(app, passport, battle) {
     //跟AI打
     app.post('/battle', isLoggedIn, function(req, res) {
       //收到怪物類型，伺服器回傳怪物資訊，在client上打
-      res.send("ok");
+      res.send("ok"); 
     });
 
     //跟玩家打
@@ -14,7 +14,7 @@ module.exports = function(app, passport, battle) {
         res.send("OK");
       });
     });
-    
+
     //登出
     app.get('/logout', function(req, res) {
         req.logout();

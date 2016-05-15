@@ -3,56 +3,54 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class Click : MonoBehaviour {
-    public GameObject Partner;
-    public GameObject BattleManager;
-    public BattlePhase battlePhase;
-    public Text btnSkillText;
-    public Text messageBoxText;
-    private int chargeMax;
-    private int charge;
+	public GameObject Partner;
+	public GameObject BattleManager;
+	public BattlePhase battlePhase;
+	public Text btnSkillText;
+	public Text messageBoxText;
+	private int chargeMax;
+	private int charge;
 	// Use this for initialization
 	void Start ()
-    {
-        battlePhase = BattleManager.GetComponent<BattlePhase>();
-        btnSkillText.text = "Charge:" + battlePhase.partnerData.charge + "/" + battlePhase.partnerData.skillCD;
-    }
-	
-	// Update is called once per frame
-	void Update () {
-        btnSkillText.text = "Charge:" + battlePhase.partnerData.charge + "/" + battlePhase.partnerData.skillCD;
-        if (battlePhase.partnerData.charge>= battlePhase.partnerData.skillCD)
-        {
-            battlePhase.partnerData.charge = battlePhase.partnerData.skillCD;
-            btnSkillText.text = "Skill";
-        }
+	{
+		battlePhase = BattleManager.GetComponent<BattlePhase>();
+		btnSkillText.text = battlePhase.partner.ChargeText;
 	}
 
-    public void action_4_btnSkill()
-    {
-        if (battlePhase.partnerData.charge < battlePhase.partnerData.skillCD)
-            battlePhase.yourNextMove = "Charge";
-        if (battlePhase.partnerData.charge >= battlePhase.partnerData.skillCD)
-            battlePhase.yourNextMove = "Skill";
-        if (battlePhase.partnerData.charge == battlePhase.partnerData.skillCD)
-            messageBoxText.text = "Charge MAX!";
-        messageBoxText.text = "Confirm to Activate Charge.";
-    }
+	// Update is called once per frame
+	void Update () {
+		btnSkillText.text = battlePhase.partner.ChargeText;
+	}
 
-    public void action_4_btnAttack()
-    {
-        battlePhase.yourNextMove = "Attack";
-        messageBoxText.text = "Confirm to Activate Attack.";
-    }
+	public void action_4_btnSkill()
+	{
+		if (battlePhase.partner.IsSkillReady) 
+		{
+			battlePhase.partnerMovement = BattlePhase.Movement.Skill;
+			messageBoxText.text = "Confirm to Activate Skill.";
+		}
+		else
+		{
+			battlePhase.partnerMovement = BattlePhase.Movement.Charge;
+			messageBoxText.text = "Confirm to Activate Charge.";
+		}
+	}
 
-    public void action_4_btnDefend()
-    {
-        battlePhase.yourNextMove = "Defend";
-        messageBoxText.text = "Confirm to Activate Defend.";
-    }
+	public void action_4_btnAttack()
+	{
+		battlePhase.partnerMovement = BattlePhase.Movement.Attack;
+		messageBoxText.text = "Confirm to Activate Attack.";
+	}
 
-    public void action_4_btnEvade()
-    {
-        battlePhase.yourNextMove = "Evade";
-        messageBoxText.text = "Confirm to Activate Evade.";
-    }
+	public void action_4_btnDefend()
+	{
+		battlePhase.partnerMovement = BattlePhase.Movement.Defense;
+		messageBoxText.text = "Confirm to Activate Defend.";
+	}
+
+	public void action_4_btnEvade()
+	{
+		battlePhase.partnerMovement = BattlePhase.Movement.Evade;
+		messageBoxText.text = "Confirm to Activate Evade.";
+	}
 }
