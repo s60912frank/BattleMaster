@@ -3,9 +3,8 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class Click : MonoBehaviour {
-	public GameObject Partner;
 	public GameObject BattleManager;
-	public BattlePhase battlePhase;
+	private BattlePhase battlePhase;
 	public Text btnSkillText;
 	public Text messageBoxText;
 	private int chargeMax;

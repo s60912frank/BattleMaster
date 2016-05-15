@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 // define the schema for our enemy model
 var enemySchema = mongoose.Schema({
   name: String,
+  level: Number,
   stamina: Number,
   attack: Number,
   defense: Number,
@@ -11,7 +12,13 @@ var enemySchema = mongoose.Schema({
   skill: {
     ID: Number,
     CD: Number,
-    params: Array
+    SkillDesc: String,
+    params: {
+      damage: Number,
+      recover: Number,
+      burn: Number,
+      attIncrease: Number
+    }
   }
 });
 

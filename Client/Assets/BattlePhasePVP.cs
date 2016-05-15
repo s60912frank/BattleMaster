@@ -24,6 +24,8 @@ public class BattlePhasePVP : MonoBehaviour {
     private SocketIOComponent socket;
     private Dictionary<string, string> attackResult;
 
+	private List<Button> buttons; //把按鈕存在這控制enable/disable
+
 	public enum Movement
 	{
 		Attack,
@@ -55,7 +57,12 @@ public class BattlePhasePVP : MonoBehaviour {
         socket.On("attackStart", OnAttackStart);
         socket.On("enemyMovementResult", OnEnemyMoveMentResult);
         socket.On("enemyData", OnReceiveEnemyData);
-        socket.On("enemyLeave", OnEnemyLeave);
+		socket.On("enemyLeave", OnEnemyLeave);
+		buttons = new List<Button> ();
+		foreach (GameObject btn in GameObject.FindGameObjectsWithTag("MovementBtn")) 
+		{
+			buttons.Add(btn.GetComponent<Button>());
+		}
         socket.Emit("battleSceneReady"); //告訴server我準備好了
 	}
 
@@ -112,6 +119,7 @@ public class BattlePhasePVP : MonoBehaviour {
 
     public void enterBattlePhase()//Press Confirm button to enter battle phase
 	{
+		SetBtnsEnable (false);
         //傳送自己的動作
         Dictionary<string, string> movement = new Dictionary<string, string>();
 		movement.Add("movement", ((int)partnerMovement).ToString());
@@ -188,19 +196,21 @@ public class BattlePhasePVP : MonoBehaviour {
 		if (partnerMovement == Movement.Skill)
         {
 			partner.Skill (ref enemy);
+			PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry> ().activated = true;
         }
 		if (enemyMovement == Movement.Skill)
 		{
 			enemy.Skill (ref partner);
+			EnemySkillEffect.GetComponent<PartnerSkillEffectEntry> ().activated = true;
 		}
 		attackResult["skillRemainingCD"] = partner.RemainingCD.ToString();
 		if(partner.BurnDamage > 0)
+		{
 			attackResult["isOnFire"] = "true";
+			Debug.Log ("我正在燃燒!");
+		}
         socket.Emit("result", new JSONObject(attackResult));
         Debug.Log("Partner Take " + attackResult["damage"] + " damage!");
-
-		if(partner.BurnDamage > 0)
-			Debug.Log ("我正在燃燒!");
 		partner.Burn ();
 
         //clear value
@@ -237,8 +247,8 @@ public class BattlePhasePVP : MonoBehaviour {
 			Debug.Log ("敵人正在燃燒!");
 			enemy.Burn ();
 		}
-
 		Debug.Log ("ENEMY剩" + int.Parse (GetString(data, "skillRemainingCD")) + "CD就可以使用技能");
+		SetBtnsEnable (true);
     }
 
     private void OnEnemyLeave(SocketIOEvent e)
@@ -258,5 +268,13 @@ public class BattlePhasePVP : MonoBehaviour {
 	private string GetString(JSONObject data, string property)
 	{
 		return data[property].ToString().Replace("\"", "");
+	}
+
+	private void SetBtnsEnable(bool state)
+	{
+		foreach (Button btn in buttons) 
+		{
+			btn.interactable = state;
+		}
 	}
 }

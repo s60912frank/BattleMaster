@@ -3,13 +3,14 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class ClickPVP : MonoBehaviour {
-    public GameObject Partner;
     public GameObject BattleManager;
-    public BattlePhasePVP battlePhase;
+    private BattlePhasePVP battlePhase;
     public Text btnSkillText;
     public Text messageBoxText;
     private int chargeMax;
     private int charge;
+
+	private Button[] buttons;
 	// Use this for initialization
 	void Start ()
     {

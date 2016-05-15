@@ -29,6 +29,8 @@ public class BattlePhase : MonoBehaviour {
 	public Movement partnerMovement = Movement.Attack;
 	public Movement enemyMovement = Movement.Attack;
 
+	private List<Button> buttons; //把按鈕存在這控制enable/disable
+
 	void Start () {
 		//Debug only
 		Dictionary<string, string> skillParam = new Dictionary<string, string> ();
@@ -45,8 +47,11 @@ public class BattlePhase : MonoBehaviour {
 		partner.Start ();
 		partner.SkillParams = skillll;
 
-        EnemyHP.text = "Enemy HP:" + enemy.stamina;
-        PartnerHP.text = "Partner HP:" + partner.stamina;
+		buttons = new List<Button> ();
+		foreach (GameObject btn in GameObject.FindGameObjectsWithTag("MovementBtn")) 
+		{
+			buttons.Add(btn.GetComponent<Button>());
+		}
 	}
 	
 	void Update ()//Update UI
@@ -71,6 +76,7 @@ public class BattlePhase : MonoBehaviour {
 
     public void enterBattlePhase()//Press Confirm button to enter battle phase
     {
+		SetBtnsEnable (false);
         //Enemy Movement
         int enemysRandomMove = Random.Range(0, 3);
         switch (enemysRandomMove)
@@ -89,9 +95,12 @@ public class BattlePhase : MonoBehaviour {
 				enemyMovement = Movement.Evade;
                 messageEnemyMove.text = "The enemy tried to evade your attack.";
                 break;
-            case 3:
-				if(enemy.IsSkillReady)
+			case 3:
+				if (enemy.IsSkillReady) 
+				{
 					enemy.Skill (ref partner);
+					EnemySkillEffect.GetComponent<PartnerSkillEffectEntry> ().activated = true;
+				}
 				else
 					enemy.charge++;
                 break;
@@ -132,11 +141,12 @@ public class BattlePhase : MonoBehaviour {
 			case Movement.Charge:
                 partner.charge++;
                 break;
-			case Movement.Skill:
+		case Movement.Skill:
                 //partnerData.charge = 0;
                 //PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
                 //Partner.GetComponent<PartnerData>().Skill();
-				partner.Skill(ref enemy);
+				partner.Skill (ref enemy);
+				PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry> ().activated = true;
                 break;
         }
 		partner.Burn ();
@@ -170,5 +180,14 @@ public class BattlePhase : MonoBehaviour {
 			enemy.NextCritical = false;
         }
 		enemy.Burn ();
+		SetBtnsEnable (true);
     }
+
+	private void SetBtnsEnable(bool state)
+	{
+		foreach (Button btn in buttons) 
+		{
+			btn.interactable = state;
+		}
+	}
 }
