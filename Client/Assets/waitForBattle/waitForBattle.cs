@@ -40,7 +40,7 @@ public class waitForBattle : MonoBehaviour {
 
     public void PlayWithAIClicked()
     {
-        SceneManager.LoadScene("Battle"); //自己玩
+        SceneManager.LoadScene("Battle2"); //自己玩
     }
 
     public void SearchEnemy()

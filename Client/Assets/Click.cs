@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class Click : MonoBehaviour {
@@ -51,5 +52,10 @@ public class Click : MonoBehaviour {
 	{
 		battlePhase.partnerMovement = BattlePhase.Movement.Evade;
 		messageBoxText.text = "Confirm to Activate Evade.";
+	}
+
+	public void LeaveBattleClicked()
+	{
+		SceneManager.LoadScene("waitForBattle");
 	}
 }

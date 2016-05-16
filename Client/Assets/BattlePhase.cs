@@ -17,6 +17,9 @@ public class BattlePhase : MonoBehaviour {
     public Text messageEnemyMove;
     public Text EnemyCrit;
     public Text PartnerCrit;
+	public GameObject VictoryPanel;
+	public GameObject DefeatPanel;
+
 	public enum Movement
 	{
 		Attack,
@@ -32,12 +35,14 @@ public class BattlePhase : MonoBehaviour {
 	private List<Button> buttons; //把按鈕存在這控制enable/disable
 
 	void Start () {
+		VictoryPanel.SetActive (false);
+		DefeatPanel.SetActive (false);
 		//Debug only
 		Dictionary<string, string> skillParam = new Dictionary<string, string> ();
 		skillParam.Add ("damage", "15");
 		skillParam.Add ("recover", "15");
 		skillParam.Add ("attIncrease", "5");
-		skillParam.Add ("burn", "0");
+		skillParam.Add ("burn", "3");
 		JSONObject skillll = new JSONObject (skillParam);
         //set status from scripts
 		enemy = new MonsterData();
@@ -181,6 +186,7 @@ public class BattlePhase : MonoBehaviour {
         }
 		enemy.Burn ();
 		SetBtnsEnable (true);
+		CheckIfGameOver ();
     }
 
 	private void SetBtnsEnable(bool state)
@@ -188,6 +194,24 @@ public class BattlePhase : MonoBehaviour {
 		foreach (Button btn in buttons) 
 		{
 			btn.interactable = state;
+		}
+	}
+
+	private void CheckIfGameOver()
+	{
+		if (partner.stamina <= 0 && enemy.stamina <= 0) {
+			VictoryPanel.SetActive (true);//其實應該要是平手
+		} 
+		else 
+		{
+			if (enemy.stamina <= 0) 
+			{
+				VictoryPanel.SetActive (true);
+			} 
+			else if(partner.stamina <= 0)
+			{
+				DefeatPanel.SetActive (true);
+			}
 		}
 	}
 }

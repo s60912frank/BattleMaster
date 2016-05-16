@@ -17,6 +17,8 @@ public class BattlePhasePVP : MonoBehaviour {
     public Text messageEnemyMove;
     public Text EnemyCrit;
     public Text PartnerCrit;
+	public GameObject VictoryPanel;
+	public GameObject DefeatPanel;
 
 	public MonsterData enemy;
 	public MonsterData partner;
@@ -40,6 +42,8 @@ public class BattlePhasePVP : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		VictoryPanel.SetActive (false);
+		DefeatPanel.SetActive (false);
         attackResult = new Dictionary<string, string>();
         attackResult.Add("nextCritical", "false");
         attackResult.Add("damage", "0");
@@ -249,6 +253,7 @@ public class BattlePhasePVP : MonoBehaviour {
 		}
 		Debug.Log ("ENEMY剩" + int.Parse (GetString(data, "skillRemainingCD")) + "CD就可以使用技能");
 		SetBtnsEnable (true);
+		CheckIfGameOver ();
     }
 
     private void OnEnemyLeave(SocketIOEvent e)
@@ -257,7 +262,8 @@ public class BattlePhasePVP : MonoBehaviour {
         messageEnemyMove.text = "The Enemy leave the battle...";
         socket.Close();
 		Destroy (GameObject.Find ("SocketIO"));
-		SceneManager.LoadScene("waitForBattle"); 
+		//SceneManager.LoadScene("waitForBattle");
+		VictoryPanel.SetActive(true);
     }
 
     private void OnApplicaionQuit()
@@ -275,6 +281,31 @@ public class BattlePhasePVP : MonoBehaviour {
 		foreach (Button btn in buttons) 
 		{
 			btn.interactable = state;
+		}
+	}
+
+	private void CheckIfGameOver()
+	{
+		if (partner.stamina <= 0 && enemy.stamina <= 0) 
+		{
+			VictoryPanel.SetActive (true);//其實應該要是平手
+			socket.Close();
+			Destroy (GameObject.Find ("SocketIO"));
+		} 
+		else 
+		{
+			if (enemy.stamina <= 0) 
+			{
+				VictoryPanel.SetActive (true);
+				socket.Close();
+				Destroy (GameObject.Find ("SocketIO"));
+			} 
+			else if(partner.stamina <= 0)
+			{
+				DefeatPanel.SetActive (true);
+				socket.Close();
+				Destroy (GameObject.Find ("SocketIO"));
+			}
 		}
 	}
 }

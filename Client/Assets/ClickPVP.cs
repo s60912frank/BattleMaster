@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class ClickPVP : MonoBehaviour {
@@ -54,4 +55,9 @@ public class ClickPVP : MonoBehaviour {
 		battlePhase.partnerMovement = BattlePhasePVP.Movement.Evade;
         messageBoxText.text = "Confirm to Activate Evade.";
     }
+
+	public void LeaveBattleClicked()
+	{
+		SceneManager.LoadScene("waitForBattle");
+	}
 }

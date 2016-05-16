@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class MonsterEntry : MonoBehaviour {
@@ -8,11 +9,13 @@ public class MonsterEntry : MonoBehaviour {
         ToRight
     }
     public Direction dir = Direction.ToLeft;
-    public float speed = 0.2f;
-    public float distance = 50;
+    private float speed;
+    private float distance;
     private Vector3 finalPos;
 	// Use this for initialization
 	void Start () {
+		distance = Screen.width * 0.5f + 150;
+		speed = distance / 60;
         finalPos = transform.position;
         if (dir == Direction.ToLeft)
             transform.position += distance * Vector3.right;
