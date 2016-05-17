@@ -37,20 +37,12 @@ public class BattlePhase : MonoBehaviour {
 	void Start () {
 		VictoryPanel.SetActive (false);
 		DefeatPanel.SetActive (false);
-		//Debug only
-		Dictionary<string, string> skillParam = new Dictionary<string, string> ();
-		skillParam.Add ("damage", "15");
-		skillParam.Add ("recover", "15");
-		skillParam.Add ("attIncrease", "5");
-		skillParam.Add ("burn", "3");
-		JSONObject skillll = new JSONObject (skillParam);
         //set status from scripts
 		enemy = new MonsterData();
-		enemy.Start();
-		enemy.SkillParams = skillll;
+        enemy.Initialize(new JSONObject(PlayerPrefs.GetString("enemyAI")));
 		partner = new MonsterData();
-		partner.Start ();
-		partner.SkillParams = skillll;
+        JSONObject user = new JSONObject(PlayerPrefs.GetString("userData"));
+        partner.Initialize(user["pet"]);
 
 		buttons = new List<Button> ();
 		foreach (GameObject btn in GameObject.FindGameObjectsWithTag("MovementBtn")) 

@@ -168,7 +168,7 @@ public class MonsterData{
 
 	public void Initialize(JSONObject data)
 	{
-		Debug.Log("PartnerData:" + data.ToString());
+		Debug.Log("Data:" + data.ToString());
 		_stamina = int.Parse(GetString(data, "stamina"));
 		Debug.Log ("WHEEEEEEE:" + data["stamina"].ToString());
 		_attack = int.Parse(GetString(data, "attack"));

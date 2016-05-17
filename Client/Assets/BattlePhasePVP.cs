@@ -212,6 +212,10 @@ public class BattlePhasePVP : MonoBehaviour {
 		{
 			attackResult["isOnFire"] = "true";
 			Debug.Log ("我正在燃燒!");
+            Color whee = Color.white;
+            whee.a = 200;
+            Partner.GetComponentInChildren<Image>().color = whee;
+            Debug.Log("6666666666:" + Partner.GetComponentInChildren<Image>().color);
 		}
         socket.Emit("result", new JSONObject(attackResult));
         Debug.Log("Partner Take " + attackResult["damage"] + " damage!");

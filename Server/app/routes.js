@@ -1,9 +1,13 @@
 var User = require('./models/user'); //資料庫USER的shema
+var Enemy = require('./models/enemy'); //資料庫USER的shema
 module.exports = function(app, passport, battle) {
     //跟AI打
     app.post('/battle', isLoggedIn, function(req, res) {
       //收到怪物類型，伺服器回傳怪物資訊，在client上打
-      res.send("ok"); 
+      Enemy.findOne({'name': "Trash"}, function(err, enemy) {
+        //傳送怪物喔
+        res.send(enemy);
+      });
     });
 
     //跟玩家打
