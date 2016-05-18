@@ -1,1 +1,2 @@
 #BattleMaster
+注意~!雖然gitignore搞定了可能會不相容編譯過的檔案，但是好像也會弄掉一些設定，clone後請將platform切換到android，螢幕寬高9:16
