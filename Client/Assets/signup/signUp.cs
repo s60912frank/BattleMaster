@@ -26,7 +26,7 @@ public class signUp : MonoBehaviour {
         {
             WWWForm form = new WWWForm();
             form.AddField("token", SystemInfo.deviceUniqueIdentifier);//用deviceID註冊
-			//form.AddField("token", "dljfndjgnjdnklndkjndkjndkjnfdjknd");
+			//form.AddField("token", "DebugThree");
             form.AddField("name", name);
             WWW w = new WWW(SERVER_URL + "/signup", form);
             StartCoroutine(WaitForSubmit(w));

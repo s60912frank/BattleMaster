@@ -91,10 +91,9 @@ public class PVPRooms : MonoBehaviour {
 		//在列表中加入按鈕
 	{
 		GameObject btn = GameObject.Instantiate (originalBtn);
-		btn.GetComponentInChildren<Text> ().text = room ["name"].ToString ();
+		btn.GetComponentInChildren<Text> ().text = room ["name"].ToString().Replace("\"", "");
 		btn.name = room ["Id"].ToString();
 		btn.GetComponent<Button> ().onClick.AddListener (delegate {
-			//do something
 			selectedRoomId = btn.name;
 			confirmPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
 		});

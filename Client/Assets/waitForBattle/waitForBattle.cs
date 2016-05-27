@@ -15,7 +15,7 @@ public class waitForBattle : MonoBehaviour {
 	void Start () {
         userData = new JSONObject(PlayerPrefs.GetString("userData")); //讀取userData
         statusText = statusObject.GetComponent<Text>();
-        statusText.text = "歡迎," + userData["name"].ToString() + "!";
+		statusText.text = "歡迎," + userData["name"].ToString().Replace("\"", "") + "!";
 	}
 
     private void OnWaiting(SocketIOEvent e)
@@ -65,5 +65,10 @@ public class waitForBattle : MonoBehaviour {
             PlayerPrefs.SetString("enemyAI", w.text);
             SceneManager.LoadScene("Battle2");
         }
+    }
+
+    public void GoToMap()
+    {
+        SceneManager.LoadScene("map");//移到地圖
     }
 }
