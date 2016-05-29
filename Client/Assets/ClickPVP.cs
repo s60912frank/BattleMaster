@@ -58,6 +58,6 @@ public class ClickPVP : MonoBehaviour {
 
 	public void LeaveBattleClicked()
 	{
-		SceneManager.LoadScene("waitForBattle");
+		SceneManager.LoadScene("Status");
 	}
 }

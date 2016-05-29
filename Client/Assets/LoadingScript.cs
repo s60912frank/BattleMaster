@@ -5,8 +5,9 @@ using System.Collections;
 public class LoadingScript : MonoBehaviour {
     private RectTransform rt;
 	// Use this for initialization
-	void Start () {
+	public void Start () {
         rt = gameObject.GetComponent<RectTransform>();
+        Debug.Log("HELLOWWWW");
         rt.anchoredPosition = new Vector2(2000, 0);
 	}
 	

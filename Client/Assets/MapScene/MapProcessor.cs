@@ -15,14 +15,13 @@ public class MapProcessor : MonoBehaviour {
     private List<MapTile> mapTiles; //儲存現在畫面上的mapTiles
     private int mapTileIndex = 0;
     private bool mapTileLock = true; //一次只畫一張地圖塊
-    private GameObject loadingPanel;
+    public GameObject loadingPanel;
 	// Use this for initialization
 	void Start () {
 		Debug.Log (Application.persistentDataPath);
         mapTiles = new List<MapTile>();
         //loading Start
-        //loadingPanel = Resources.Load("LoadingPanel") as GameObject;
-        loadingPanel = GameObject.Find("LoadingPanel");
+        loadingPanel.GetComponent<LoadingScript>().Start();
         loadingPanel.GetComponent<LoadingScript>().StartLoading();
         StartCoroutine(GPS());
 	}

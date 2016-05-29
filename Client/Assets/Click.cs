@@ -56,6 +56,6 @@ public class Click : MonoBehaviour {
 
 	public void LeaveBattleClicked()
 	{
-		SceneManager.LoadScene("waitForBattle");
+		SceneManager.LoadScene("Status");
 	}
 }

@@ -44,6 +44,10 @@ public class BattlePhasePVP : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         //開始loading畫面
+        //LoadingPanel = Resources.Load("LoadingPanel") as GameObject;
+        //LoadingPanel.GetComponent<RectTransform>().SetParent(GameObject.Find("Canvas").transform);
+        //LoadingPanel.transform.parent = GameObject.Find("Canvas").transform;
+        LoadingPanel.GetComponent<LoadingScript>().Start();
         LoadingPanel.GetComponent<LoadingScript>().StartLoading();
 		VictoryPanel.SetActive (false);
 		DefeatPanel.SetActive (false);
