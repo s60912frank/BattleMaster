@@ -140,6 +140,6 @@ public class PVPRooms : MonoBehaviour {
 	public void LeaveList()
 	{
 		socket.Close ();
-		SceneManager.LoadScene("waitForBattle");
+		SceneManager.LoadScene("Status");
 	}
 }

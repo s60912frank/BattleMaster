@@ -71,7 +71,7 @@ public class entry : MonoBehaviour {
                 break;
             case "login":
                 if (Input.GetMouseButtonDown(0))
-                    SceneManager.LoadScene("WaitForBattle");
+                    SceneManager.LoadScene("Status");
                 entryText.GetComponentInChildren<Text>().text = "點擊螢幕進入遊戲";
                 break;
             case "signup":

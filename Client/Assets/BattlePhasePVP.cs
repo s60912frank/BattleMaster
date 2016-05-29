@@ -19,8 +19,9 @@ public class BattlePhasePVP : MonoBehaviour {
     public Text PartnerCrit;
 	public GameObject VictoryPanel;
 	public GameObject DefeatPanel;
+    public GameObject LoadingPanel;
 
-	public MonsterData enemy;
+    public MonsterData enemy;
 	public MonsterData partner;
 
     private SocketIOComponent socket;
@@ -42,6 +43,8 @@ public class BattlePhasePVP : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+        //開始loading畫面
+        LoadingPanel.GetComponent<LoadingScript>().StartLoading();
 		VictoryPanel.SetActive (false);
 		DefeatPanel.SetActive (false);
         attackResult = new Dictionary<string, string>();
@@ -78,6 +81,8 @@ public class BattlePhasePVP : MonoBehaviour {
         Debug.Log("EnemyData:" + data.ToString());
 		enemy.Initialize (data);
 		attackResult["skillRemainingCD"] = data["skill"]["CD"].ToString();
+        //結束讀取畫面
+        LoadingPanel.GetComponent<LoadingScript>().EndLoading();
     }
 
     private void SetInitinalData()
