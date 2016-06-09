@@ -13,8 +13,6 @@ public class PVPRooms : MonoBehaviour {
 	private GameObject grid;
 	public GameObject confirmPanel;
 	public GameObject createRoomPanel;
-	//private const string SERVER_URL = "http://127.0.0.1:8080";
-	private const string SERVER_URL = "http://server-gmin.rhcloud.com";
 	private JSONObject userData;
 	private string selectedRoomId;
 	// Use this for initialization
@@ -22,41 +20,17 @@ public class PVPRooms : MonoBehaviour {
 		originalBtn = Resources.Load("RoomListButton") as GameObject;
 		grid = GameObject.Find ("Grid");
 		socket = socketIOObject.GetComponent<SocketIOComponent> ();
-		//socket.Connect ();
-		userData = new JSONObject(PlayerPrefs.GetString("userData")); //讀取userDat
+		userData = new JSONObject(PlayerPrefs.GetString("userData")); //讀取userData
 		socket.On ("roomList", OnGetRoomList);
 		socket.On ("roomAdded", OnRoomAdded);
 		socket.On ("roomRemoved", OnRoomRemoved);
 		socket.On ("battleStart", OnBattleStart);
-		socket.Connect();
-		StartCoroutine(WaitForBattle());
-	}
-
-	private IEnumerator WaitForBattle()
-	{
-		//yield return new WaitForSeconds (5);
-		socket.Connect(); //加入等待前先連socket
-		while (socket.sid == null)
-		{
-			yield return null; // wait until sid != null
-		}
-		Debug.Log("CONNECT!" + socket.sid);
-		WWWForm form = new WWWForm();
-		Dictionary<string, string> headers = new Dictionary<string, string>();
-		headers.Add("Cookie", userData["cookie"].ToString().Replace("\"", "")); //加入認證過的cookie就不用重新登入了
-		form.AddField("sid", "/#" + socket.sid); //加入連上的sid
-		WWW w = new WWW(SERVER_URL + "/waitforbattle", form.data, headers);
-		yield return w;
-		//就只是看有沒有錯誤而已
-		if (!string.IsNullOrEmpty(w.error))
-		{
-			Debug.Log(w.error);
-		}
-		else
-		{
-			Debug.Log(w.text);
-		}
-	}
+        string rawSid = userData["cookie"].ToString().Replace("\"", "");
+        //附上登入過後server給我們的餅乾再連線
+        socket.socket.SetCookie(new WebSocketSharp.Net.Cookie("connect.sid", rawSid.Replace("connect.sid=", "")));
+        //連線!!只要有登入過就會連線成功
+        socket.Connect();
+    }
 
 	private void OnGetRoomList(SocketIOEvent e)
 	{

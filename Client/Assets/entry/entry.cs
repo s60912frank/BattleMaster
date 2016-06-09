@@ -54,7 +54,8 @@ public class entry : MonoBehaviour {
             string[] data = w.responseHeaders["SET-COOKIE"].Split(";"[0]); //取出登入後的cookie就不用一直登入了
             if (data.Length > 0)
             {
-                response.AddField("cookie", data[0]); 
+                response.AddField("cookie", data[0]);
+                Debug.Log(data[0]);
             }
             //進入可戰鬥畫面
             Debug.Log("登入成功");

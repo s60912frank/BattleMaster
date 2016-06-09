@@ -6,6 +6,8 @@
   "main": "server.js",
   "dependencies" : {
     "express" : "latest",
+    "connect-mongo" : "latest",
+    "passport.socketio" : "latest",
     "mongoose" : "latest",
     "passport" : "latest",
     "passport-local" : "latest",

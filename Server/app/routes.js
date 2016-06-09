@@ -1,6 +1,6 @@
 var User = require('./models/user'); //資料庫USER的shema
 var Enemy = require('./models/enemy'); //資料庫USER的shema
-module.exports = function(app, passport, battle) {
+module.exports = function(app, passport) {
     //跟AI打
     app.post('/battle', isLoggedIn, function(req, res) {
       //收到怪物類型，伺服器回傳怪物資訊，在client上打
@@ -10,13 +10,9 @@ module.exports = function(app, passport, battle) {
       });
     });
 
-    //跟玩家打
-    app.post('/waitforbattle', isLoggedIn, function(req, res) {
-      User.findOne({'token': req.user.token}, function(err, user) {
-        //找到此USER後丟到等待列，由伺服器主持戰鬥
-        battle.addToWaitingQueue(user, req.body.sid);
-        res.send("OK");
-      });
+    app.get('/whee', isLoggedIn, function(req, res){
+      console.log("WHEEE");
+      res.end();
     });
 
     //登出

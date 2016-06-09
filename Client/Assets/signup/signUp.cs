@@ -56,7 +56,7 @@ public class signUp : MonoBehaviour {
             //進入可戰鬥畫面
             Debug.Log("註冊成功");
             PlayerPrefs.SetString("userData", response.ToString()); //存user資料
-            SceneManager.LoadScene("WaitForBattle");
+            SceneManager.LoadScene("Status");
         }
     }
 }
