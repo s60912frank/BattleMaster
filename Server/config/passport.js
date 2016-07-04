@@ -4,6 +4,10 @@ var LocalStrategy = require('passport-local').Strategy;
 // load up the user model
 var User = require('../app/models/user');
 
+//跟FB驗證需要的
+var request = require('request');
+var auth = require('./auth.js')
+
 // expose this function to our app using module.exports
 module.exports = function(passport) {
 
@@ -44,30 +48,55 @@ module.exports = function(passport) {
         newUser.name = name;
         newUser.token = token;
         newUser.provider = "local";
-        newUser.pet = { //這是目前的初始數值
-          "name": name,
-          stamina: 50,
-          attack: 12,
-          defense: 2,
-          evade: 30,
-          skill: {
-            ID: 1,
-            CD: 3,
-            SkillDesc: "Drain 15 Hp from Enemy and boost 5 attack",
-            params: {
-              damage: 15,
-              recover: 15,
-              burn: 3,
-              attIncrease: 5
-            }
-          }
-        };
+        newUser.pet = petDefault(name);
         // save the user
         newUser.save(function(err) {
           if (err)
             throw err;
           console.log(newUser.name + "created!");
           return done(null, newUser);
+        });
+      }
+    });
+  }));
+
+  //facebook註冊
+  passport.use('facebook-signup', new LocalStrategy({
+    usernameField: 'name', //使用者輸入的暱稱
+    passwordField: 'token' //使用者表示的fb token 等一下需要驗證
+  },function (name, token, done) {
+    //搜尋這個使用者是否在資料庫內
+    User.findOne({ 'token': token }, function(err, user) {
+      // if there are any errors, return the error
+      if (err){
+        return done(err);
+      }
+      if (user) {
+        //有就直接登入吧
+        return done(null, false, "You already have an account!");
+      }
+      else {
+        //跟FB確認這個token是對的
+        request('https://graph.facebook.com/app?access_token=' + token, function (error, response, body) {
+          var data = JSON.parse(body);
+          if (!error && response.statusCode == 200 && data.id == auth.facebookAuth.clientID) {
+            var newUser = new User();
+            newUser.name = name;
+            newUser.token = token;
+            newUser.provider = "facebook";
+            newUser.pet = petDefault(name);
+            // save the user
+            newUser.save(function(err) {
+              if (err)
+                throw err;
+              console.log(newUser.name + "created!(Facebook)");
+              return done(null, newUser);
+            });
+          }
+          else{
+            console.log(fbid + "FB註冊失敗!");
+            return done(null, false, "Signup failed!");
+          }
         });
       }
     });
@@ -101,3 +130,24 @@ module.exports = function(passport) {
 
     }));
 };
+
+var petDefault = function(name){
+  return { //這是目前的初始數值
+    "name": name,
+    stamina: 50,
+    attack: 12,
+    defense: 2,
+    evade: 30,
+    skill: {
+      ID: 1,
+      CD: 3,
+      SkillDesc: "Drain 15 Hp from Enemy and boost 5 attack",
+      params: {
+        damage: 15,
+        recover: 15,
+        burn: 3,
+        attIncrease: 5
+      }
+    }
+  };
+}

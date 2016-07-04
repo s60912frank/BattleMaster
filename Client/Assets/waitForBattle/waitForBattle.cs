@@ -8,8 +8,6 @@ using SocketIO;
 public class waitForBattle : MonoBehaviour {
     public GameObject statusObject;
     private Text statusText;
-    //private const string SERVER_URL = "http://127.0.0.1:8080";
-    private const string SERVER_URL = "http://server-gmin.rhcloud.com";
     private JSONObject userData;
 	// Use this for initialization
 	void Start () {
@@ -41,7 +39,7 @@ public class waitForBattle : MonoBehaviour {
         Dictionary<string, string> headers = new Dictionary<string, string>();
         headers.Add("Cookie", userData["cookie"].ToString().Replace("\"", "")); //加入認證過的cookie就不用重新登入了
         form.AddField("whe", "wheee");
-        WWW w = new WWW(SERVER_URL + "/battle", form.data, headers);
+        WWW w = new WWW(Constant.SERVER_URL + "/battle", form.data, headers);
         yield return w;
         //就只是看有沒有錯誤而已
         if (!string.IsNullOrEmpty(w.error))

@@ -16,7 +16,8 @@
     "cookie-parser": "latest",
     "method-override": "latest",
     "express-session": "latest",
-    "socket.io": "latest"
+    "socket.io": "latest",
+    "request": "latest"
   },
   "scripts": {
     "start": "node server.js"

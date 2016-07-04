@@ -17,9 +17,11 @@ public class PVPRooms : MonoBehaviour {
 	private string selectedRoomId;
 	// Use this for initialization
 	void Start () {
-		originalBtn = Resources.Load("RoomListButton") as GameObject;
+        socket = socketIOObject.AddComponent<SocketIOComponent>();
+        originalBtn = Resources.Load("RoomListButton") as GameObject;
 		grid = GameObject.Find ("Grid");
-		socket = socketIOObject.GetComponent<SocketIOComponent> ();
+        //yield return new WaitForSeconds(0.5f);
+        //socket.socket.Url = Constant.SOCKET_URL;
 		userData = new JSONObject(PlayerPrefs.GetString("userData")); //讀取userData
 		socket.On ("roomList", OnGetRoomList);
 		socket.On ("roomAdded", OnRoomAdded);
