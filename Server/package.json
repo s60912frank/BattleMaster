@@ -17,7 +17,8 @@
     "method-override": "latest",
     "express-session": "latest",
     "socket.io": "latest",
-    "request": "latest"
+    "request": "latest",
+    "shortid": "latest"
   },
   "scripts": {
     "start": "node server.js"

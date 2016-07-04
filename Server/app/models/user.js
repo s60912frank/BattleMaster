@@ -1,8 +1,14 @@
 // load the things we need
 var mongoose = require('mongoose');
+//for shorter id
+var shortid = require('shortid');
 
 // define the schema for our user model
 var userSchema = mongoose.Schema({
+  _id: {
+    type: String,
+    'default': shortid.generate
+  },
   provider: String,
   token: String,
   name: String,
