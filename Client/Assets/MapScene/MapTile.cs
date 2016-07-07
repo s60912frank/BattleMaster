@@ -126,6 +126,28 @@ public class MapTile
         mapObjs.Add(new MapObj(type, vecs));
     }
 
+    public Vector2[] CoordTransform(List<Vector2> raw)
+    {
+        Vector2[] transformed = new Vector2[raw.Count];
+        for (int i = 0; i < raw.Count; i++)
+        {
+            Vector2 temp = raw[i];
+            temp.x = (temp.x - MapProcessor.lonOrigin) * times;
+            temp.y = (temp.y - MapProcessor.latOrigin) * times;
+            UpdateBound(temp);
+            transformed[i] = temp;
+        }
+        return transformed;
+    }
+
+    public void SetPlane()
+    {
+        plane.name = xTile + "/" + yTile;
+        plane.transform.localScale = new Vector3(mapBoundary.Width / 10, 1, mapBoundary.Height / 10);
+        plane.transform.position = new Vector3((longtitude - MapProcessor.lonOrigin) * times + 0.5f * mapBoundary.Width, (latitude - MapProcessor.latOrigin) * times - 0.5f * mapBoundary.Height, 0);
+        plane.GetComponent<Renderer>().material = Resources.Load<Material>("plane");
+    }
+
     public void Normalize()
         //經緯度轉遊戲座標,並且計算範圍
     {
@@ -141,6 +163,7 @@ public class MapTile
                 mo.verticies[i] = temp;
             }
         }
+        plane.name = xTile + "/" + yTile;
         plane.transform.localScale = new Vector3(mapBoundary.Width / 10, 1, mapBoundary.Height / 10);
         plane.transform.position = new Vector3((longtitude - MapProcessor.lonOrigin) * times + 0.5f * mapBoundary.Width, (latitude - MapProcessor.latOrigin) * times - 0.5f * mapBoundary.Height, 0);
         plane.GetComponent<Renderer>().material = Resources.Load<Material>("plane");

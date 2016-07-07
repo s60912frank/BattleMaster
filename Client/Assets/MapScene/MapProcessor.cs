@@ -141,21 +141,25 @@ public class MapProcessor : MonoBehaviour {
                     break;
             }
             //存入該mapTile的點List
-            mapTiles[mapTileIndex].AddMapObj(type, coords);
+            //mapTiles[mapTileIndex].AddMapObj(type, coords);
+            //不存了直接畫
+            StartCoroutine(DrawMapObj("Polygon", mapTiles[mapTileIndex].CoordTransform(coords)));
         }
 
         JSONObject roads = data["roads"]["features"]; //讀取資料中的"roads"節點下的"features"節點
         foreach (JSONObject obj in roads.list)
         {
-            List<Vector2> coords = new List<Vector2>();
+            //List<Vector2> coords = new List<Vector2>();
             string type = obj["geometry"]["type"].ToString().Replace("\"", "");
             switch (type)
             {
                 case "LineString":
+                    List<Vector2> coords = new List<Vector2>();
                     foreach (JSONObject co in obj["geometry"]["coordinates"].list) //lineString的座標陣列存在陣列中
                     {
                         coords.Add(new Vector2(float.Parse(co[0].ToString()), float.Parse(co[1].ToString()))); 
                     }
+                    StartCoroutine(DrawMapObj("LineString", mapTiles[mapTileIndex].CoordTransform(coords)));
                     break;
                 case "MultiLineString":
                     foreach (JSONObject co in obj["geometry"]["coordinates"].list) //multiLineString的座標陣列存在陣列中
@@ -166,7 +170,8 @@ public class MapProcessor : MonoBehaviour {
                             smallLine.Add(new Vector2(float.Parse(co2[0].ToString()), float.Parse(co2[1].ToString()))); 
                         }
                         //存入該mapTile的點List
-                        mapTiles[mapTileIndex].AddMapObj("LineString", smallLine);
+                        //mapTiles[mapTileIndex].AddMapObj("LineString", smallLine);
+                        StartCoroutine(DrawMapObj("LineString", mapTiles[mapTileIndex].CoordTransform(smallLine)));
                     }
                     break;
                 default:
@@ -174,21 +179,22 @@ public class MapProcessor : MonoBehaviour {
                     break;
             }
             //存入該mapTile的點List
-            mapTiles[mapTileIndex].AddMapObj("LineString", coords);
+            //mapTiles[mapTileIndex].AddMapObj("LineString", coords);
         }
 
         JSONObject boundaries = data["boundaries"]["features"]; //讀取資料中的"boundaries"節點下的"features"節點
         foreach (JSONObject obj in boundaries.list) //其實跟上面一樣
         {
-            List<Vector2> coords = new List<Vector2>();
             string type = obj["geometry"]["type"].ToString().Replace("\"", "");
             switch (type)
             {
                 case "LineString":
+                    List<Vector2> coords = new List<Vector2>();
                     foreach (JSONObject co in obj["geometry"]["coordinates"].list)
                     {
                         coords.Add(new Vector2(float.Parse(co[0].ToString()), float.Parse(co[1].ToString()))); 
                     }
+                    StartCoroutine(DrawMapObj("LineString", mapTiles[mapTileIndex].CoordTransform(coords)));
                     break;
                 case "MultiLineString":
                     foreach (JSONObject co in obj["geometry"]["coordinates"].list)
@@ -199,55 +205,19 @@ public class MapProcessor : MonoBehaviour {
                             smallLine.Add(new Vector2(float.Parse(co2[0].ToString()), float.Parse(co2[1].ToString()))); 
                         }
                         //存入該mapTile的點List
-                        mapTiles[mapTileIndex].AddMapObj("LineString", smallLine);
+                        //mapTiles[mapTileIndex].AddMapObj("LineString", smallLine);
+                        StartCoroutine(DrawMapObj("LineString", mapTiles[mapTileIndex].CoordTransform(smallLine)));
                     }
                     break;
                 default:
                     Debug.Log(type);
                     break;
             }
-            //存入該mapTile的點List
-            mapTiles[mapTileIndex].AddMapObj("LineString", coords);
         }
-
-        //轉換成遊戲世界座標and取得這地圖塊的大小
-        mapTiles[mapTileIndex].Normalize();
-        //畫地圖
-        //foreach (MapTile mapTile in mapTiles)
-        //{
-        foreach (MapTile.MapObj mo in mapTiles[mapTiles.Count - 1].mapObjs)
-        {
-            StartCoroutine(DrawMapObj(mo.type, mo.verticies.ToArray()));
-        }
-        //}
-        //StartCoroutine(DrawMapBatch(mapTiles[mapTiles.Count - 1].mapObjs));
-        //畫完解除鎖定
+        mapTiles[mapTileIndex].SetPlane();
         mapTileLock = false;
         loadingPanel.GetComponent<LoadingScript>().EndLoading();
         Debug.Log("Done drawing map.");
-    }
-
-    private IEnumerator DrawMapBatch(List<MapTile.MapObj> mapObjs)
-    {
-        const int PARTS = 10;
-        int objCount = mapObjs.Count;
-        Debug.Log("COUNT:" + objCount);
-        int oneTodraw = objCount / PARTS;
-        DrawMapObj(mapObjs[0].type, mapObjs[0].verticies.ToArray());
-        for (int i = 1; i <= PARTS + 1; i++)
-        {
-            //yield return new WaitForSeconds(0.1f);
-            yield return true;
-            int fromm = (objCount / PARTS) * (i - 1) + 1;
-            int to = (objCount / PARTS) * i;
-            if (to > objCount)
-                to = objCount;
-            for (int j = fromm;j < to; j++)
-            {
-                Debug.Log(mapObjs[j].type);
-                DrawMapObj(mapObjs[j].type, mapObjs[j].verticies.ToArray());
-            }
-        }
     }
 
     private IEnumerator DrawMapObj(string type, Vector2[] vertices2D) //畫地圖物件
@@ -286,6 +256,7 @@ public class MapProcessor : MonoBehaviour {
             case "LineString":
                 //Test
                 //HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+                /*Debug.Log(vertices.Length);
                 Vector2[] newVecs = new Vector2[vertices.Length * 2];
                 for (int i = 0; i < vertices.Length; i++)
                 {
@@ -311,10 +282,10 @@ public class MapProcessor : MonoBehaviour {
                 MeshRenderer msgr2 = obj.AddComponent<MeshRenderer>();
                 msgr2.material = Resources.Load("building") as Material;
                 MeshFilter filter2 = obj.AddComponent<MeshFilter>() as MeshFilter;
-                filter2.mesh = msh2;
+                filter2.mesh = msh2;*/
 
 
-                /*LineRenderer line = obj.AddComponent<LineRenderer>();
+                LineRenderer line = obj.AddComponent<LineRenderer>();
                 //set the number of points to the line
                 line.SetVertexCount(vertices.Length);
                 Debug.Log("WHEEE?" + vertices.Length);
@@ -327,7 +298,7 @@ public class MapProcessor : MonoBehaviour {
                 line.material = Resources.Load("road") as Material;
                 //line.transform.parent = this.gameObject.transform;
                 line.useWorldSpace = false;
-                obj.SetActive(true);*/
+                obj.SetActive(true);
                 break;
         }
         //yield return false;
