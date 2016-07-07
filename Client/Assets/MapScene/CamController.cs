@@ -10,7 +10,7 @@ public class CamController : MonoBehaviour {
 	void Start () {
         trans = gameObject.transform;
         map = GameObject.Find("Map"); //存map主體等一下會用到
-        
+        StartCoroutine(LessFreqRaycast());
     }
 	
 	// Update is called once per frame
@@ -31,40 +31,6 @@ public class CamController : MonoBehaviour {
         else if (Input.GetKey(KeyCode.RightArrow))
         {
             trans.Translate(Vector3.right * 0.5f);
-        }
-
-        //從cam射ray,檢查cam是否離開了地圖塊,是就畫地圖
-        RaycastHit hit;
-        if (Physics.Raycast(gameObject.transform.position, Vector3.forward, out hit))
-        {
-            nowHit = hit.transform.position; //紀錄最後射到的地圖塊
-        }
-        else
-        {
-            Vector2 diff = new Vector2(trans.position.x - nowHit.x, trans.position.y - nowHit.y).normalized;
-            float angle = Vector2.Angle(Vector2.right, diff);
-            if (angle < 45)
-            {
-                map.BroadcastMessage("GetNewTile", new int[] { 1, 0 }); //跟正x軸夾角<45就是右方一格的地圖
-            }
-            else if (angle >= 45 && angle <= 135)
-            {
-                if (diff.y > 0)
-                {
-                    //Debug.Log("上");
-                    map.BroadcastMessage("GetNewTile", new int[] { 0, 1 });//跟正x軸夾角45~135且y>0就是上方一格的地圖
-                }
-                else
-                {
-                    //Debug.Log("下");
-                    map.BroadcastMessage("GetNewTile", new int[] { 0, -1 });//跟正x軸夾角45~135且y<0就是下方一格的地圖
-                }
-            }
-            else if (angle > 135)
-            {
-                //Debug.Log("左");
-                map.BroadcastMessage("GetNewTile", new int[] { -1, 0 });//跟正x軸夾角135~180就是左方一格的地圖
-            }
         }
 
         //滑鼠滾輪縮放
@@ -113,15 +79,17 @@ public class CamController : MonoBehaviour {
         }
 
         //起始y=-10,-5時可視面積1/4所以zoom+1,-20時可視面積4倍所以zoom-1
-        if (trans.position.z > -5)
+        if (trans.position.z > -3f)
         {
             Debug.Log("太大啦!");
-            RequestNewZoomMap(1);
+            //RequestNewZoomMap(1);
+            trans.position = new Vector3(trans.position.x, trans.position.y, -3);
         }
         if (trans.position.z < -20)
         {
             Debug.Log("太小啦!");
-            RequestNewZoomMap(-1);     
+            //RequestNewZoomMap(-1);     
+            trans.position = new Vector3(trans.position.x, trans.position.y, -20);
         }
 	}
 
@@ -137,5 +105,38 @@ public class CamController : MonoBehaviour {
         trans.position = new Vector3(trans.position.x, trans.position.y, -10);
         //request
         map.BroadcastMessage("GetNewZoomTile", new object[] { new Vector2(trans.position.x, trans.position.y), diff });
+    }
+
+    private IEnumerator LessFreqRaycast()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(0.3f); //每300ms就raycast一次
+            Debug.Log("HELLO");
+            Ray left = Camera.main.ViewportPointToRay(new Vector3(0, 0.5f, 0));
+            Ray right = Camera.main.ViewportPointToRay(new Vector3(1, 0.5f, 0));
+            Ray top = Camera.main.ViewportPointToRay(new Vector3(0.5f, 1, 0));
+            Ray down = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0, 0));
+            if (!Physics.Raycast(left))
+            {
+                map.BroadcastMessage("GetNewTile", new int[] { -1, 0 });
+                Debug.Log("LEFT!");
+            }
+            if (!Physics.Raycast(right))
+            {
+                map.BroadcastMessage("GetNewTile", new int[] { 1, 0 });
+                Debug.Log("RIGHT!");
+            }
+            if (!Physics.Raycast(top))
+            {
+                map.BroadcastMessage("GetNewTile", new int[] { 0, 1 });
+                Debug.Log("TOP!");
+            }
+            if (!Physics.Raycast(down))
+            {
+                map.BroadcastMessage("GetNewTile", new int[] { 0, -1 });
+                Debug.Log("Down!");
+            }
+        }
     }
 }

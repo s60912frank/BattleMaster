@@ -213,21 +213,46 @@ public class MapProcessor : MonoBehaviour {
         //轉換成遊戲世界座標and取得這地圖塊的大小
         mapTiles[mapTileIndex].Normalize();
         //畫地圖
-        foreach (MapTile mapTile in mapTiles)
+        //foreach (MapTile mapTile in mapTiles)
+        //{
+        foreach (MapTile.MapObj mo in mapTiles[mapTiles.Count - 1].mapObjs)
         {
-            foreach (MapTile.MapObj mo in mapTile.mapObjs)
-            {
-                StartCoroutine(DrawMapObj(mo.type, mo.verticies.ToArray()));
-            }
+            StartCoroutine(DrawMapObj(mo.type, mo.verticies.ToArray()));
         }
+        //}
+        //StartCoroutine(DrawMapBatch(mapTiles[mapTiles.Count - 1].mapObjs));
         //畫完解除鎖定
         mapTileLock = false;
         loadingPanel.GetComponent<LoadingScript>().EndLoading();
         Debug.Log("Done drawing map.");
     }
 
+    private IEnumerator DrawMapBatch(List<MapTile.MapObj> mapObjs)
+    {
+        const int PARTS = 10;
+        int objCount = mapObjs.Count;
+        Debug.Log("COUNT:" + objCount);
+        int oneTodraw = objCount / PARTS;
+        DrawMapObj(mapObjs[0].type, mapObjs[0].verticies.ToArray());
+        for (int i = 1; i <= PARTS + 1; i++)
+        {
+            //yield return new WaitForSeconds(0.1f);
+            yield return true;
+            int fromm = (objCount / PARTS) * (i - 1) + 1;
+            int to = (objCount / PARTS) * i;
+            if (to > objCount)
+                to = objCount;
+            for (int j = fromm;j < to; j++)
+            {
+                Debug.Log(mapObjs[j].type);
+                DrawMapObj(mapObjs[j].type, mapObjs[j].verticies.ToArray());
+            }
+        }
+    }
+
     private IEnumerator DrawMapObj(string type, Vector2[] vertices2D) //畫地圖物件
     {
+        //yield return new WaitForEndOfFrame();
         yield return false;
         GameObject obj = new GameObject(); //創個新物體
         obj.tag = "MapObj"; //方便清掉
@@ -259,9 +284,40 @@ public class MapProcessor : MonoBehaviour {
                 //還是不知怎畫
                 break;
             case "LineString":
-                LineRenderer line = obj.AddComponent<LineRenderer>();
+                //Test
+                //HEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+                Vector2[] newVecs = new Vector2[vertices.Length * 2];
+                for (int i = 0; i < vertices.Length; i++)
+                {
+                    //line.SetPosition(i, vertices[i]);
+                    newVecs[2 * i] = new Vector2(vertices[i].x + 0.1f, vertices[i].y + 0.1f);
+                    newVecs[2 * i + 1] = new Vector2(vertices[i].x, vertices[i].y);
+                }
+                Vector3[] newVec3 = new Vector3[newVecs.Length];
+                for (int i = 0; i < newVecs.Length; i++)
+                {
+                    newVec3[i] = newVecs[i];
+                }
+                Triangulator tr2 = new Triangulator(newVecs);
+                int[] indices2 = tr2.Triangulate();
+                //Create the mesh
+                Mesh msh2 = new Mesh();
+                msh2.vertices = newVec3;
+                msh2.triangles = indices2;
+                msh2.RecalculateNormals();
+                msh2.RecalculateBounds();
+
+                // Set up game object with mesh;
+                MeshRenderer msgr2 = obj.AddComponent<MeshRenderer>();
+                msgr2.material = Resources.Load("building") as Material;
+                MeshFilter filter2 = obj.AddComponent<MeshFilter>() as MeshFilter;
+                filter2.mesh = msh2;
+
+
+                /*LineRenderer line = obj.AddComponent<LineRenderer>();
                 //set the number of points to the line
                 line.SetVertexCount(vertices.Length);
+                Debug.Log("WHEEE?" + vertices.Length);
                 for (int i = 0; i < vertices.Length; i++)
                 {
                     line.SetPosition(i, vertices[i]);
@@ -271,7 +327,7 @@ public class MapProcessor : MonoBehaviour {
                 line.material = Resources.Load("road") as Material;
                 //line.transform.parent = this.gameObject.transform;
                 line.useWorldSpace = false;
-                obj.SetActive(true);
+                obj.SetActive(true);*/
                 break;
         }
         //yield return false;
