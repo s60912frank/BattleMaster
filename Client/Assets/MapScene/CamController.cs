@@ -3,13 +3,14 @@ using System.Collections;
 
 public class CamController : MonoBehaviour {
     private Transform trans;
-    private GameObject map;
+    private MapProcessor mapProcessor;
     private Vector3 nowHit;
     private float panDiff;
+    private bool rayCasting = true;
 	// Use this for initialization
 	void Start () {
         trans = gameObject.transform;
-        map = GameObject.Find("Map"); //存map主體等一下會用到
+        mapProcessor = GameObject.Find("Map").GetComponent<MapProcessor>(); //存map主體等一下會用到
         StartCoroutine(LessFreqRaycast());
     }
 	
@@ -104,39 +105,83 @@ public class CamController : MonoBehaviour {
         //cam z變回-10
         trans.position = new Vector3(trans.position.x, trans.position.y, -10);
         //request
-        map.BroadcastMessage("GetNewZoomTile", new object[] { new Vector2(trans.position.x, trans.position.y), diff });
+        //map.BroadcastMessage("GetNewZoomTile", new object[] { new Vector2(trans.position.x, trans.position.y), diff });
     }
 
     private IEnumerator LessFreqRaycast()
     {
-        while (true)
+        while (rayCasting)
         {
             yield return new WaitForSeconds(0.3f); //每300ms就raycast一次
-            Debug.Log("HELLO");
+            //Debug.Log("HELLO");
             Ray left = Camera.main.ViewportPointToRay(new Vector3(0, 0.5f, 0));
             Ray right = Camera.main.ViewportPointToRay(new Vector3(1, 0.5f, 0));
             Ray top = Camera.main.ViewportPointToRay(new Vector3(0.5f, 1, 0));
             Ray down = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0, 0));
             if (!Physics.Raycast(left))
             {
-                map.BroadcastMessage("GetNewTile", new int[] { -1, 0 });
+
+                Vector3 wp = Camera.main.ViewportToWorldPoint(new Vector3(0, 0.5f, 0));
+                mapProcessor.GetNewTileByWordPos(wp.x, wp.y);
+                /*Ray center = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+                RaycastHit hit;
+                Physics.Raycast(center, out hit);
+                string[] tileNum = hit.transform.name.Split('/');
+                mapProcessor.GetNewTile(int.Parse(tileNum[0]) - 1, int.Parse(tileNum[1]));
+                Debug.Log(tileNum[0] + "/" + tileNum[1]);*/
                 Debug.Log("LEFT!");
             }
             if (!Physics.Raycast(right))
             {
-                map.BroadcastMessage("GetNewTile", new int[] { 1, 0 });
+                Vector3 wp = Camera.main.ViewportToWorldPoint(new Vector3(1, 0.5f, 0));
+                mapProcessor.GetNewTileByWordPos(wp.x, wp.y);
+                /*Ray center = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+                RaycastHit hit;
+                Physics.Raycast(center, out hit);
+                string[] tileNum = hit.transform.name.Split('/');
+                mapProcessor.GetNewTile(int.Parse(tileNum[0]) + 1, int.Parse(tileNum[1]));
+                Debug.Log(tileNum[0] + "/" + tileNum[1]);*/
                 Debug.Log("RIGHT!");
             }
             if (!Physics.Raycast(top))
             {
-                map.BroadcastMessage("GetNewTile", new int[] { 0, 1 });
+                Vector3 wp = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 1, 0));
+                mapProcessor.GetNewTileByWordPos(wp.x, wp.y);
+                /*Ray center = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+                RaycastHit hit;
+                Physics.Raycast(center, out hit);
+                string[] tileNum = hit.transform.name.Split('/');
+                mapProcessor.GetNewTile(int.Parse(tileNum[0]), int.Parse(tileNum[1]) - 1);
+                Debug.Log(tileNum[0] + "/" + tileNum[1]);*/
                 Debug.Log("TOP!");
             }
             if (!Physics.Raycast(down))
             {
-                map.BroadcastMessage("GetNewTile", new int[] { 0, -1 });
+                Vector3 wp = Camera.main.ViewportToWorldPoint(new Vector3(0.5f, 0, 0));
+                mapProcessor.GetNewTileByWordPos(wp.x, wp.y);
+                /*Ray center = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+                RaycastHit hit;
+                Physics.Raycast(center, out hit);
+                string[] tileNum = hit.transform.name.Split('/');
+                mapProcessor.GetNewTile(int.Parse(tileNum[0]), int.Parse(tileNum[1]) + 1);
+                Debug.Log(tileNum[0] + "/" + tileNum[1]);*/
                 Debug.Log("Down!");
             }
         }
     }
+
+    /*private int[] DetermineCurrentTile()
+    {
+        Ray center = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
+        RaycastHit hit;
+        if(Physics.Raycast(center, out hit))
+        {
+            string[] tileNum = hit.transform.name.Split('/');
+            return new int[] { int.Parse(tileNum[0]), int.Parse(tileNum[1]) };
+        }
+        else
+        {
+            return null;
+        }
+    }*/
 }

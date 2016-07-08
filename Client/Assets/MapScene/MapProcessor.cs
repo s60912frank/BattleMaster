@@ -13,9 +13,10 @@ public class MapProcessor : MonoBehaviour {
 	public static float lonOrigin = 121.5339142f;
     private int zoom = 14; //放大倍率，1~19
     private List<MapTile> mapTiles; //儲存現在畫面上的mapTiles
-    private int mapTileIndex = 0;
-    private bool mapTileLock = true; //一次只畫一張地圖塊
+    //private List<T>
+    private int mapTileIndex = -1;
     public GameObject loadingPanel;
+    //public Text gpsStatus;
 	// Use this for initialization
 	void Start () {
 		Debug.Log (Application.persistentDataPath);
@@ -23,69 +24,33 @@ public class MapProcessor : MonoBehaviour {
         //loading Start
         loadingPanel.GetComponent<LoadingScript>().Start();
         loadingPanel.GetComponent<LoadingScript>().StartLoading();
-        StartCoroutine(GPS());
 	}
 
-    public IEnumerator GPS()
+    public void requestMap(float lon,float lat)
     {
-        // First, check if user has location service enabled
-        if (!Input.location.isEnabledByUser)
+        mapTiles.Add(new MapTile(lon, lat, zoom));
+        mapTileIndex++;
+        int xTile2 = mapTiles[mapTileIndex].xTile;
+        int yTile2 = mapTiles[mapTileIndex].yTile;
+        if (File.Exists(Application.persistentDataPath + "/" + zoom.ToString() + "_" + xTile2.ToString() + "_" + yTile2.ToString() + ".json"))
         {
-            Debug.Log("GPS沒開");
-            mapTiles.Add(new MapTile(lonOrigin, latOrigin, zoom));
-            xTile = mapTiles[mapTileIndex].xTile; //起始地圖格
-            yTile = mapTiles[mapTileIndex].yTile;
-            requestMap(xTile, yTile); //要第一塊地圖格
-            mapTileLock = false;
-            //loading End
-            //loadingPanel.GetComponent<LoadingScript>().EndLoading();
-            yield break;
+            JsonProssor(File.ReadAllText(Application.persistentDataPath + "/" + zoom.ToString() + "_" + xTile2.ToString() + "_" + yTile2.ToString() + ".json"));
         }
-
-        // Start service before querying location
-        Input.location.Start();
-
-        // Wait until service initializes
-        int maxWait = 20;
-        while (Input.location.status == LocationServiceStatus.Initializing && maxWait > 0)
-        {
-            yield return new WaitForSeconds(1);
-            maxWait--;
-        }
-
-        // Service didn't initialize in 20 seconds
-        if (maxWait < 1)
-        {
-            Debug.Log("GPS逾時");
-            Input.location.Stop();
-            yield break;
-        }
-
-        // Connection has failed
-        if (Input.location.status == LocationServiceStatus.Failed)
-        {
-            Debug.Log("GPS錯誤");
-            Input.location.Stop();
-            yield break;
-        }
+        //沒的話跟伺服器要
         else
         {
-            Debug.Log("起始OK");
-            lonOrigin = Input.location.lastData.longitude;
-            latOrigin = Input.location.lastData.latitude;
-            mapTiles.Add(new MapTile(lonOrigin, latOrigin, zoom));
-            xTile = mapTiles[mapTileIndex].xTile; //起始地圖格
-            yTile = mapTiles[mapTileIndex].yTile;
-            requestMap(xTile, yTile); //要第一塊地圖格
-            mapTileLock = false;
-            //loading End
-            //loadingPanel.GetComponent<LoadingScript>().EndLoading();
+            url = "https://vector.mapzen.com/osm/" + MAP_TYPE + "/" + zoom + "/" + xTile2 + "/" + yTile2 + ".json?api_key=" + API_KEY;
+            Debug.Log(url);
+            WWW request = new WWW(url);
+            StartCoroutine(WaitForRequest(request));
         }
     }
 
     private void requestMap(int xtile, int ytile) //要地圖塊
     {
         loadingPanel.GetComponent<LoadingScript>().StartLoading();
+        mapTiles.Add(new MapTile(xTile, yTile, zoom));
+        mapTileIndex++;
         //如果之前有存過此地圖塊那就直接讀檔
         if (File.Exists(Application.persistentDataPath + "/" + zoom.ToString() + "_" + xTile.ToString() + "_" + yTile.ToString() + ".json"))
         {
@@ -215,7 +180,6 @@ public class MapProcessor : MonoBehaviour {
             }
         }
         mapTiles[mapTileIndex].SetPlane();
-        mapTileLock = false;
         loadingPanel.GetComponent<LoadingScript>().EndLoading();
         Debug.Log("Done drawing map.");
     }
@@ -288,7 +252,6 @@ public class MapProcessor : MonoBehaviour {
                 LineRenderer line = obj.AddComponent<LineRenderer>();
                 //set the number of points to the line
                 line.SetVertexCount(vertices.Length);
-                Debug.Log("WHEEE?" + vertices.Length);
                 for (int i = 0; i < vertices.Length; i++)
                 {
                     line.SetPosition(i, vertices[i]);
@@ -304,36 +267,57 @@ public class MapProcessor : MonoBehaviour {
         //yield return false;
     }
 
-    public void GetNewTile(int[] diff) //跟伺服器要新地圖塊
+    public void GetNewTileByWordPos(float x, float y)
     {
-        if (!mapTileLock) //沒被鎖才畫
+        //先除times再加原點
+        //2^14/10
+        const float times = 1638.4f;
+        float lon = x / times + lonOrigin;
+        float lat = y / times + latOrigin;
+        //經緯度轉地圖格
+        int xTile2 = (int)Mathf.Floor((lon + 180.0f) / 360.0f * (1 << zoom));
+        int yTile2 = (int)Mathf.Floor(((1.0f - Mathf.Log(Mathf.Tan(lat * Mathf.PI / 180.0f) + 1.0f / Mathf.Cos(lat * Mathf.PI / 180.0f)) / Mathf.PI) / 2.0f * (1 << zoom)));
+        GetNewTile(xTile2, yTile2);
+    }
+
+    public void GetNewTile(int xTile, int yTile) //跟伺服器要新地圖塊
+    {
+        bool found = false;
+        foreach(MapTile mt in mapTiles)
         {
-            mapTileLock = true; //鎖
-            xTile += diff[0]; //往右??格
-            yTile -= diff[1]; //往下??格
-            mapTiles.Add(new MapTile(xTile, yTile, zoom));
-            mapTileIndex++;
+            if(mt.xTile == xTile && mt.yTile == yTile && mt.zoom == zoom)
+            {
+                found = true;
+                break;
+            }
+        }
+        if (!found)
+        {
+            this.xTile = xTile; //往右??格
+            this.yTile = yTile; //往下??格
+            //mapTiles.Add(new MapTile(xTile, yTile, zoom));
+            //mapTileIndex++;
             requestMap(xTile, yTile); //沒重複的話就要
+        }
+        else
+        {
+            Debug.Log("拒絕!!!!!!!!");
         }
     }
 
     public void GetNewZoomTile(object[] objs) //要不同縮放層級的地圖
     {
-        if (!mapTileLock)
-        {
-            mapTiles.Clear();  //清掉array
-            mapTileIndex = 0; //index設為0
-            int zoomDiff = (int)(objs[1] as int?);//zoom+1 or -1
-            Vector2 camPos = (Vector2)(objs[0] as Vector2?);//cam的位置
-            zoom += zoomDiff;
-            float times = Mathf.Pow(2, zoom) / 10;
-            //將遊戲座標轉回經緯度
-            mapTiles.Add(new MapTile(camPos.x / times + lonOrigin, camPos.y / times + latOrigin, zoom));
-            mapTileLock = true; //鎖個
-            xTile = mapTiles[0].xTile;
-            yTile = mapTiles[0].yTile;
-            requestMap(mapTiles[0].xTile, mapTiles[0].yTile);
-            Debug.Log(mapTiles[0].xTile + "/" + mapTiles[0].yTile);
-        }
+        mapTiles.Clear();  //清掉array
+        mapTileIndex = 0; //index設為0
+        int zoomDiff = (int)(objs[1] as int?);//zoom+1 or -1
+        Vector2 camPos = (Vector2)(objs[0] as Vector2?);//cam的位置
+        zoom += zoomDiff;
+        float times = Mathf.Pow(2, zoom) / 10;
+        //將遊戲座標轉回經緯度
+        mapTiles.Add(new MapTile(camPos.x / times + lonOrigin, camPos.y / times + latOrigin, zoom));
+        xTile = mapTiles[0].xTile;
+        yTile = mapTiles[0].yTile;
+        requestMap(mapTiles[0].xTile, mapTiles[0].yTile);
+        Debug.Log(mapTiles[0].xTile + "/" + mapTiles[0].yTile);
     }
 }

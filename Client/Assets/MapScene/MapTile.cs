@@ -80,9 +80,6 @@ public class MapTile
         //其他初始化
     {
         this.mapObjs = new List<MapObj>();
-        plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
-        plane.transform.Rotate(Vector3.right, -90);
-        plane.tag = "MapObj";
         times = Mathf.Pow(2, zoom) / 10; //除10試試出來的@@;
         Vector2 worldCoord = new Vector2((longtitude - MapProcessor.lonOrigin) * times, (latitude - MapProcessor.latOrigin) * times);
         mapBoundary = new MapBoundary(worldCoord.y, worldCoord.y, worldCoord.x, worldCoord.x);
@@ -142,6 +139,10 @@ public class MapTile
 
     public void SetPlane()
     {
+        Debug.Log("SET PLANE!");
+        plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        plane.transform.Rotate(Vector3.right, -90);
+        plane.tag = "MapObj";
         plane.name = xTile + "/" + yTile;
         plane.transform.localScale = new Vector3(mapBoundary.Width / 10, 1, mapBoundary.Height / 10);
         plane.transform.position = new Vector3((longtitude - MapProcessor.lonOrigin) * times + 0.5f * mapBoundary.Width, (latitude - MapProcessor.latOrigin) * times - 0.5f * mapBoundary.Height, 0);
