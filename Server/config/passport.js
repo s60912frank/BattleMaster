@@ -1,5 +1,6 @@
 // load all the things we need
-var LocalStrategy = require('passport-local').Strategy;
+//var LocalStrategy = require('passport-local').Strategy;
+var CustomStrategy = require('passport-custom').Strategy;
 
 // load up the user model
 var User = require('../app/models/user');
@@ -9,7 +10,7 @@ var request = require('request');
 var auth = require('./auth.js')
 
 // expose this function to our app using module.exports
-module.exports = function(passport) {
+module.exports = (passport) => {
 
   // =========================================================================
   // passport session setup ==================================================
@@ -18,41 +19,29 @@ module.exports = function(passport) {
   // passport needs ability to serialize and unserialize users out of session
 
   // used to serialize the user for the session
-  passport.serializeUser(function(user, done) {
-    done(null, user.token);
-  });
+  passport.serializeUser((user, done) => done(null, user._id));
 
   // used to deserialize the user
-  passport.deserializeUser(function(token, done) {
-    User.findOne({'token': token}, function(err, user) {
-      done(err, user);
-    });
+  passport.deserializeUser((id, done) => {
+    User.findOne({'_id': id}, (err, user) => done(err, user));
   });
 
   //本地資料庫註冊
-  passport.use('local-signup', new LocalStrategy({
-    usernameField: 'name', //使用者輸入的暱稱
-    passwordField: 'token' //這個使用unity提供的deviceID
-  },function (name, token, done) {
+  passport.use('local-signup', new CustomStrategy((req, done) => {
     //搜尋這個使用者是否在資料庫內
-    User.findOne({ 'token': token }, function(err, user) {
+    User.findOne({ 'token': req.body.token }, (err, user) => {
       // if there are any errors, return the error
-      if (err){
-        return done(err);
-      }
-      if (user) {
-        return done(null, false, "You already have an account!");
-      }
+      if (err) return done(err);
+      if (user) return done(null, false, "You already have an account!");
       else {
         var newUser = new User();
-        newUser.name = name;
-        newUser.token = token;
+        newUser.name = req.body.name;
+        newUser.token = req.body.token;
         newUser.provider = "local";
-        newUser.pet = petDefault(name);
+        newUser.pet = petDefault(req.body.name);
         // save the user
-        newUser.save(function(err) {
-          if (err)
-            throw err;
+        newUser.save((err) => {
+          if (err) throw err;
           console.log(newUser.name + "created!");
           return done(null, newUser);
         });
@@ -61,34 +50,22 @@ module.exports = function(passport) {
   }));
 
   //facebook註冊
-  passport.use('facebook-signup', new LocalStrategy({
-    usernameField: 'name', //使用者輸入的暱稱
-    passwordField: 'token' //使用者表示的fb token 等一下需要驗證
-  },function (name, token, done) {
-    //搜尋這個使用者是否在資料庫內
-    User.findOne({ 'token': token }, function(err, user) {
-      // if there are any errors, return the error
-      if (err){
-        return done(err);
-      }
-      if (user) {
-        //有就直接登入吧
-        return done(null, false, "You already have an account!");
-      }
-      else {
-        //跟FB確認這個token是對的
-        request('https://graph.facebook.com/app?access_token=' + token, function (error, response, body) {
+  passport.use('facebook-signup', new CustomStrategy((req, done) => {
+    //需要三項資料:暱稱,fbid,token
+    User.findOne({ fbid: req.body.fbid }, (err, user) => {
+      if(!user){
+        request('https://graph.facebook.com/me?access_token=' + req.body.token, (error, response, body) => {
           var data = JSON.parse(body);
-          if (!error && response.statusCode == 200 && data.id == auth.facebookAuth.clientID) {
+          if (!error && response.statusCode == 200 && data.id == req.body.fbid) {
             var newUser = new User();
-            newUser.name = name;
-            newUser.token = token;
+            newUser.name = req.body.name;
+            newUser.fbid = req.body.fbid;
+            newUser.token = req.body.token;
             newUser.provider = "facebook";
-            newUser.pet = petDefault(name);
+            newUser.pet = petDefault(req.body.name);
             // save the user
-            newUser.save(function(err) {
-              if (err)
-                throw err;
+            newUser.save((err) => {
+              if (err) throw err;
               console.log(newUser.name + "created!(Facebook)");
               return done(null, newUser);
             });
@@ -99,24 +76,50 @@ module.exports = function(passport) {
           }
         });
       }
+      else{
+        return done(null, false, "Account already exists!");
+      }
     });
-  }));
+  }
+  ));
+
+  //facebook登入
+  passport.use('facebook-login', new CustomStrategy((req, done) => {
+      //需要兩項資料:fbid,token
+      User.findOne({ fbid: req.body.fbid }, (err, user) => {
+        if(user){
+          request('https://graph.facebook.com/me?access_token=' + req.body.token, (error, response, body) => {
+            var data = JSON.parse(body);
+            if (!error && response.statusCode == 200 && data.id == req.body.fbid) {
+              user.token = req.body.token;
+              // save the user
+              user.save((err) => {
+                if (err) throw err;
+                console.log(user.name + "Logged in!(Facebook)");
+                return done(null, user);
+              });
+            }
+            else{
+              console.log(fbid + "FB註冊失敗!");
+              return done(null, false, "Login failed!");
+            }
+          });
+        }
+        else{
+          return done(null, false, "User not found!");
+        }
+      });
+    }
+  ));
 
   //本地資料庫登入
-  passport.use('local-login', new LocalStrategy({
-      usernameField: 'name',
-      passwordField: 'token'
-    },
-    function(name, token, done) {
+  passport.use('local-login', new CustomStrategy((req, done) => {
       // asynchronous
-      process.nextTick(function() {
+      process.nextTick(() => {
         //同上搜尋資料庫
-        User.findOne({
-          'token': token
-        }, function(err, user) {
+        User.findOne({'token': req.body.token }, (err, user) => {
           // if there are any errors, return the error
-          if (err)
-            return done(err);
+          if (err) return done(err);
           // check to see if theres already a user with that email
           if (user) {
             console.log(user.name + " logged in!");
@@ -125,13 +128,11 @@ module.exports = function(passport) {
             return done(null, false, "Account not found");
           }
         });
-
       });
-
     }));
 };
 
-var petDefault = function(name){
+var petDefault = (name) => {
   return { //這是目前的初始數值
     "name": name,
     stamina: 50,

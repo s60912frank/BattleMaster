@@ -1,33 +1,30 @@
 var User = require('./models/user'); //資料庫USER的shema
 var Enemy = require('./models/enemy'); //資料庫USER的shema
-module.exports = function(app, passport) {
-  app.get('/isAlive', function(req, res) {
+module.exports = (app, passport) => {
+  app.get('/isAlive', (req, res) => {
     res.send("Yes!");
     res.end();
   });
     //跟AI打
-    app.post('/battle', isLoggedIn, function(req, res) {
+    app.post('/battle', isLoggedIn, (req, res) => {
       //收到怪物類型，伺服器回傳怪物資訊，在client上打
-      Enemy.findOne({'name': "Trash"}, function(err, enemy) {
-        //傳送怪物喔
-        res.send(enemy);
-      });
+      Enemy.findOne({'name': "Trash"}, (err, enemy) => res.send(enemy));
     });
 
-    app.get('/isLoggedIn', isLoggedIn, function(req, res){
+    app.get('/isLoggedIn', isLoggedIn, (req, res) => {
       console.log("WHEEE");
       res.send("Yes!");
       res.end();
     });
 
     //登出
-    app.get('/logout', function(req, res) {
+    app.get('/logout', (req, res) => {
         req.logout();
         res.send('你已經成功登出');
     });
 
-    //登入
-    app.post('/login', passport.authenticate('local-login') ,function(req, res){
+    //local登入
+    app.post('/login', passport.authenticate('local-login') ,(req, res) => {
         if(req.user){
           res.send(req.user); //登入成功
         }
@@ -37,8 +34,8 @@ module.exports = function(app, passport) {
         }
       });
 
-    //註冊
-    app.post('/signup', passport.authenticate('local-signup') ,function(req, res){
+    //local註冊
+    app.post('/signup', passport.authenticate('local-signup') ,(req, res) => {
         if(req.user){
           res.send(req.user); //註冊成功
         }
@@ -48,18 +45,22 @@ module.exports = function(app, passport) {
       });
 
     //facebook註冊
-    app.post('/signupFacebook', passport.authenticate('facebook-signup') ,function(req, res){
+    app.post('/signupFacebook', passport.authenticate('facebook-signup') ,(req, res) => {
       if(req.user){
         res.send(req.user); //註冊成功
       }
-      else{
-        res.send("Account already exists"); //你已經註冊過了!
+    });
+
+    //facebook登入
+    app.post('/loginFacebook', passport.authenticate('facebook-login') ,(req, res) => {
+      if(req.user){
+        res.send(req.user); //登入成功
       }
     });
 };
 
 // route middleware to make sure a user is logged in
-function isLoggedIn(req, res, next) {
+var isLoggedIn = (req, res, next) => {
   console.log(req.isAuthenticated());
     // if user is authenticated in the session, carry on
     if (req.isAuthenticated())

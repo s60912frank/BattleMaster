@@ -1,15 +1,15 @@
 var rooms = [];
 var roomCount = 0;
 
-module.exports = function(io){
+module.exports = (io) => {
 	this.ioInstance = io;
-	io.on('connection', function(socket){
+	io.on('connection', (socket) => {
 		console.log(socket.request.user.name + " connected to socket!");
 		socket.emit("roomList", {
 			"data": rooms
 		});
 
-		socket.on('createRoom', function(data){
+		socket.on('createRoom', (data) => {
 			console.log(rooms.length + "!!!");
 			roomCount++; //感覺會出問題w
 			var room = {
@@ -23,7 +23,7 @@ module.exports = function(io){
 			io.sockets.emit('roomAdded', room); //通知全體有房間建立了
 		});
 
-		socket.on('leaveRoom', function(data){
+		socket.on('leaveRoom', (data) => {
 			for(i = 0;i < rooms.length;i++){
 				if(rooms[i].user1 == socket.id){
 					console.log(socket.request.user.name + "離開了房間!");
@@ -34,7 +34,7 @@ module.exports = function(io){
 			}
 		});
 
-		socket.on('joinRoom', function(data){
+		socket.on('joinRoom', (data) => {
 			for(i = 0;i < rooms.length;i++){
 				if(rooms[i].Id == data.Id){
 					var userNumber = io.sockets.adapter.rooms['Room' + data.Id].length;
@@ -61,7 +61,7 @@ module.exports = function(io){
 			}
 		});
 
-		socket.on('disconnect', function(){ //client離線時觸發
+		socket.on('disconnect', () => { //client離線時觸發
 			console.log(socket.id + "disconnected!");
 			for(i = 0;i < rooms.length;i++){
 				if(rooms[i].user1 == socket.id){
@@ -75,7 +75,7 @@ module.exports = function(io){
 
 
 	//BATTLE!!!!!!!!!!///////////////////////////////////////////////////
-	var battle = function(roomName){
+	var battle = (roomName) => {
 	  io.to(roomName).emit("battleStart", {}); //告訴房間所有人戰鬥開始了
 		var room = io.sockets.adapter.rooms[roomName].sockets;
 		var clients = [];
@@ -88,12 +88,11 @@ module.exports = function(io){
 	  battlePhase(roomName, clients[1], clients[0]);
 	}
 
-	var battlePhase = function (roomName, you, enemy) {
-		you.on("battleSceneReady", function(data){ //等client準備好了就把敵人資料給他
-			you.emit("enemyData", enemy.request.user.pet);
-		});
+	var battlePhase = (roomName, you, enemy) => {
+		//等client準備好了就把敵人資料給他
+		you.on("battleSceneReady", (data) => you.emit("enemyData", enemy.request.user.pet));
 
-	  you.on("movement", function(data){ //當client選好動作時觸發
+	  you.on("movement", (data) => { //當client選好動作時觸發
 	    enemy.emit("enemyMovement", data); //把動作傳給敵人(使用者在這時看不到)
 			console.log(data.movement);
 	    you["ready"] = true; //把它設為準備好了
@@ -106,20 +105,17 @@ module.exports = function(io){
 	    }
 	  });
 
-	  you.on("result", function(data){ //clients計算自己受到的傷害並回傳
+	  you.on("result", (data) => { //clients計算自己受到的傷害並回傳
 	    enemy.emit("enemyMovementResult", data); //將自己受到的傷害傳給對方
 			console.log("DAMAGE:" + data.damage);
 	  });
 
-	  you.on("dead", function(data){ //告訴敵人啊我死了
+	  you.on("dead", (data) => { //告訴敵人啊我死了
 	    enemy.emit("enemyDead", {});
 	  });
 
-	  you.on("disconnect", function () { //我離線了
+	  you.on("disconnect", () => { //我離線了
 	      enemy.emit("enemyLeave", {}); //告訴對方我離線了
-	      //socket.enemy.leave(room.name); //把對方移出房間
-	      //delete room; //刪除房間
-	      //distroyRoom(room);
 	  });
 	}
 };

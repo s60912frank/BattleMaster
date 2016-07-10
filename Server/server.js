@@ -53,8 +53,6 @@ require('./app/battle')(io);
 require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
 
 // launch ======================================================================
-io.listen(app.listen(port,
-//ip_address,
-   function(){
-  console.log('The magic happens on port ' + port);
-}));
+//io.listen(app.listen(port, ip_address, () => console.log('The magic happens on port ' + port)));
+//debug用
+io.listen(app.listen(port, () => console.log('The magic happens on port ' + port)));

@@ -10,6 +10,7 @@ var userSchema = mongoose.Schema({
     'default': shortid.generate
   },
   provider: String,
+  fbid: String,
   token: String,
   name: String,
   abilityPoint: Number,

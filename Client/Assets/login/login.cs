@@ -10,6 +10,7 @@ public class login : MonoBehaviour {
     public GameObject NameInput;
     private string type;
     private string token;
+    private string fbid;
     // Use this for initialization
     void Start () {
         PlayerPrefs.SetString("userData", "");
@@ -72,6 +73,7 @@ public class login : MonoBehaviour {
                 Debug.Log("WHEEEE!!!!!" + result.AccessToken.TokenString);
                 //使用FB登入
                 type = "facebook";
+                fbid = result.AccessToken.UserId;
                 token = result.AccessToken.TokenString;
                 StartCoroutine(WaitForLogin());
             }
@@ -97,8 +99,17 @@ public class login : MonoBehaviour {
     {
         WWWForm form = new WWWForm();
         form.AddField("token", token); //用token登入，deviceID or FB
-        form.AddField("name", "n");
-        WWW w = new WWW(Constant.SERVER_URL + "/login", form);
+        string requestUrl = Constant.SERVER_URL;
+        if (type == "local")
+        {
+            requestUrl += "/login";
+        }
+        else if (type == "facebook")
+        {
+            requestUrl += "/loginFacebook";
+            form.AddField("fbid", fbid);
+        }
+        WWW w = new WWW(requestUrl, form);
         yield return w;
         if (string.IsNullOrEmpty(w.error))
         {
@@ -130,6 +141,7 @@ public class login : MonoBehaviour {
         }
         else if (type == "facebook")
         {
+            form2.AddField("fbid", fbid);
             requestUrl += "/signupFacebook";
         }
         WWW w2 = new WWW(requestUrl, form2);
