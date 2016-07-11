@@ -10,6 +10,7 @@ public class GPS : MonoBehaviour {
     // Use this for initialization
     void Start () {
         mp = GameObject.Find("Map").GetComponent<MapProcessor>();
+        //開始開啟GPS
         StartCoroutine(GPSInit());
     }
 	

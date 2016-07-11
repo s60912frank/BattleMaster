@@ -4,13 +4,14 @@ var roomCount = 0;
 module.exports = (io) => {
 	this.ioInstance = io;
 	io.on('connection', (socket) => {
+		/*socket.request.user.abilityPoint = 3;
+		socket.request.user.save((err) => {
+			if(!err) console.log("WHEEEE")
+		});*/
 		console.log(socket.request.user.name + " connected to socket!");
-		socket.emit("roomList", {
-			"data": rooms
-		});
+		socket.emit("roomList", { "data": rooms });
 
 		socket.on('createRoom', (data) => {
-			console.log(rooms.length + "!!!");
 			roomCount++; //感覺會出問題w
 			var room = {
 				"Id": roomCount,
@@ -19,6 +20,7 @@ module.exports = (io) => {
 			}
 			console.log(room.name + " CREATED!");
 			rooms.push(room);
+			console.log("房間數:" + rooms.length);
 			socket.join("Room" + room.Id); //加入某房間
 			io.sockets.emit('roomAdded', room); //通知全體有房間建立了
 		});
@@ -110,12 +112,37 @@ module.exports = (io) => {
 			console.log("DAMAGE:" + data.damage);
 	  });
 
-	  you.on("dead", (data) => { //告訴敵人啊我死了
-	    enemy.emit("enemyDead", {});
+	  you.on("dead", () => { //告訴敵人啊我死了
+	    //enemy.emit("enemyDead", {});
+			you.emit("battleResult2", {
+				mileageIncrease: 50,
+				mileage: you.request.user.mileage + 50,
+				result: 'lose'
+			});
+			enemy.emit("battleResult2", {
+				mileageIncrease: 500,
+				mileage: enemy.request.user.mileage + 500,
+				result: 'win'
+			});
+			IncreaseMileage(enemy.request.user, 500);
+			IncreaseMileage(you.request.user, 50);
+			console.log(you.request.user.name + "輸了!");
+			console.log(enemy.request.user.name + "贏了!");
 	  });
 
 	  you.on("disconnect", () => { //我離線了
 	      enemy.emit("enemyLeave", {}); //告訴對方我離線了
+				delete(you);
+				//console.log(you.request.user.name + "輸了!");
+				//console.log(enemy.request.user.name + "贏了!");
 	  });
 	}
 };
+
+var IncreaseMileage = (user, amount) => {
+	user.mileage = user.mileage + amount;
+	user.save((err) => {
+		if(err) console.log(err);
+		console.log(user.name + " now have " + user.mileage + "mileage!");
+	});
+}

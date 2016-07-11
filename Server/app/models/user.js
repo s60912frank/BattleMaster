@@ -13,7 +13,7 @@ var userSchema = mongoose.Schema({
   fbid: String,
   token: String,
   name: String,
-  abilityPoint: Number,
+  mileage: Number,
   pet: {
     name: String,
     level: Number,

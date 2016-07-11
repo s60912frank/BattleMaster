@@ -10,7 +10,7 @@ public class CamController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         trans = gameObject.transform;
-        mapProcessor = GameObject.Find("Map").GetComponent<MapProcessor>(); //存map主體等一下會用到
+        mapProcessor = GameObject.Find("Map").GetComponent<MapProcessor>(); //存mapProcessor
         StartCoroutine(LessFreqRaycast());
     }
 	

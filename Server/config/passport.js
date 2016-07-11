@@ -38,6 +38,7 @@ module.exports = (passport) => {
         newUser.name = req.body.name;
         newUser.token = req.body.token;
         newUser.provider = "local";
+        newUser.mileage = 500;
         newUser.pet = petDefault(req.body.name);
         // save the user
         newUser.save((err) => {
@@ -62,6 +63,7 @@ module.exports = (passport) => {
             newUser.fbid = req.body.fbid;
             newUser.token = req.body.token;
             newUser.provider = "facebook";
+            newUser.mileage = 500;
             newUser.pet = petDefault(req.body.name);
             // save the user
             newUser.save((err) => {

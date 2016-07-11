@@ -64,12 +64,13 @@ public class BattlePhasePVP : MonoBehaviour {
 		partner = new MonsterData();
         socket = GameObject.Find("SocketIO").GetComponent<SocketIOComponent>();
         //socket事件們
-        socket.On("enemyMovement", OnEnemyMoveMent);
+        socket.On("battleResult2", OnBattleResult);
+        socket.On("enemyMovement", OnEnemyMovement);
         socket.On("attackStart", OnAttackStart);
         socket.On("enemyMovementResult", OnEnemyMoveMentResult);
         socket.On("enemyData", OnReceiveEnemyData);
 		socket.On("enemyLeave", OnEnemyLeave);
-		buttons = new List<Button> ();
+        buttons = new List<Button> ();
 		foreach (GameObject btn in GameObject.FindGameObjectsWithTag("MovementBtn")) 
 		{
 			buttons.Add(btn.GetComponent<Button>());
@@ -98,7 +99,7 @@ public class BattlePhasePVP : MonoBehaviour {
 		partner.Initialize (monster);
     }
 
-    private void OnEnemyMoveMent(SocketIOEvent e)
+    private void OnEnemyMovement(SocketIOEvent e)
         //當enemy選好動作時觸發
     {
         JSONObject data = e.data;
@@ -279,6 +280,23 @@ public class BattlePhasePVP : MonoBehaviour {
 		VictoryPanel.SetActive(true);
     }
 
+    private void OnBattleResult(SocketIOEvent e)
+    {
+        JSONObject result = new JSONObject(e.data);
+        /*if(result["result"].str == "win")
+        {
+
+        }
+        else if(result["result"].str == "lose")
+        {
+
+        }*/
+        Debug.Log("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWHEEEEEEEEEEEEEEEEE");
+        Debug.Log(e.data);
+        socket.Close();
+        Destroy(GameObject.Find("SocketIO"));
+    }
+
     private void OnApplicaionQuit()
     {
         socket.Close();//關閉socket
@@ -302,22 +320,23 @@ public class BattlePhasePVP : MonoBehaviour {
 		if (partner.stamina <= 0 && enemy.stamina <= 0) 
 		{
 			VictoryPanel.SetActive (true);//其實應該要是平手
-			socket.Close();
-			Destroy (GameObject.Find ("SocketIO"));
+			//socket.Close();
+			//Destroy (GameObject.Find ("SocketIO"));
 		} 
 		else 
 		{
 			if (enemy.stamina <= 0) 
 			{
 				VictoryPanel.SetActive (true);
-				socket.Close();
-				Destroy (GameObject.Find ("SocketIO"));
+				//socket.Close();
+				//Destroy (GameObject.Find ("SocketIO"));
 			} 
 			else if(partner.stamina <= 0)
 			{
+                socket.Emit("dead");
 				DefeatPanel.SetActive (true);
-				socket.Close();
-				Destroy (GameObject.Find ("SocketIO"));
+				//socket.Close();
+				//Destroy (GameObject.Find ("SocketIO"));
 			}
 		}
 	}

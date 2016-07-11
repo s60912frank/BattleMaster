@@ -16,6 +16,7 @@ public class entry : MonoBehaviour {
 	}
 
     private IEnumerator CheckServerAlive()
+        //檢查server是否還活著 嘗試超過五次失敗就顯示無法連線
     {
         WWW w = new WWW(Constant.SERVER_URL + "/isAlive");
         yield return w;
@@ -38,39 +39,37 @@ public class entry : MonoBehaviour {
     }
 
     private void CheckUserDataExist()
+        //檢查有沒有存過使用者資料
     {
         userData = new JSONObject(PlayerPrefs.GetString("userData"));
         //先找有沒有登入過的資訊
         if (string.IsNullOrEmpty(PlayerPrefs.GetString("userData")))
         {
-            //轉向註冊or登入畫面
-            //轉向選擇FB OR本機登入
-            //StartCoroutine(WaitForLogin());
-            //SceneManager.LoadScene("login");
+            //沒有的話轉向註冊&登入畫面
             isLoaded = "login";
         }
         else
         {
-            //檢查此cookie O不OK
             StartCoroutine(CheckIfLoggedIn());
         }
     }
 
     private IEnumerator CheckIfLoggedIn()
+        //檢查此cookie O不OK 有沒有過期 存不存在
     {
         Dictionary<string, string> headers = new Dictionary<string, string>();
-        headers.Add("Cookie", userData["cookie"].ToString().Replace("\"", "")); //加入認證過的cookie就不用重新登入了
+        headers.Add("Cookie", userData["cookie"].ToString().Replace("\"", "")); //加入cookie
         WWW w = new WWW(Constant.SERVER_URL + "/isLoggedIn", null, headers);
         yield return w;
         if (string.IsNullOrEmpty(w.error))
         {
-            //直接登入了
+            //沒有錯誤就直接登入了
             //到status畫面
             isLoaded = "status";
         }
         else
         {
-            //註冊去
+            //收到錯誤就註冊去
             isLoaded = "login";
         }
     }
@@ -99,9 +98,7 @@ public class entry : MonoBehaviour {
                     isLoaded = "";
                 }
                 else
-                {
                     entryText.GetComponentInChildren<Text>().text = "無法連接伺服器,點擊重試";
-                }
                 break;
             default:
                 throw null;

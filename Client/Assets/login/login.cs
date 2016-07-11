@@ -13,6 +13,7 @@ public class login : MonoBehaviour {
     private string fbid;
     // Use this for initialization
     void Start () {
+        //先清空userData
         PlayerPrefs.SetString("userData", "");
 	}
 	
@@ -23,6 +24,7 @@ public class login : MonoBehaviour {
 
     public void LocalLoginClicked()
     {
+        //本地登入 使用DeviceID
         type = "local";
         token = SystemInfo.deviceUniqueIdentifier;
         StartCoroutine(WaitForLogin());
@@ -30,11 +32,13 @@ public class login : MonoBehaviour {
 
     public void FBLoginCLicked()
     {
+        //使用FB API登入
         FB.Init(OnInitComplete, OnHideUnity);
     }
 
     public void SignUpClicked()
     {
+        //註冊按鈕被按時觸發
         StartCoroutine(WaitForSignUp());
     }
 
@@ -70,7 +74,6 @@ public class login : MonoBehaviour {
         {
             if (string.IsNullOrEmpty(result.Error))
             {
-                Debug.Log("WHEEEE!!!!!" + result.AccessToken.TokenString);
                 //使用FB登入
                 type = "facebook";
                 fbid = result.AccessToken.UserId;
@@ -88,13 +91,6 @@ public class login : MonoBehaviour {
         }
     }
 
-
-
-
-
-
-
-
     private IEnumerator WaitForLogin()
     {
         WWWForm form = new WWWForm();
@@ -107,7 +103,7 @@ public class login : MonoBehaviour {
         else if (type == "facebook")
         {
             requestUrl += "/loginFacebook";
-            form.AddField("fbid", fbid);
+            form.AddField("fbid", fbid); //fb登入還要多付加一項fbid
         }
         WWW w = new WWW(requestUrl, form);
         yield return w;
@@ -141,7 +137,7 @@ public class login : MonoBehaviour {
         }
         else if (type == "facebook")
         {
-            form2.AddField("fbid", fbid);
+            form2.AddField("fbid", fbid); //多需要FBID
             requestUrl += "/signupFacebook";
         }
         WWW w2 = new WWW(requestUrl, form2);
@@ -160,9 +156,10 @@ public class login : MonoBehaviour {
     }
 
     private void SetUserData(WWW w)
+        //將server傳來的使用者資料儲存在本機
     {
         JSONObject response = new JSONObject(w.text);
-        string[] data = w.responseHeaders["SET-COOKIE"].Split(";"[0]); //取出登入後的cookie就不用一直登入了
+        string[] data = w.responseHeaders["SET-COOKIE"].Split(";"[0]); //取出登入後的cookie存起來
         if (data.Length > 0)
         {
             response.AddField("cookie", data[0]);
