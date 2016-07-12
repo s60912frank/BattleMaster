@@ -4,13 +4,8 @@ var roomCount = 0;
 module.exports = (io) => {
 	this.ioInstance = io;
 	io.on('connection', (socket) => {
-		/*socket.request.user.abilityPoint = 3;
-		socket.request.user.save((err) => {
-			if(!err) console.log("WHEEEE")
-		});*/
-		console.log(socket.request.user.name + " connected to socket!");
+		console.log(socket.request.user.game.name + " connected to socket!");
 		socket.emit("roomList", { "data": rooms });
-
 		socket.on('createRoom', (data) => {
 			roomCount++; //感覺會出問題w
 			var room = {
@@ -28,7 +23,7 @@ module.exports = (io) => {
 		socket.on('leaveRoom', (data) => {
 			for(i = 0;i < rooms.length;i++){
 				if(rooms[i].user1 == socket.id){
-					console.log(socket.request.user.name + "離開了房間!");
+					console.log(socket.request.user.game.name + "離開了房間!");
 					io.sockets.emit('roomRemoved', rooms[i]); //通知全體有房間刪除了
 					rooms.splice(i, 1);
 					return;
@@ -92,7 +87,7 @@ module.exports = (io) => {
 
 	var battlePhase = (roomName, you, enemy) => {
 		//等client準備好了就把敵人資料給他
-		you.on("battleSceneReady", (data) => you.emit("enemyData", enemy.request.user.pet));
+		you.on("battleSceneReady", (data) => you.emit("enemyData", enemy.request.user.game.pet));
 
 	  you.on("movement", (data) => { //當client選好動作時觸發
 	    enemy.emit("enemyMovement", data); //把動作傳給敵人(使用者在這時看不到)
@@ -112,37 +107,59 @@ module.exports = (io) => {
 			console.log("DAMAGE:" + data.damage);
 	  });
 
-	  you.on("dead", () => { //告訴敵人啊我死了
-	    //enemy.emit("enemyDead", {});
-			you.emit("battleResult2", {
-				mileageIncrease: 50,
-				mileage: you.request.user.mileage + 50,
-				result: 'lose'
-			});
-			enemy.emit("battleResult2", {
-				mileageIncrease: 500,
-				mileage: enemy.request.user.mileage + 500,
-				result: 'win'
-			});
-			IncreaseMileage(enemy.request.user, 500);
-			IncreaseMileage(you.request.user, 50);
-			console.log(you.request.user.name + "輸了!");
-			console.log(enemy.request.user.name + "贏了!");
+	  you.on("battleEnd", (data) => { //戰鬥結束!
+			you.end = data.result;
+			if(you.end && enemy.end){
+				var youResult, enemyResult;
+				if(you.end == enemy.end){
+					//平手
+					youResult = MileageProcess(you.request.user, 'even');
+					enemyResult = MileageProcess(enemy.request.user, 'even');
+				}
+				else if(you.end == 'win' && enemy.end == 'lose'){
+					//"you"贏
+					youResult = MileageProcess(you.request.user, 'win');
+					enemyResult = MileageProcess(enemy.request.user, 'lose');
+				}
+				else if(you.end == 'lose' && enemy.end == 'win'){
+					//"enemy"贏
+					youResult = MileageProcess(you.request.user, 'lose');
+					enemyResult = MileageProcess(enemy.request.user, 'win');
+				}
+				else{
+					throw "Unknown battle result!!!!!";
+				}
+				you.emit("battleResult2", youResult);
+				enemy.emit("battleResult2", enemyResult);
+				console.log(you.request.user.game.name + " " + you.end);
+				console.log(enemy.request.user.game.name + " " + enemy.end);
+			}
 	  });
 
 	  you.on("disconnect", () => { //我離線了
 	      enemy.emit("enemyLeave", {}); //告訴對方我離線了
 				delete(you);
-				//console.log(you.request.user.name + "輸了!");
-				//console.log(enemy.request.user.name + "贏了!");
 	  });
 	}
 };
 
-var IncreaseMileage = (user, amount) => {
-	user.mileage = user.mileage + amount;
+//會把戰鬥結束的里程存到資料庫，並且return戰鬥結果
+var MileageProcess = (user, result) => {
+	console.log("HELLO! " + result);
+	var battleResult = {};
+	battleResult["result"] = result;
+	if(result == 'win')
+		battleResult["mileageIncrease"] = 500;
+	else if(result == 'lose')
+		battleResult["mileageIncrease"] = 50;
+	else if(result == 'even')
+		battleResult["mileageIncrease"] = 250;
+
+	user.game.mileage = user.game.mileage + battleResult.mileageIncrease;
+	battleResult["mileage"] = user.game.mileage;
 	user.save((err) => {
 		if(err) console.log(err);
-		console.log(user.name + " now have " + user.mileage + "mileage!");
+		console.log(user.game.name + " now have " + user.game.mileage + "mileage!");
 	});
+	return battleResult;
 }

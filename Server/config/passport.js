@@ -35,15 +35,15 @@ module.exports = (passport) => {
       if (user) return done(null, false, "You already have an account!");
       else {
         var newUser = new User();
-        newUser.name = req.body.name;
+        newUser.game.name = req.body.name;
         newUser.token = req.body.token;
         newUser.provider = "local";
-        newUser.mileage = 500;
-        newUser.pet = petDefault(req.body.name);
+        newUser.game.mileage = 500;
+        newUser.game.pet = petDefault(req.body.name);
         // save the user
         newUser.save((err) => {
           if (err) throw err;
-          console.log(newUser.name + "created!");
+          console.log(newUser.game.name + "created!");
           return done(null, newUser);
         });
       }
@@ -59,16 +59,16 @@ module.exports = (passport) => {
           var data = JSON.parse(body);
           if (!error && response.statusCode == 200 && data.id == req.body.fbid) {
             var newUser = new User();
-            newUser.name = req.body.name;
+            newUser.game.name = req.body.name;
             newUser.fbid = req.body.fbid;
             newUser.token = req.body.token;
             newUser.provider = "facebook";
-            newUser.mileage = 500;
-            newUser.pet = petDefault(req.body.name);
+            newUser.game.mileage = 500;
+            newUser.game.pet = petDefault(req.body.name);
             // save the user
             newUser.save((err) => {
               if (err) throw err;
-              console.log(newUser.name + "created!(Facebook)");
+              console.log(newUser.game.name + "created!(Facebook)");
               return done(null, newUser);
             });
           }
@@ -97,7 +97,7 @@ module.exports = (passport) => {
               // save the user
               user.save((err) => {
                 if (err) throw err;
-                console.log(user.name + "Logged in!(Facebook)");
+                console.log(user.game.name + "Logged in!(Facebook)");
                 return done(null, user);
               });
             }
@@ -124,7 +124,7 @@ module.exports = (passport) => {
           if (err) return done(err);
           // check to see if theres already a user with that email
           if (user) {
-            console.log(user.name + " logged in!");
+            console.log(user.game.name + " logged in!");
             return done(null, user);
           } else {
             return done(null, false, "Account not found");

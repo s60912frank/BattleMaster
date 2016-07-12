@@ -1,5 +1,5 @@
 var User = require('./models/user'); //資料庫USER的shema
-var Enemy = require('./models/enemy'); //資料庫USER的shema
+var Enemy = require('./models/enemy'); //資料庫ENEMY的shema
 module.exports = (app, passport) => {
   app.get('/isAlive', (req, res) => {
     res.send("Yes!");
@@ -8,12 +8,35 @@ module.exports = (app, passport) => {
     //跟AI打
     app.post('/battle', isLoggedIn, (req, res) => {
       //收到怪物類型，伺服器回傳怪物資訊，在client上打
-      Enemy.findOne({'name': "Trash"}, (err, enemy) => res.send(enemy));
+      Enemy.findOne({'name': req.body.enemyName }, (err, enemy) => res.send(enemy));
+    });
+
+    //可能還要再改良
+    app.post('/battleAIResult', isLoggedIn, (req, res) => {
+      //收到怪物類型，伺服器回傳怪物資訊，在client上打
+      Enemy.findOne({'name': req.body.enemyName }, (err, enemy) => {
+        if(err) throw err;
+        var battleResult = {};
+        battleResult.result = req.body.result;
+        if(req.body.result == 'win')
+          battleResult["mileageIncrease"] = enemy.reward;
+        else if(req.body.result == 'lose')
+          battleResult["mileageIncrease"] = Math.round(enemy.reward / 10);
+        else if(req.body.result == 'even')
+          battleResult["mileageIncrease"] = Math.round(enemy.reward / 2);
+        req.user.game.mileage = req.user.game.mileage + battleResult["mileageIncrease"];
+        battleResult["mileage"] = req.user.game.mileage;
+        req.user.save((err) =>{
+          if(err) throw err;
+          console.log(req.user.game.name + "BattleAI SAVED!");
+        });
+        res.send(battleResult);
+      });
     });
 
     app.get('/isLoggedIn', isLoggedIn, (req, res) => {
-      console.log("WHEEE");
-      res.send("Yes!");
+      console.log(req.user.game.name + "LOGGED IN!");
+      res.send(req.user.game);
       res.end();
     });
 
@@ -26,10 +49,9 @@ module.exports = (app, passport) => {
     //local登入
     app.post('/login', passport.authenticate('local-login') ,(req, res) => {
         if(req.user){
-          res.send(req.user); //登入成功
+          res.send(req.user.game); //登入成功
         }
         else{
-          console.log("WHEEEJENEJNEJENJE");
           res.send("Account not found"); //你誰
         }
       });
@@ -37,7 +59,7 @@ module.exports = (app, passport) => {
     //local註冊
     app.post('/signup', passport.authenticate('local-signup') ,(req, res) => {
         if(req.user){
-          res.send(req.user); //註冊成功
+          res.send(req.user.game); //註冊成功
         }
         else{
           res.send("Account already exists"); //你已經註冊過了!
@@ -47,14 +69,14 @@ module.exports = (app, passport) => {
     //facebook註冊
     app.post('/signupFacebook', passport.authenticate('facebook-signup') ,(req, res) => {
       if(req.user){
-        res.send(req.user); //註冊成功
+        res.send(req.user.game); //註冊成功
       }
     });
 
     //facebook登入
     app.post('/loginFacebook', passport.authenticate('facebook-login') ,(req, res) => {
       if(req.user){
-        res.send(req.user); //登入成功
+        res.send(req.user.game); //登入成功
       }
     });
 };

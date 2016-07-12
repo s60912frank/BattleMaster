@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,6 +20,8 @@ public class BattlePhase : MonoBehaviour {
     public Text PartnerCrit;
 	public GameObject VictoryPanel;
 	public GameObject DefeatPanel;
+    private JSONObject enemyData;
+    private JSONObject userData;
 
 	public enum Movement
 	{
@@ -37,12 +40,13 @@ public class BattlePhase : MonoBehaviour {
 	void Start () {
 		VictoryPanel.SetActive (false);
 		DefeatPanel.SetActive (false);
+        enemyData = new JSONObject(PlayerPrefs.GetString("enemyAI"));
+        userData = new JSONObject(PlayerPrefs.GetString("userData"));
         //set status from scripts
-		enemy = new MonsterData();
-        enemy.Initialize(new JSONObject(PlayerPrefs.GetString("enemyAI")));
+        enemy = new MonsterData();
+        enemy.Initialize(enemyData);
 		partner = new MonsterData();
-        JSONObject user = new JSONObject(PlayerPrefs.GetString("userData"));
-        partner.Initialize(user["pet"]);
+        partner.Initialize(userData["pet"]);
 
 		buttons = new List<Button> ();
 		foreach (GameObject btn in GameObject.FindGameObjectsWithTag("MovementBtn")) 
@@ -191,19 +195,48 @@ public class BattlePhase : MonoBehaviour {
 
 	private void CheckIfGameOver()
 	{
-		if (partner.stamina <= 0 && enemy.stamina <= 0) {
-			VictoryPanel.SetActive (true);//其實應該要是平手
-		} 
-		else 
-		{
-			if (enemy.stamina <= 0) 
-			{
-				VictoryPanel.SetActive (true);
-			} 
-			else if(partner.stamina <= 0)
-			{
-				DefeatPanel.SetActive (true);
-			}
-		}
+        if(partner.stamina <= 0 || enemy.stamina <= 0)
+        {
+            SetBtnsEnable(false);
+            WWWForm form = new WWWForm();
+            form.AddField("enemyName", enemyData["name"].str);
+            if (partner.stamina <= 0 && enemy.stamina <= 0)
+            {
+                VictoryPanel.SetActive(true);//其實應該要是平手
+                form.AddField("result", "even");
+            }
+            else
+            {
+                if (enemy.stamina <= 0)
+                {
+                    VictoryPanel.SetActive(true);
+                    form.AddField("result", "win");
+                }
+                else if (partner.stamina <= 0)
+                {
+                    DefeatPanel.SetActive(true);
+                    form.AddField("result", "lose");
+                }
+            }
+            Dictionary<string, string> headers = new Dictionary<string, string>();
+            headers.Add("Cookie", userData["cookie"].str); //加入認證過的cookie就不用重新登入了
+            WWW w = new WWW(Constant.SERVER_URL + "/battleAIResult", form.data, headers);
+            StartCoroutine(WaitForBattleResult(w));
+        }
 	}
+
+    private IEnumerator WaitForBattleResult(WWW w)
+    {
+        yield return w;
+        if (string.IsNullOrEmpty(w.error))
+        {
+            Debug.Log(w.text);
+            PlayerPrefs.SetString("BattleResult", w.text);
+            SceneManager.LoadScene("BattleResult");
+        }
+        else
+        {
+            Debug.Log(w.error);
+        }
+    }
 }

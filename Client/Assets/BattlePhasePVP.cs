@@ -282,19 +282,12 @@ public class BattlePhasePVP : MonoBehaviour {
 
     private void OnBattleResult(SocketIOEvent e)
     {
-        JSONObject result = new JSONObject(e.data);
-        /*if(result["result"].str == "win")
-        {
-
-        }
-        else if(result["result"].str == "lose")
-        {
-
-        }*/
-        Debug.Log("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWHEEEEEEEEEEEEEEEEE");
-        Debug.Log(e.data);
+        //JSONObject result = e.data;
+        PlayerPrefs.SetString("BattleResult", e.data.ToString());
+        Debug.Log(e.data.ToString());
         socket.Close();
         Destroy(GameObject.Find("SocketIO"));
+        SceneManager.LoadScene("BattleResult");
     }
 
     private void OnApplicaionQuit()
@@ -320,6 +313,7 @@ public class BattlePhasePVP : MonoBehaviour {
 		if (partner.stamina <= 0 && enemy.stamina <= 0) 
 		{
 			VictoryPanel.SetActive (true);//其實應該要是平手
+            socket.Emit("battleEnd", new JSONObject(new Dictionary<string, string>() { { "result", "even" } }));
 			//socket.Close();
 			//Destroy (GameObject.Find ("SocketIO"));
 		} 
@@ -328,13 +322,15 @@ public class BattlePhasePVP : MonoBehaviour {
 			if (enemy.stamina <= 0) 
 			{
 				VictoryPanel.SetActive (true);
-				//socket.Close();
-				//Destroy (GameObject.Find ("SocketIO"));
-			} 
+                socket.Emit("battleEnd", new JSONObject(new Dictionary<string, string>() { { "result", "win" } }));
+                //socket.Close();
+                //Destroy (GameObject.Find ("SocketIO"));
+            } 
 			else if(partner.stamina <= 0)
 			{
-                socket.Emit("dead");
-				DefeatPanel.SetActive (true);
+                //socket.Emit("dead");
+                socket.Emit("battleEnd", new JSONObject(new Dictionary<string, string>() { { "result", "lose" } }));
+                DefeatPanel.SetActive (true);
 				//socket.Close();
 				//Destroy (GameObject.Find ("SocketIO"));
 			}

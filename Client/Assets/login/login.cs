@@ -14,7 +14,7 @@ public class login : MonoBehaviour {
     // Use this for initialization
     void Start () {
         //先清空userData
-        PlayerPrefs.SetString("userData", "");
+        PlayerPrefs.DeleteKey("userData");
 	}
 	
 	// Update is called once per frame

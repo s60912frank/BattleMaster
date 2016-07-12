@@ -5,6 +5,7 @@ var mongoose = require('mongoose');
 var enemySchema = mongoose.Schema({
   name: String,
   level: Number,
+  reward: Number,
   stamina: Number,
   attack: Number,
   defense: Number,

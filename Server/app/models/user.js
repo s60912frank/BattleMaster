@@ -12,24 +12,26 @@ var userSchema = mongoose.Schema({
   provider: String,
   fbid: String,
   token: String,
-  name: String,
-  mileage: Number,
-  pet: {
+  game: {
     name: String,
-    level: Number,
-    stamina: Number,
-    attack: Number,
-    defense: Number,
-    evade: Number,
-    skill: {
-      ID: Number,
-      CD: Number,
-      SkillDesc: String,
-      params: {
-        damage: Number,
-        recover: Number,
-        burn: Number,
-        attIncrease: Number
+    mileage: Number,
+    pet: {
+      name: String,
+      level: Number,
+      stamina: Number,
+      attack: Number,
+      defense: Number,
+      evade: Number,
+      skill: {
+        ID: Number,
+        CD: Number,
+        SkillDesc: String,
+        params: {
+          damage: Number,
+          recover: Number,
+          burn: Number,
+          attIncrease: Number
+        }
       }
     }
   }

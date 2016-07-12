@@ -41,7 +41,6 @@ public class entry : MonoBehaviour {
     private void CheckUserDataExist()
         //檢查有沒有存過使用者資料
     {
-        userData = new JSONObject(PlayerPrefs.GetString("userData"));
         //先找有沒有登入過的資訊
         if (string.IsNullOrEmpty(PlayerPrefs.GetString("userData")))
         {
@@ -50,6 +49,7 @@ public class entry : MonoBehaviour {
         }
         else
         {
+            userData = new JSONObject(PlayerPrefs.GetString("userData"));
             StartCoroutine(CheckIfLoggedIn());
         }
     }
@@ -58,7 +58,7 @@ public class entry : MonoBehaviour {
         //檢查此cookie O不OK 有沒有過期 存不存在
     {
         Dictionary<string, string> headers = new Dictionary<string, string>();
-        headers.Add("Cookie", userData["cookie"].ToString().Replace("\"", "")); //加入cookie
+        headers.Add("Cookie", userData["cookie"].str); //加入cookie
         WWW w = new WWW(Constant.SERVER_URL + "/isLoggedIn", null, headers);
         yield return w;
         if (string.IsNullOrEmpty(w.error))
@@ -66,6 +66,9 @@ public class entry : MonoBehaviour {
             //沒有錯誤就直接登入了
             //到status畫面
             isLoaded = "status";
+            JSONObject newUserData = new JSONObject(w.text);
+            newUserData.AddField("cookie", userData["cookie"]);
+            PlayerPrefs.SetString("userData", newUserData.ToString());
         }
         else
         {

@@ -4,9 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class BtnFunctions : MonoBehaviour {
-    //private const string SERVER_URL = "http://127.0.0.1:8080";
-    private const string SERVER_URL = "http://server-gmin.rhcloud.com";
-
     public GameObject LoadingPanel;
     // Use this for initialization
     void Start () {
@@ -36,9 +33,10 @@ public class BtnFunctions : MonoBehaviour {
         WWWForm form = new WWWForm();
         Dictionary<string, string> headers = new Dictionary<string, string>();
         JSONObject data = new JSONObject(PlayerPrefs.GetString("userData"));
-        headers.Add("Cookie", data["cookie"].ToString().Replace("\"", "")); //加入認證過的cookie就不用重新登入了
-        form.AddField("whe", "wheee");
-        WWW w = new WWW(SERVER_URL + "/battle", form.data, headers);
+        headers.Add("Cookie", data["cookie"].str); //加入認證過的cookie就不用重新登入了
+        //將來這項資料從地圖取得
+        form.AddField("enemyName", "Hammer");
+        WWW w = new WWW(Constant.SERVER_URL + "/battle", form.data, headers);
         yield return w;
         //就只是看有沒有錯誤而已
         if (!string.IsNullOrEmpty(w.error))

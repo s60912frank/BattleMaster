@@ -3,15 +3,15 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class ShowUserInfo : MonoBehaviour {
-    public GameObject UserNameText;
-    public GameObject MileageText;
+    public Text UserNameText;
+    public Text MileageText;
     // Use this for initialization
     void Start ()
     {
         JSONObject data = new JSONObject(PlayerPrefs.GetString("userData"));
-        string userName = data["name"].ToString().Replace("\"", "");
-        UserNameText.GetComponent<Text>().text = userName;
-        //之後還要顯示里程
+        UserNameText.text = data["name"].str;
+        //顯示里程
+        MileageText.text = data["mileage"].f.ToString();
     }
 	
 	// Update is called once per frame
