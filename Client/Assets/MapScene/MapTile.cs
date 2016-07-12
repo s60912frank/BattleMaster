@@ -147,26 +147,30 @@ public class MapTile
         plane.transform.localScale = new Vector3(mapBoundary.Width / 10, 1, mapBoundary.Height / 10);
         plane.transform.position = new Vector3((longtitude - MapProcessor.lonOrigin) * times + 0.5f * mapBoundary.Width, (latitude - MapProcessor.latOrigin) * times - 0.5f * mapBoundary.Height, 0);
         plane.GetComponent<Renderer>().material = Resources.Load<Material>("plane");
+        DrawSomeCircle();
     }
 
-    public void Normalize()
-        //經緯度轉遊戲座標,並且計算範圍
+    private void DrawSomeCircle()
     {
-        foreach (MapObj mo in mapObjs)
+        Debug.Log("WHEEEEAREAAREA!!!!");
+        //float maxRad = (mapBoundary.Width + mapBoundary.Height) / 2.0f;
+        //float getRad = Random.Range(maxRad * 0.15f, maxRad * 0.85f);
+        float rad = (mapBoundary.Width + mapBoundary.Height) / 8.0f;
+        Vector2[] poss = new Vector2[] {
+            new Vector2(plane.transform.position.x - rad, plane.transform.position.y + rad),
+            new Vector2(plane.transform.position.x + rad, plane.transform.position.y + rad),
+            new Vector2(plane.transform.position.x - rad, plane.transform.position.y - rad),
+            new Vector2(plane.transform.position.x + rad, plane.transform.position.y - rad)
+        };
+        string[] enemyKinds = new string[] { "Trash", "Hammer", "Flyer" };
+        for(int i = 0;i < 4; i++)
         {
-            for (int i = 0; i < mo.verticies.Count; i++)
-            {
-                Vector2 temp = mo.verticies[i];
-
-                temp.x = (temp.x - MapProcessor.lonOrigin) * times;
-                temp.y = (temp.y - MapProcessor.latOrigin) * times;
-                UpdateBound(temp);
-                mo.verticies[i] = temp;
-            }
+            GameObject area = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            area.name = enemyKinds[Random.Range(0, enemyKinds.Length)];
+            area.transform.Rotate(new Vector3(90, 0, 0));
+            area.transform.localScale = new Vector3(rad * 2.0f, 0.1f, rad * 2.0f);
+            area.transform.position = new Vector3(poss[i].x, poss[i].y, -0.1f);
+            area.GetComponent<Renderer>().material = Resources.Load<Material>("area");
         }
-        plane.name = xTile + "/" + yTile;
-        plane.transform.localScale = new Vector3(mapBoundary.Width / 10, 1, mapBoundary.Height / 10);
-        plane.transform.position = new Vector3((longtitude - MapProcessor.lonOrigin) * times + 0.5f * mapBoundary.Width, (latitude - MapProcessor.latOrigin) * times - 0.5f * mapBoundary.Height, 0);
-        plane.GetComponent<Renderer>().material = Resources.Load<Material>("plane");
     }
 }

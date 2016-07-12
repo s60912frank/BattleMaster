@@ -11,7 +11,7 @@ public class MapProcessor : MonoBehaviour {
     public string url;
 	public static float latOrigin = 25.0417534f;
 	public static float lonOrigin = 121.5339142f;
-    private int zoom = 14; //放大倍率，1~19
+    private int zoom = 15; //放大倍率，1~19
     private List<MapTile> mapTiles; //儲存現在畫面上的mapTiles
     //private List<T>
     private int mapTileIndex = -1;
@@ -19,7 +19,27 @@ public class MapProcessor : MonoBehaviour {
     //public Text gpsStatus;
 	// Use this for initialization
 	void Start () {
-		Debug.Log (Application.persistentDataPath);
+        //test畫圓
+        /*GameObject whee = new GameObject();
+        LineRenderer lr = whee.AddComponent<LineRenderer>();
+        lr.SetWidth(15f, 15f);
+        lr.SetVertexCount((int)((2.0 * Mathf.PI) / 0.02f) + 1);
+        int i = 0;
+        float radCircle = 0.015f;
+        for (float theta = 0f; theta < (2 * Mathf.PI); theta += 0.02f)
+        {
+            // Calculate position of point
+            float x = (radCircle * 100) * Mathf.Cos(theta);
+            float y = (radCircle * 100) * Mathf.Sin(theta);
+
+            // Set the position of this point
+            Vector3 pos = new Vector3(x, y, 1);
+            lr.SetPosition(i, pos);
+            i++;
+        }*/
+
+
+        Debug.Log (Application.persistentDataPath);
         mapTiles = new List<MapTile>();
         //loading Start
         loadingPanel.GetComponent<LoadingScript>().Start();
@@ -271,7 +291,7 @@ public class MapProcessor : MonoBehaviour {
     {
         //先除times再加原點
         //2^14/10
-        const float times = 1638.4f;
+        const float times = 3276.8f;
         float lon = x / times + lonOrigin;
         float lat = y / times + latOrigin;
         //經緯度轉地圖格

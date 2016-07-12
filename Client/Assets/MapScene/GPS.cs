@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class GPS : MonoBehaviour {
-    private int zoom = 14; //放大倍率，1~19
+    private int zoom = 15; //放大倍率，1~19
     private MapProcessor mp;
     public Text gpsStatus;
     public GameObject Player;
@@ -84,7 +84,7 @@ public class GPS : MonoBehaviour {
         {
             yield return new WaitForSeconds(0.5f);
             gpsStatus.text = "longitude:" + Input.location.lastData.longitude + "    latitude:" + Input.location.lastData.latitude;
-            const float times = 1638.4f;
+            const float times = 3276.8f;
             float newX = (Input.location.lastData.longitude - MapProcessor.lonOrigin) * times;
             float newY = (Input.location.lastData.latitude - MapProcessor.latOrigin) * times;
             //PlayerLocation.Set(newX, newY);

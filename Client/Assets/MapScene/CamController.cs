@@ -16,6 +16,15 @@ public class CamController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        if (Input.GetMouseButtonDown(0))
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
+            {
+                Debug.Log("HITTTT:" + hit.transform.name);
+            }
+        }
+
         //方向建移動cam
         if (Input.GetKey(KeyCode.UpArrow))
         {
@@ -86,11 +95,11 @@ public class CamController : MonoBehaviour {
             //RequestNewZoomMap(1);
             trans.position = new Vector3(trans.position.x, trans.position.y, -3);
         }
-        if (trans.position.z < -20)
+        if (trans.position.z < -30)
         {
             Debug.Log("太小啦!");
             //RequestNewZoomMap(-1);     
-            trans.position = new Vector3(trans.position.x, trans.position.y, -20);
+            trans.position = new Vector3(trans.position.x, trans.position.y, -30);
         }
 	}
 
