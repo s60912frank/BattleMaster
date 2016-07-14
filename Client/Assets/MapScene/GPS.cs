@@ -4,10 +4,10 @@ using System.Collections;
 
 public class GPS {
     private int zoom = 15; //放大倍率，1~19
-    public static float latOrigin = 25.0417534f;
-    public static float lonOrigin = 121.5339142f;
+    private float latOrigin = 25.0417534f;
+    private float lonOrigin = 121.5339142f;
     //public Text gpsStatus;
-    public GameObject Player;
+    public string GPSStatus = "";
 
     private Vector2 Location
     {
@@ -23,6 +23,7 @@ public class GPS {
         if (!Input.location.isEnabledByUser)
         {
             Debug.Log("GPS沒開");
+            GPSStatus = "GPS沒開";
             location(Location);
             yield break;
         }
@@ -42,7 +43,7 @@ public class GPS {
         if (maxWait < 1)
         {
             Debug.Log("GPS逾時");
-            //gpsStatus.text = "GPS逾時";
+            GPSStatus = "GPS逾時";
             Input.location.Stop();
             location(Location);
             yield break;
@@ -52,7 +53,7 @@ public class GPS {
         if (Input.location.status == LocationServiceStatus.Failed)
         {
             Debug.Log("GPS錯誤");
-            //gpsStatus.text = "GPS錯誤";
+            GPSStatus = "GPS錯誤";
             Input.location.Stop();
             location(Location);
             yield break;
@@ -72,14 +73,22 @@ public class GPS {
         }
     }
 
-    public void UpdateLocation()
+    public Vector2 PlayerLocation
     {
-        //yield return new WaitForSeconds(0.5f);
-        //gpsStatus.text = "longitude:" + Input.location.lastData.longitude + "    latitude:" + Input.location.lastData.latitude;
-        const float times = 3276.8f;
-        float newX = (Input.location.lastData.longitude - lonOrigin) * times;
-        float newY = (Input.location.lastData.latitude - latOrigin) * times;
-        //PlayerLocation.Set(newX, newY);
-        Player.transform.position = new Vector3(newX, newY, Player.transform.position.z);
+        get
+        {
+            if(Input.location.status == LocationServiceStatus.Running)
+            {
+                const float times = 3276.8f;
+                float newX = (Input.location.lastData.longitude - lonOrigin) * times;
+                float newY = (Input.location.lastData.latitude - latOrigin) * times;
+                GPSStatus = "longitude:" + Input.location.lastData.longitude + "    latitude:" + Input.location.lastData.latitude;
+                return new Vector2(newX, newY);
+            }
+            else
+            {
+                return new Vector2(lonOrigin, latOrigin);
+            }
+        }
     }
 }

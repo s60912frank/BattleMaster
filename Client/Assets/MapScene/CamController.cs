@@ -6,7 +6,9 @@ using System.Collections.Generic;
 public class CamController : MonoBehaviour {
     private Transform trans;
     private MapView map;
-    private Vector3 nowHit;
+    public float perspectiveZoomSpeed = 0.003f;        // The rate of change of the field of view in perspective mode.
+    //private Vector3 nowHit;
+    //private float lastDistance;
     private float panDiff;
     private bool rayCasting = true;
     //臭
@@ -22,6 +24,7 @@ public class CamController : MonoBehaviour {
 	void Update () {
         if (Input.GetMouseButtonUp(0) && MouseRay)
         {
+            bool found = false;
             RaycastHit[] hits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition));
             foreach(RaycastHit hit in hits)
             {
@@ -29,9 +32,15 @@ public class CamController : MonoBehaviour {
                 {
                     //showMonsterData
                     MouseRay = false;
-                    map.ShowEnemyData(hit.transform.name);
+                    map.ShowEnemyData(hit.transform);
+                    found = true;
                     break;
                 }
+            }
+            if (!found)
+            {
+                map.ShowEnemyData();
+                MouseRay = false;
             }
         }
 
@@ -70,7 +79,7 @@ public class CamController : MonoBehaviour {
         }
 
         //雙指縮放,未測試
-        if (Input.touchCount == 2)
+        /*if (Input.touchCount == 2)
         {
 			//Vector2 one = Input.GetTouch (0).deltaPosition;
 			//Vector2 two = Input.GetTouch (1).deltaPosition;
@@ -88,14 +97,45 @@ public class CamController : MonoBehaviour {
                 float dir = panDiff - diff;
                 if (dir < 0)
                 {
-                    trans.position -= Vector3.forward * dir * 0.0015f;
+                    //放大
+                    float times = Mathf.Abs(diff / panDiff);
+                    trans.position.Set(trans.position.x, trans.position.y, trans.position.z * times);
+                    //trans.position -= Vector3.forward * dir * 0.0015f;
                 }
                 else
                 {
+                    //縮小
+                    float times = Mathf.Abs(diff / panDiff);
+                    trans.position.Set(trans.position.x, trans.position.y, trans.position.z * times);
                     trans.position -= Vector3.forward * dir * 0.0015f;
                 }
+                panDiff = diff;
                 Debug.Log(dir);
             }
+        }*/
+        // If there are two touches on the device...
+        if (Input.touchCount == 2)
+        {
+            // Store both touches.
+            Touch touchZero = Input.GetTouch(0);
+            Touch touchOne = Input.GetTouch(1);
+
+            // Find the position in the previous frame of each touch.
+            Vector2 touchZeroPrevPos = touchZero.position - touchZero.deltaPosition;
+            Vector2 touchOnePrevPos = touchOne.position - touchOne.deltaPosition;
+
+            // Find the magnitude of the vector (the distance) between the touches in each frame.
+            float prevTouchDeltaMag = (touchZeroPrevPos - touchOnePrevPos).magnitude;
+            float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
+
+            // Find the difference in the distances between each frame.
+            float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
+
+            Camera temp = GetComponent<Camera>();
+            // Otherwise change the field of view based on the change in distance between the touches.
+            temp.fieldOfView += deltaMagnitudeDiff * perspectiveZoomSpeed;
+            // Clamp the field of view to make sure it's between 0 and 180.
+            temp.fieldOfView = Mathf.Clamp(temp.fieldOfView, 0.1f, 179.9f);
         }
 
         //起始y=-10,-5時可視面積1/4所以zoom+1,-20時可視面積4倍所以zoom-1

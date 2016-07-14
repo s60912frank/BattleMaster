@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
 public class MapView : MonoBehaviour {
     public GameObject LoadingPanel;
     public GameObject EnemyDataPanel;
+    public Text GPSText;
+    public GameObject Player;
     private MapModel model;
 	// Use this for initialization
 	IEnumerator Start () {
@@ -26,12 +29,31 @@ public class MapView : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        
-	}
+        Vector2 newPos = model.PlayerLocation;
+        Player.transform.position.Set(newPos.x, newPos.y, Player.transform.position.z);
+        GPSText.text = model.GPSStatus;
+    }
 
-    public void ShowEnemyData(string name)
+    public void ShowEnemyData()
     {
-        JSONObject enemy = model.GetEnemyData(name);
+        JSONObject enemy = model.GetEnemyData("Trash").Copy();
+        enemy.AddField("inRange", true);
+        EnemyDataPanel.GetComponent<EnemyPanel>().SetEnemyData(enemy);
+    }
+
+    public void ShowEnemyData(Transform trans)
+    {
+        JSONObject enemy = model.GetEnemyData(trans.name).Copy();
+        Vector2 disVec = new Vector2(Player.transform.position.x - trans.position.x, Player.transform.position.y - trans.position.y);
+        float distance = Mathf.Sqrt(disVec.sqrMagnitude);
+        if(distance < trans.localScale.x / 2.0f)
+        {
+            enemy.AddField("inRange", true);
+        }
+        else
+        {
+            enemy.AddField("inRange", false);
+        }
         EnemyDataPanel.GetComponent<EnemyPanel>().SetEnemyData(enemy);
     }
 
@@ -129,6 +151,8 @@ public class MapView : MonoBehaviour {
         for (int i = 0; i < 4; i++)
         {
             GameObject area = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            Destroy(area.GetComponent<CapsuleCollider>());
+            area.AddComponent<MeshCollider>();
             area.tag = "Area";
             area.name = enemyKinds[Random.Range(0, enemyKinds.Length)];
             area.transform.Rotate(new Vector3(90, 0, 0));

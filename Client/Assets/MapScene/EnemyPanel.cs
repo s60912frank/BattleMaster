@@ -9,6 +9,7 @@ public class EnemyPanel : MonoBehaviour {
     public Text StaminaText;
     public Text AttackText;
     public Text RewardText;
+    public Button BattleButton;
 	// Use this for initialization
 	void Start () {
 	
@@ -27,6 +28,7 @@ public class EnemyPanel : MonoBehaviour {
         StaminaText.text = "血量:" + data["stamina"].f.ToString();
         AttackText.text = "攻擊:" + data["attack"].f.ToString();
         RewardText.text = "獎勵:" + data["reward"].f.ToString();
+        BattleButton.interactable = data["inRange"].b;
         Show();
     }
 

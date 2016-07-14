@@ -22,6 +22,7 @@ public class MapModel {
     private JSONObject EnemyData;
     private JSONObject UserData;
     private MapProcessor2 process;
+    private GPS gps;
 	// Use this for initialization
     public MapModel()
     {
@@ -31,7 +32,7 @@ public class MapModel {
 
     public IEnumerator MapInit()
     {
-        GPS gps = new GPS();
+        gps = new GPS();
         yield return gps.GPSInit((location) => {
             this.lonOrigin = location.x;
             this.latOrigin = location.y;
@@ -163,5 +164,21 @@ public class MapModel {
             }
         }
         return null;
+    }
+
+    public Vector2 PlayerLocation
+    {
+        get
+        {
+            return gps.PlayerLocation;
+        }
+    }
+
+    public string GPSStatus
+    {
+        get
+        {
+            return gps.GPSStatus;
+        }
     }
 }
