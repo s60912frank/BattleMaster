@@ -34,6 +34,15 @@ module.exports = (app, passport) => {
       });
     });
 
+    app.get('/allEnemyData',isLoggedIn ,(req, res) => {
+      Enemy.find({}, { "_id": 0 }, (err, data) => {
+        res.send(data);
+      });
+      /*Enemy.SomeValue.find({}).select({ "name": 1, "_id": 0}).query.exec((err, data) => {
+        res.send(data);
+      });*/
+    });
+
     app.get('/isLoggedIn', isLoggedIn, (req, res) => {
       console.log(req.user.game.name + "LOGGED IN!");
       res.send(req.user.game);
