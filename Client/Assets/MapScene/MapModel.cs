@@ -38,6 +38,7 @@ public class MapModel {
         });
         process = new MapProcessor2(lonOrigin, latOrigin);
         yield return RequestMap(lonOrigin, latOrigin);
+        yield return GetAllEnemyData();
         yield break;
     }
 
@@ -136,5 +137,31 @@ public class MapModel {
         tile.x = (int)Mathf.Floor((longtitude + 180.0f) / 360.0f * (1 << ZOOM));
         tile.y = (int)Mathf.Floor(((1.0f - Mathf.Log(Mathf.Tan(latitude * Mathf.PI / 180.0f) + 1.0f / Mathf.Cos(latitude * Mathf.PI / 180.0f)) / Mathf.PI) / 2.0f * (1 << ZOOM)));
         return tile;
+    }
+
+    public string[] EnemyNames
+    {
+        get
+        {
+            int count = EnemyData.list.Count;
+            string[] enemies = new string[count];
+            for(int i = 0;i < count; i++)
+            {
+                enemies[i] = EnemyData.list[i]["name"].str;
+            }
+            return enemies;
+        }
+    }
+
+    public JSONObject GetEnemyData(string name)
+    {
+        foreach(JSONObject enemy in EnemyData.list)
+        {
+            if(enemy["name"].str == name)
+            {
+                return enemy;
+            }
+        }
+        return null;
     }
 }

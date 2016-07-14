@@ -38,6 +38,7 @@ module.exports = (app, passport) => {
       Enemy.find({}, { "_id": 0 }, (err, data) => {
         res.send(data);
       });
+      console.log(req.user.game.name + "取得了怪物資訊!");
       /*Enemy.SomeValue.find({}).select({ "name": 1, "_id": 0}).query.exec((err, data) => {
         res.send(data);
       });*/

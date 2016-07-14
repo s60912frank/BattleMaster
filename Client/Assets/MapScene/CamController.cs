@@ -9,6 +9,8 @@ public class CamController : MonoBehaviour {
     private Vector3 nowHit;
     private float panDiff;
     private bool rayCasting = true;
+    //臭
+    public bool MouseRay = true;
 	// Use this for initialization
 	void Start () {
         trans = gameObject.transform;
@@ -18,13 +20,18 @@ public class CamController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0) && MouseRay)
         {
-            RaycastHit hit;
-            if (Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit))
+            RaycastHit[] hits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition));
+            foreach(RaycastHit hit in hits)
             {
-                //Debug.Log("HITTTT:" + hit.transform.name);
-                //StartCoroutine(GetEnemyData(hit.transform.name));
+                if(hit.transform.tag == "Area")
+                {
+                    //showMonsterData
+                    MouseRay = false;
+                    map.ShowEnemyData(hit.transform.name);
+                    break;
+                }
             }
         }
 
@@ -164,23 +171,23 @@ public class CamController : MonoBehaviour {
     private int[] DetermineCurrentTile()
     {
         Ray center = Camera.main.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-        RaycastHit hit;
-        if(Physics.Raycast(center, out hit))
+        RaycastHit[] hits = Physics.RaycastAll(center);
+        foreach(RaycastHit hit in hits)
         {
-            try
+            if(hit.transform.tag == "MapPlane")
             {
-                string[] tileNum = hit.transform.name.Split('/');
-                return new int[] { int.Parse(tileNum[0]), int.Parse(tileNum[1]) };
-            }
-            catch
-            {
-                return null;
+                try
+                {
+                    string[] tileNum = hit.transform.name.Split('/');
+                    return new int[] { int.Parse(tileNum[0]), int.Parse(tileNum[1]) };
+                }
+                catch
+                {
+                    return null;
+                }
             }
         }
-        else
-        {
-            return null;
-        }
+        return null;
     }
 
     private IEnumerator GetEnemyData(string enemyName)

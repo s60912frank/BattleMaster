@@ -29,6 +29,12 @@ public class MapView : MonoBehaviour {
         
 	}
 
+    public void ShowEnemyData(string name)
+    {
+        JSONObject enemy = model.GetEnemyData(name);
+        EnemyDataPanel.GetComponent<EnemyPanel>().SetEnemyData(enemy);
+    }
+
     public IEnumerator GetNewTile(int xTile, int yTile)
     {
         LoadingPanel.GetComponent<LoadingScript>().StartLoading();
@@ -103,11 +109,33 @@ public class MapView : MonoBehaviour {
         Debug.Log("SET PLANE!");
         GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
         plane.transform.Rotate(Vector3.right, -90);
-        plane.tag = "MapObj";
+        plane.tag = "MapPlane";
         plane.name = model.TileNum.x + "/" + model.TileNum.y;
         plane.transform.localScale = new Vector3(data.mapBoundary.width / 10.0f, 1, data.mapBoundary.height / 10.0f);
         plane.transform.position = new Vector3(data.mapBoundary.center.x, data.mapBoundary.center.y);
         plane.GetComponent<Renderer>().material = Resources.Load<Material>("plane");
-        //DrawSomeCircle();
+        //DrawSomeCircle(plane);
+        Debug.Log("WHEEEEAREAAREA!!!!");
+        //float maxRad = (mapBoundary.Width + mapBoundary.Height) / 2.0f;
+        //float getRad = Random.Range(maxRad * 0.15f, maxRad * 0.85f);
+        float rad = (data.mapBoundary.width + data.mapBoundary.height) / 8.0f;
+        Vector2[] poss = new Vector2[] {
+            new Vector2(plane.transform.position.x - rad, plane.transform.position.y + rad),
+            new Vector2(plane.transform.position.x + rad, plane.transform.position.y + rad),
+            new Vector2(plane.transform.position.x - rad, plane.transform.position.y - rad),
+            new Vector2(plane.transform.position.x + rad, plane.transform.position.y - rad)
+        };
+        string[] enemyKinds = model.EnemyNames;
+        for (int i = 0; i < 4; i++)
+        {
+            GameObject area = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            area.tag = "Area";
+            area.name = enemyKinds[Random.Range(0, enemyKinds.Length)];
+            area.transform.Rotate(new Vector3(90, 0, 0));
+            area.transform.localScale = new Vector3(rad * 2.0f, 0.1f, rad * 2.0f);
+            area.transform.position = new Vector3(poss[i].x, poss[i].y, -0.1f);
+            area.GetComponent<Renderer>().material = Resources.Load<Material>("area");
+        }
     }
+
 }
