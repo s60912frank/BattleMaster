@@ -29,9 +29,18 @@ public class MapView : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        Vector2 newPos = model.PlayerLocation;
-        Player.transform.position.Set(newPos.x, newPos.y, Player.transform.position.z);
-        GPSText.text = model.GPSStatus;
+        
+    }
+
+    private IEnumerator UpdateGPS()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1);
+            Vector2 newPos = model.PlayerLocation;
+            Player.transform.position.Set(newPos.x, newPos.y, Player.transform.position.z);
+            GPSText.text = model.GPSStatus;
+        }
     }
 
     public void ShowEnemyData()

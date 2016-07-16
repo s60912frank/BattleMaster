@@ -2,6 +2,7 @@
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class EnemyPanel : MonoBehaviour {
     public RawImage EnemyImage;
@@ -53,6 +54,23 @@ public class EnemyPanel : MonoBehaviour {
     public void Battle()
     {
         //.GetComponent<LoadingScript>().EndLoading();
-        SceneManager.LoadScene("Battle2");
+        StartCoroutine(BattleWithAI());
+    }
+
+    private IEnumerator BattleWithAI()
+    {
+        Dictionary<string, string> headers = new Dictionary<string, string>();
+        headers.Add("Cookie", PlayerPrefs.GetString("Cookie")); //加入cookie
+        WWW w = new WWW(Constant.SERVER_URL + "/battleWithAI", null, headers);
+        yield return w;
+        if (string.IsNullOrEmpty(w.error))
+        {
+            PlayerPrefs.SetString("userData", w.text);
+            SceneManager.LoadScene("Battle2");
+        }
+        else
+        {
+            Debug.Log(w.error);
+        }
     }
 }

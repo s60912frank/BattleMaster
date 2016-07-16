@@ -34,24 +34,34 @@ module.exports = (app, passport) => {
       });
     });
 
-    app.post('/traningResult', isLoggedIn, (req, res) => {
+    var consume100Mileage = (req, res) => {
       if(req.user.game.mileage >= 100){
-        console.log(req.body);
         req.user.game.mileage -= 100;
-        req.user.game.pet.stamina += parseInt(req.body.staminaIncrease);
-        req.user.game.pet.attack += parseInt(req.body.attackIncrease);
-        req.user.game.pet.evade += parseInt(req.body.evadeIncrease);
-        req.user.game.pet.defense += parseInt(req.body.defenseIncrease);
         req.user.save((err) => {
           if(err) throw err;
-          console.log(req.user.game.name + " traning saved!");
+          console.log(req.user.game.name + " mileage - 100!");
         });
         res.send(req.user.game);
       }
       else{
-        console.log("Invalid access");
         res.status(401);
       }
+    }
+
+    app.get('/battleWithAI', isLoggedIn, consume100Mileage);
+
+    app.get('/enterTraning', isLoggedIn, consume100Mileage);
+
+    app.post('/traningResult', isLoggedIn, (req, res) => {
+      req.user.game.pet.stamina += parseInt(req.body.staminaIncrease);
+      req.user.game.pet.attack += parseInt(req.body.attackIncrease);
+      req.user.game.pet.evade += parseInt(req.body.evadeIncrease);
+      req.user.game.pet.defense += parseInt(req.body.defenseIncrease);
+      req.user.save((err) => {
+        if(err) throw err;
+        console.log(req.user.game.name + " traning saved!");
+      });
+      res.send(req.user.game);
     });
 
     app.get('/allEnemyData',isLoggedIn ,(req, res) => {

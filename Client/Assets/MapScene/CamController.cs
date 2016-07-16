@@ -229,27 +229,4 @@ public class CamController : MonoBehaviour {
         }
         return null;
     }
-
-    private IEnumerator GetEnemyData(string enemyName)
-    {
-        WWWForm form = new WWWForm();
-        Dictionary<string, string> headers = new Dictionary<string, string>();
-        headers.Add("Cookie", PlayerPrefs.GetString("Cookie")); //加入認證過的cookie就不用重新登入了
-        //將來這項資料從地圖取得
-        form.AddField("enemyName", enemyName);
-        WWW w = new WWW(Constant.SERVER_URL + "/battle", form.data, headers);
-        yield return w;
-        //就只是看有沒有錯誤而已
-        if (!string.IsNullOrEmpty(w.error))
-        {
-            Debug.Log(w.error);
-        }
-        else
-        {
-            Debug.Log(w.text);
-            PlayerPrefs.SetString("enemyAI", w.text);
-            //LoadingPanel.GetComponent<LoadingScript>().EndLoading();
-            SceneManager.LoadScene("Battle2");
-        }
-    }
 }

@@ -1,16 +1,33 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Catcher : MonoBehaviour {
+public class Catcher : Pauseable {
     // Use this for initialization
     private UpdateScore updateScore;
-	void Start () {
+    private bool run = true;
+    private float deltaTime = 0.0f;
+    void Start () {
         updateScore = GameObject.Find("Canvas").GetComponent<UpdateScore>();
+        GameObject.Find("GameScript").GetComponent<statsMinigame>().AddPauseableObject(this);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        transform.position = new Vector3(Mathf.PingPong(Time.time * 1.5f, 4) - 2, transform.position.y, transform.position.z);
+        if (run)
+        {
+            deltaTime += Time.deltaTime;
+            transform.position = new Vector3(Mathf.PingPong(deltaTime * 1.5f, 4) - 2, transform.position.y, transform.position.z);
+        }
+    }
+
+    public override void Pause()
+    {
+        run = false;
+    }
+
+    public override void Resume()
+    {
+        run = true;
     }
 
     void OnTriggerEnter2D(Collider2D col)

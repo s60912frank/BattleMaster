@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 
-public class UpdateScore : MonoBehaviour {
+public class UpdateScore : Pauseable {
     public Text AttackText;
     public Text DefenseText;
     public Text StaminaText;
@@ -13,8 +13,10 @@ public class UpdateScore : MonoBehaviour {
     private int defenseScore = 0;
     private int staminaScore = 0;
     private int time = 30;
+    private bool run = true;
     // Use this for initialization
     void Start () {
+        StartCoroutine(DirtyWay());
         StartCoroutine(CountDownTimer());
 	}
 	
@@ -23,13 +25,32 @@ public class UpdateScore : MonoBehaviour {
 	
 	}
 
+    private IEnumerator DirtyWay()
+    {
+        yield return new WaitForSeconds(0.1f);
+        GameObject.Find("GameScript").GetComponent<statsMinigame>().AddPauseableObject(this);
+    }
+
+    public override void Pause()
+    {
+        run = false;
+    }
+
+    public override void Resume()
+    {
+        run = true;
+    }
+
     private IEnumerator CountDownTimer()
     {
         do
         {
             yield return new WaitForSeconds(1);
-            time--;
-            TimerText.text = "剩餘時間:" + time.ToString();
+            if (run)
+            {
+                time--;
+                TimerText.text = "剩餘時間:" + time.ToString();
+            }
         } while (time > 0);
         //結算訓練成果
         Time.timeScale = 0;

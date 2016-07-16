@@ -28,10 +28,34 @@ public class BtnFunctions : MonoBehaviour {
     public void TrainingClicked()
     {
         //有點臭
+        LoadingPanel.GetComponent<LoadingScript>().StartLoading();
         JSONObject data = new JSONObject(PlayerPrefs.GetString("userData"));
         if(data["mileage"].f > 100)
         {
-            SceneManager.LoadScene("StatsTraining");
+            StartCoroutine(EnterTraningGame());
         }
+        else
+        {
+            //出去走走好嗎
+        }
+    }
+
+    private IEnumerator EnterTraningGame()
+    {
+        Dictionary<string, string> headers = new Dictionary<string, string>();
+        headers.Add("Cookie", PlayerPrefs.GetString("Cookie")); //加入cookie
+        WWW w = new WWW(Constant.SERVER_URL + "/enterTraning", null, headers);
+        yield return w;
+        if (string.IsNullOrEmpty(w.error))
+        {
+            PlayerPrefs.SetString("userData", w.text);
+        }
+        else
+        {
+            //你4不4偷改數據
+            Debug.Log(w.error);
+        }
+        LoadingPanel.GetComponent<LoadingScript>().EndLoading();
+        SceneManager.LoadScene("StatsTraining");
     }
 }
