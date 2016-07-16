@@ -162,7 +162,8 @@ public class login : MonoBehaviour {
         string[] data = w.responseHeaders["SET-COOKIE"].Split(";"[0]); //取出登入後的cookie存起來
         if (data.Length > 0)
         {
-            response.AddField("cookie", data[0]);
+            //response.AddField("cookie", data[0]);
+            PlayerPrefs.SetString("Cookie", data[0]);
             Debug.Log(data[0]);
         }
         Debug.Log("登入成功");

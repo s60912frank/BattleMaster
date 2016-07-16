@@ -219,7 +219,7 @@ public class BattlePhase : MonoBehaviour {
                 }
             }
             Dictionary<string, string> headers = new Dictionary<string, string>();
-            headers.Add("Cookie", userData["cookie"].str); //加入認證過的cookie就不用重新登入了
+            headers.Add("Cookie", PlayerPrefs.GetString("Cookie")); //加入認證過的cookie就不用重新登入了
             WWW w = new WWW(Constant.SERVER_URL + "/battleAIResult", form.data, headers);
             StartCoroutine(WaitForBattleResult(w));
         }

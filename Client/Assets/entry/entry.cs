@@ -50,6 +50,7 @@ public class entry : MonoBehaviour {
         else
         {
             userData = new JSONObject(PlayerPrefs.GetString("userData"));
+            Debug.Log(PlayerPrefs.GetString("userData"));
             StartCoroutine(CheckIfLoggedIn());
         }
     }
@@ -57,24 +58,33 @@ public class entry : MonoBehaviour {
     private IEnumerator CheckIfLoggedIn()
         //檢查此cookie O不OK 有沒有過期 存不存在
     {
-        Dictionary<string, string> headers = new Dictionary<string, string>();
-        headers.Add("Cookie", userData["cookie"].str); //加入cookie
-        WWW w = new WWW(Constant.SERVER_URL + "/isLoggedIn", null, headers);
-        yield return w;
-        if (string.IsNullOrEmpty(w.error))
+        string cookie = PlayerPrefs.GetString("Cookie");
+        if (!string.IsNullOrEmpty(cookie))
         {
-            //沒有錯誤就直接登入了
-            //到status畫面
-            isLoaded = "status";
-            JSONObject newUserData = new JSONObject(w.text);
-            newUserData.AddField("cookie", userData["cookie"]);
-            PlayerPrefs.SetString("userData", newUserData.ToString());
+            Dictionary<string, string> headers = new Dictionary<string, string>();
+            headers.Add("Cookie", cookie); //加入cookie
+            WWW w = new WWW(Constant.SERVER_URL + "/isLoggedIn", null, headers);
+            yield return w;
+            if (string.IsNullOrEmpty(w.error))
+            {
+                //沒有錯誤就直接登入了
+                //到status畫面
+                isLoaded = "status";
+                JSONObject newUserData = new JSONObject(w.text);
+                newUserData.AddField("cookie", userData["cookie"]);
+                PlayerPrefs.SetString("userData", newUserData.ToString());
+            }
+            else
+            {
+                //收到錯誤就註冊去
+                isLoaded = "login";
+            }
         }
         else
         {
-            //收到錯誤就註冊去
             isLoaded = "login";
         }
+        
     }
 
 	// Update is called once per frame

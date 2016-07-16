@@ -27,7 +27,7 @@ public class PVPRooms : MonoBehaviour {
 		socket.On ("roomAdded", OnRoomAdded);
 		socket.On ("roomRemoved", OnRoomRemoved);
 		socket.On ("battleStart", OnBattleStart);
-        string rawSid = userData["cookie"].ToString().Replace("\"", "");
+        string rawSid = PlayerPrefs.GetString("Cookie");
         //附上登入過後server給我們的餅乾再連線
         socket.socket.SetCookie(new WebSocketSharp.Net.Cookie("connect.sid", rawSid.Replace("connect.sid=", "")));
         //連線!!只要有登入過就會連線成功

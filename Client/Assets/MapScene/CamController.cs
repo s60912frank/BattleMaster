@@ -234,8 +234,7 @@ public class CamController : MonoBehaviour {
     {
         WWWForm form = new WWWForm();
         Dictionary<string, string> headers = new Dictionary<string, string>();
-        JSONObject data = new JSONObject(PlayerPrefs.GetString("userData"));
-        headers.Add("Cookie", data["cookie"].str); //加入認證過的cookie就不用重新登入了
+        headers.Add("Cookie", PlayerPrefs.GetString("Cookie")); //加入認證過的cookie就不用重新登入了
         //將來這項資料從地圖取得
         form.AddField("enemyName", enemyName);
         WWW w = new WWW(Constant.SERVER_URL + "/battle", form.data, headers);

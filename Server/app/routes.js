@@ -34,6 +34,26 @@ module.exports = (app, passport) => {
       });
     });
 
+    app.post('/traningResult', isLoggedIn, (req, res) => {
+      if(req.user.game.mileage >= 100){
+        console.log(req.body);
+        req.user.game.mileage -= 100;
+        req.user.game.pet.stamina += parseInt(req.body.staminaIncrease);
+        req.user.game.pet.attack += parseInt(req.body.attackIncrease);
+        req.user.game.pet.evade += parseInt(req.body.evadeIncrease);
+        req.user.game.pet.defense += parseInt(req.body.defenseIncrease);
+        req.user.save((err) => {
+          if(err) throw err;
+          console.log(req.user.game.name + " traning saved!");
+        });
+        res.send(req.user.game);
+      }
+      else{
+        console.log("Invalid access");
+        res.status(401);
+      }
+    });
+
     app.get('/allEnemyData',isLoggedIn ,(req, res) => {
       Enemy.find({}, { "_id": 0 }, (err, data) => {
         res.send(data);

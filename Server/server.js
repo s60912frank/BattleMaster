@@ -16,6 +16,9 @@ var io = require('socket.io')(app.server);//client跟server連接
 
 var configDB = require('./config/database.js'); //db位置
 
+//public
+app.use('/public', express.static(__dirname + '/public'));
+
 // configuration ===============================================================
 mongoose.connect(configDB.url); // connect to our database
 var msInstance = new mongoStore({ mongooseConnection: mongoose.connection }); //save session in mongo

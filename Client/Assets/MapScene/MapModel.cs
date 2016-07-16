@@ -20,13 +20,11 @@ public class MapModel {
     //private int mapTileIndex = -1;
     //????????
     private JSONObject EnemyData;
-    private JSONObject UserData;
     private MapProcessor2 process;
     private GPS gps;
 	// Use this for initialization
     public MapModel()
     {
-        UserData = new JSONObject(PlayerPrefs.GetString("userData"));
         mapBoundry = new Rect(0, 0, 0, 0);
     }
 
@@ -51,7 +49,7 @@ public class MapModel {
     public IEnumerator GetAllEnemyData()
     {
         Dictionary<string, string> headers = new Dictionary<string, string>();
-        headers.Add("Cookie", UserData["cookie"].str); //加入cookie
+        headers.Add("Cookie", PlayerPrefs.GetString("Cookie")); //加入cookie
         WWW w = new WWW(Constant.SERVER_URL + "/allEnemyData", null, headers);
         yield return w;
         if (string.IsNullOrEmpty(w.error))
