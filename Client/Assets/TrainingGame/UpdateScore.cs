@@ -59,7 +59,7 @@ public class UpdateScore : Pauseable {
 
     private IEnumerator TrainingResult()
     {
-        JSONObject userData = new JSONObject(PlayerPrefs.GetString("userData"));
+        //JSONObject userData = new JSONObject(PlayerPrefs.GetString("userData"));
         WWWForm postData = new WWWForm();
         postData.AddField("staminaIncrease", staminaScore);
         postData.AddField("attackIncrease", attackScore);
