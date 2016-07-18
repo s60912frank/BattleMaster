@@ -2,7 +2,7 @@
 using System.Collections;
 
 public class BattlePhase666{
-    private MonsterData2 enemyData;
+    /*private MonsterData2 enemyData;
     private MonsterData2 userData;
     public enum Movement
     {
@@ -129,5 +129,5 @@ public class BattlePhase666{
     {
         A.Charge();
         B.DropDefense();
-    }
+    }*/
 }

@@ -4,55 +4,74 @@ using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class Click : MonoBehaviour {
-	public GameObject BattleManager;
-	private BattlePhase battlePhase;
-	public Text btnSkillText;
+    public Button SkillBtn;
+    public Button AttackBtn;
+    public Button DefendBtn;
+    public Button EvadeBtn;
+    public Button ConfirmBtn;
+    private Button[] allBtns;
+
+	private BattleView battleView;
 	public Text messageBoxText;
-	private int chargeMax;
-	private int charge;
+    private Text SkillBtnText;
+    private BattlePhase.Movement movement;
 	// Use this for initialization
 	void Start ()
 	{
-		battlePhase = BattleManager.GetComponent<BattlePhase>();
-		btnSkillText.text = battlePhase.partner.ChargeText;
+        allBtns = new Button[] { SkillBtn, AttackBtn, DefendBtn, EvadeBtn, ConfirmBtn };
+        SkillBtnText = SkillBtn.GetComponentInChildren<Text>();
+		battleView = GameObject.Find("BattleManager").GetComponent<BattleView>();
 	}
+
+    public void SetBtnsEnabled(bool status)
+    {
+        foreach(Button btn in allBtns)
+        {
+            btn.interactable = status;
+        }
+    }
 
 	// Update is called once per frame
 	void Update () {
-		btnSkillText.text = battlePhase.partner.ChargeText;
+        SkillBtnText.text = battleView.GetSkillBtnText();
 	}
 
 	public void action_4_btnSkill()
 	{
-		if (battlePhase.partner.IsSkillReady) 
+		if (battleView.IsPartnerSkillReady()) 
 		{
-			battlePhase.partnerMovement = BattlePhase.Movement.Skill;
+			movement = BattlePhase.Movement.Skill;
 			messageBoxText.text = "Confirm to Activate Skill.";
 		}
 		else
 		{
-			battlePhase.partnerMovement = BattlePhase.Movement.Charge;
+            movement = BattlePhase.Movement.Charge;
 			messageBoxText.text = "Confirm to Activate Charge.";
 		}
 	}
 
 	public void action_4_btnAttack()
 	{
-		battlePhase.partnerMovement = BattlePhase.Movement.Attack;
+        movement = BattlePhase.Movement.Attack;
 		messageBoxText.text = "Confirm to Activate Attack.";
 	}
 
 	public void action_4_btnDefend()
 	{
-		battlePhase.partnerMovement = BattlePhase.Movement.Defense;
+        movement = BattlePhase.Movement.Defense;
 		messageBoxText.text = "Confirm to Activate Defend.";
 	}
 
 	public void action_4_btnEvade()
 	{
-		battlePhase.partnerMovement = BattlePhase.Movement.Evade;
+        movement = BattlePhase.Movement.Evade;
 		messageBoxText.text = "Confirm to Activate Evade.";
 	}
+
+    public void ConfirmBtnClicked()
+    {
+        battleView.RoundStart(movement);
+    }
 
 	public void LeaveBattleClicked()
 	{

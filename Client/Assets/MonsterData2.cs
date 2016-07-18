@@ -2,13 +2,49 @@
 using System.Collections;
 
 public class MonsterData2 {
-    public int _stamina;
+    private string _name;
+    public string Name
+    {
+        get
+        {
+            return _name;
+        }
+    }
+    private int _stamina;
+    public int Stamina
+    {
+        get
+        {
+            return _stamina;
+        }
+    }
     private int _charge;
     public int _skillCD;
     private int _attack;
-    public int _defense;
+    public int Attack
+    {
+        get
+        {
+            return _attack;
+        }
+    }
+    private int _defense;
+    public int Defense
+    {
+        get
+        {
+            return _defense;
+        }
+    }
     public int _initialDefense;
-    public int _evade;
+    private int _evade;
+    public int Evade
+    {
+        get
+        {
+            return _evade;
+        }
+    }
     private bool _nextCritical;
     public int _burnDamage;
     public int SkillDamage;
@@ -17,24 +53,24 @@ public class MonsterData2 {
     public int SkillBurn;
     public string _textSkillDescription;
 
-    public void NextCricical()
+    public void SetNextCricical(bool status)
     {
-        _nextCritical = true;
+        _nextCritical = status;
     }
 
-    public int Attack
+    public bool IsNextCritical
     {
         get
         {
-            if (_nextCritical)
-            {
-                _nextCritical = false;
-                return _attack * 2;
-            }
-            else
-            {
-                return _attack;
-            }
+            return _nextCritical;
+        }
+    }
+
+    public int NowCharge
+    {
+        get
+        {
+            return _charge;
         }
     }
 
@@ -56,7 +92,8 @@ public class MonsterData2 {
 
     public MonsterData2(JSONObject data)
     {
-        Debug.Log("Data:" + data.ToString());
+        //Debug.Log("Data:" + data.ToString());
+        _name = data["name"].str;
         _stamina = (int)data["stamina"].f;
         _attack = (int)data["attack"].f;
         _defense = (int)data["defense"].f;
@@ -142,6 +179,22 @@ public class MonsterData2 {
         get
         {
             return _charge >= _skillCD;
+        }
+    }
+
+    public bool IsOnFire
+    {
+        get
+        {
+            return (_burnDamage > 0);
+        }
+    }
+
+    public bool IsDenfenseDropped
+    {
+        get
+        {
+            return _initialDefense != _defense;
         }
     }
 }

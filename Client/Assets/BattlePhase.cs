@@ -1,27 +1,10 @@
 ﻿using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
-public class BattlePhase : MonoBehaviour {
-
-    public GameObject Partner;
-    public GameObject Enemy;
-    public GameObject PartnerSkillEffect;
-    public GameObject EnemySkillEffect;//<---
-    public MonsterData enemy;
-	public MonsterData partner;
-    public Text EnemyHP;
-    public Text PartnerHP;
-    public Text messageBoxText;
-    public Text messageEnemyMove;
-    public Text EnemyCrit;
-    public Text PartnerCrit;
-	public GameObject VictoryPanel;
-	public GameObject DefeatPanel;
-    private JSONObject enemyData;
-    private JSONObject userData;
+public class BattlePhase {
+    public MonsterData2 enemy;
+	public MonsterData2 partner;
 
 	public enum Movement
 	{
@@ -32,78 +15,43 @@ public class BattlePhase : MonoBehaviour {
 		Skill
 	}
 
-	public Movement partnerMovement = Movement.Attack;
-	public Movement enemyMovement = Movement.Attack;
-
-	private List<Button> buttons; //把按鈕存在這控制enable/disable
-
-	void Start () {
-		VictoryPanel.SetActive (false);
-		DefeatPanel.SetActive (false);
-        enemyData = new JSONObject(PlayerPrefs.GetString("enemyAI"));
-        userData = new JSONObject(PlayerPrefs.GetString("userData"));
-        //set status from scripts
-        enemy = new MonsterData();
-        enemy.Initialize(enemyData);
-		partner = new MonsterData();
-        partner.Initialize(userData["pet"]);
-
-		buttons = new List<Button> ();
-		foreach (GameObject btn in GameObject.FindGameObjectsWithTag("MovementBtn")) 
-		{
-			buttons.Add(btn.GetComponent<Button>());
-		}
-	}
-	
-	void Update ()//Update UI
+    public BattlePhase(JSONObject enemy, JSONObject partner)
     {
-		if (enemy.NextCritical){
-			EnemyCrit.text = "Next hit Critical";
-		}
-		else
-		{
-			EnemyCrit.text = "";
-		}
-		if (partner.NextCritical){
-			PartnerCrit.text = "Next hit Critical";
-		}
-		else
-		{
-			PartnerCrit.text = "";
-		}
-		EnemyHP.text = "Enemy HP:" + enemy.stamina;
-		PartnerHP.text = "Partner HP:" + partner.stamina;
-	}
+        this.enemy = new MonsterData2(enemy);
+        this.partner = new MonsterData2(partner);
+    }
 
-    public void enterBattlePhase()//Press Confirm button to enter battle phase
+    public BattleRoundResult RoundStart(Movement partnerMovement, Movement enemyMovement)//Press Confirm button to enter battle phase
     {
-		SetBtnsEnable (false);
+		//SetBtnsEnable (false);
+        BattleRoundResult result = new BattleRoundResult();
         //Enemy Movement
         int enemysRandomMove = Random.Range(0, 3);
-        switch (enemysRandomMove)
+        switch (enemyMovement)
         {
-			case 0:
-				enemyMovement = Movement.Attack;
-                messageEnemyMove.text = "The enemy attacked!";
+			case Movement.Attack:
+                result.enemyStatusText = "The enemy attacked!";
                 //yourEvadeNumber = Random.Range(0, 100);
                 /* See Enemy's attack below */
                 break;
-            case 1:
-				enemyMovement = Movement.Defense;
-                messageEnemyMove.text = "The enemy tried to defend your attack.";
+            case Movement.Defense:
+                result.enemyStatusText = "The enemy tried to defend your attack.";
                 break;
-            case 2:
-				enemyMovement = Movement.Evade;
-                messageEnemyMove.text = "The enemy tried to evade your attack.";
+            case Movement.Evade:
+                result.enemyStatusText = "The enemy tried to evade your attack.";
                 break;
-			case 3:
-				if (enemy.IsSkillReady) 
-				{
-					enemy.Skill (ref partner);
-					EnemySkillEffect.GetComponent<PartnerSkillEffectEntry> ().activated = true;
-				}
-				else
-					enemy.charge++;
+			case Movement.Charge:
+                if (enemy.IsSkillReady)
+                {
+                    enemy.Skill(ref partner);
+                    //EnemySkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
+                    result.isEnemySkillActivated = true;
+                    enemyMovement = Movement.Skill;
+                    result.enemyStatusText = "敵人使用了技能!";
+                }
+                else
+                    enemy.Charge();
+                result.enemyStatusText = "敵人正在蓄能!";
                 break;
         }
 
@@ -112,131 +60,173 @@ public class BattlePhase : MonoBehaviour {
         {
 			case Movement.Attack:
                 int evadeNumber = Random.Range(0, 100);
-				int evade = enemy.evade * (enemyMovement == Movement.Evade ? 2 : 1);
-				int defense = enemy.defense * (enemyMovement == Movement.Defense ? 2 : 1);
-				int attack = partner.attack * (partner.NextCritical ? 2 : 1);
+				int evade = enemy.Evade * (enemyMovement == Movement.Evade ? 2 : 1);
+				int defense = enemy.Defense;
+                if(enemyMovement == Movement.Defense)
+                {
+                    defense *= 2;
+                    enemy.RecoverDefense();
+                    enemy.Charge();
+                    //enemy防禦力回復了 並且charge+1
+                }
+				int attack = partner.Attack * (partner.IsNextCritical ? 2 : 1);
                 if (evade < evadeNumber)//update messageBox text
                 {
 					int damage = attack - defense;
-                    enemy.stamina -= damage;
-                    messageBoxText.text = "Attack hit and dealt " + damage + " damage.";
+                    enemy.TakeDamage(damage);
+                    result.enemyDamageTake = damage;
+                    result.partnerStatusText = "Attack hit and dealt " + damage + " damage.";
                 }
                 else
                 {
-                    messageBoxText.text = "The Enemy evaded your attack...";
+                    result.partnerStatusText = "The Enemy evaded your attack...";
 					if (enemyMovement == Movement.Evade)
-						enemy.NextCritical = true;
+                    {
+                        enemy.SetNextCricical(true);
+                    }
                 }
-				partner.NextCritical = false;
+				partner.SetNextCricical(false);
                 break;
 			case Movement.Defense:
 				if (enemyMovement != Movement.Attack)
                 {
 					partner.DropDefense ();
-					Debug.Log ("Parter的防禦降到" + partner.defense + "了!");
+                    result.partnerStatusText = "你的防禦降低了!";
+                    Debug.Log ("Parter的防禦降到" + partner.Defense + "了!");
                 }
                 break;
 			case Movement.Evade:
 				partnerMovement = Movement.Evade;
                 break;
 			case Movement.Charge:
-                partner.charge++;
+                partner.Charge();
                 break;
-		case Movement.Skill:
-                //partnerData.charge = 0;
-                //PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
-                //Partner.GetComponent<PartnerData>().Skill();
-				partner.Skill (ref enemy);
-				PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry> ().activated = true;
+		    case Movement.Skill:
+                if (partner.IsSkillReady)
+                {
+                    partner.Skill(ref enemy);
+                    //PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
+                    result.isPartnerSkillActivated = true;
+                }
                 break;
         }
 		partner.Burn ();
+        result.isPartnerOnfire = partner.IsOnFire;
         
         /* Enemy's attack */
 		if (enemyMovement == Movement.Attack)
         {
-			int yourEvadeNumber = Random.Range(0, 100);
-			int evade = partner.evade * (partnerMovement == Movement.Evade ? 2 : 1);
-			int defense = partner.defense * (partnerMovement == Movement.Defense ? 2 : 1);
-			int enemyAtt = enemy.attack * (enemy.NextCritical ? 2 : 1);
-			if (evade < yourEvadeNumber)
-			{
-				int damage = enemyAtt - defense;
-				partner.TakeDamage (damage);
-				messageBoxText.text = "You took " + damage + " damage";
-				if (partnerMovement == Movement.Defense)
-				{
-					//Defend success --> Skill boost
-					partner.charge++;
-					partner.RecoverDefense();
-				}
-			}
+            if(partnerMovement == Movement.Defense)
+            {
+                //防禦時迴避規0
+                partner.Charge();
+                partner.RecoverDefense();
+            }
             else
             {
-                //Attack dodged
-                messageBoxText.text = "You dodged the enemy's attack.";
-				if (partnerMovement == Movement.Evade)
-					partner.NextCritical = true;
+                int yourEvadeNumber = Random.Range(0, 100);
+                int evade = partner.Evade * (partnerMovement == Movement.Evade ? 2 : 1);
+                int enemyAtt = enemy.Attack * (enemy.IsNextCritical ? 2 : 1);
+                if (evade < yourEvadeNumber)
+                {
+                    //迴避失敗
+                    int damage = enemyAtt - partner.Defense;
+                    result.partnerDamageTake = damage;
+                    partner.TakeDamage(damage);
+                    result.partnerStatusText = "You took " + damage + " damage";
+                }
+                else
+                {
+                    //迴避成功
+                    result.partnerStatusText = "You dodged the enemy's attack.";
+                    if (partnerMovement == Movement.Evade)
+                    {
+                        partner.SetNextCricical(true);
+                    }
+                }
             }
-			enemy.NextCritical = false;
+			enemy.SetNextCricical(false);
+        }
+        else if(enemyMovement == Movement.Defense)
+        {
+            if (partnerMovement != Movement.Attack)
+            {
+                enemy.DropDefense();
+            }
+                
         }
 		enemy.Burn ();
-		SetBtnsEnable (true);
-		CheckIfGameOver ();
+        result.isPartnerNextCritical = partner.IsNextCritical;
+        result.isEnemyNextCritical = enemy.IsNextCritical;
+        result.isPartnerDefenseDropped = partner.IsDenfenseDropped;
+        result.isEnemyDefenseDropped = enemy.IsDenfenseDropped;
+        result.isEnemyOnfire = enemy.IsOnFire;
+        result.enemyRemainingCD = enemy.RemainingCD;
+        result.partnerRemainingCD = partner.RemainingCD;
+        result.enemyHp = enemy.Stamina;
+        result.partnerHp = partner.Stamina;
+        //ROUND OVER
+        return result;
     }
 
-	private void SetBtnsEnable(bool state)
+	public string CheckIfGameOver()
 	{
-		foreach (Button btn in buttons) 
-		{
-			btn.interactable = state;
-		}
-	}
-
-	private void CheckIfGameOver()
-	{
-        if(partner.stamina <= 0 || enemy.stamina <= 0)
+        if(partner.Stamina <= 0 || enemy.Stamina <= 0)
         {
-            SetBtnsEnable(false);
-            WWWForm form = new WWWForm();
-            form.AddField("enemyName", enemyData["name"].str);
-            if (partner.stamina <= 0 && enemy.stamina <= 0)
+            if (partner.Stamina <= 0 && enemy.Stamina <= 0)
             {
-                VictoryPanel.SetActive(true);//其實應該要是平手
-                form.AddField("result", "even");
+                return "even";
             }
             else
             {
-                if (enemy.stamina <= 0)
+                if (enemy.Stamina <= 0)
                 {
-                    VictoryPanel.SetActive(true);
-                    form.AddField("result", "win");
+                    return "win";
                 }
-                else if (partner.stamina <= 0)
+                else if (partner.Stamina <= 0)
                 {
-                    DefeatPanel.SetActive(true);
-                    form.AddField("result", "lose");
+                    return "lose";
                 }
             }
-            Dictionary<string, string> headers = new Dictionary<string, string>();
-            headers.Add("Cookie", PlayerPrefs.GetString("Cookie")); //加入認證過的cookie就不用重新登入了
-            WWW w = new WWW(Constant.SERVER_URL + "/battleAIResult", form.data, headers);
-            StartCoroutine(WaitForBattleResult(w));
         }
+        return "no";
 	}
 
-    private IEnumerator WaitForBattleResult(WWW w)
+    public IEnumerator WaitForBattleResult(string result)
     {
+        WWWForm form = new WWWForm();
+        form.AddField("enemyName", enemy.Name);
+        form.AddField("result", result);
+        Dictionary<string, string> headers = new Dictionary<string, string>();
+        headers.Add("Cookie", PlayerPrefs.GetString("Cookie")); //加入認證過的cookie就不用重新登入了
+        WWW w = new WWW(Constant.SERVER_URL + "/battleAIResult", form.data, headers);
         yield return w;
         if (string.IsNullOrEmpty(w.error))
         {
             Debug.Log(w.text);
             PlayerPrefs.SetString("BattleResult", w.text);
-            SceneManager.LoadScene("BattleResult");
+            //SceneManager.LoadScene("BattleResult");
         }
         else
         {
             Debug.Log(w.error);
         }
+    }
+
+    public string GetSkillBtnText()
+    {
+        if (partner.IsSkillReady)
+        {
+            return "Skill";
+        }
+        else
+        {
+            return "Charge" + partner.NowCharge + "/" + partner._skillCD;
+        }
+    }
+
+    public bool IsPartnerSkillReady()
+    {
+        return partner.IsSkillReady;
     }
 }
