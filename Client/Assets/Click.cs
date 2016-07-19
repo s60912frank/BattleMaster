@@ -21,7 +21,12 @@ public class Click : MonoBehaviour {
         allBtns = new Button[] { SkillBtn, AttackBtn, DefendBtn, EvadeBtn, ConfirmBtn };
         SkillBtnText = SkillBtn.GetComponentInChildren<Text>();
 		battleView = GameObject.Find("BattleManager").GetComponent<BattleView>();
-	}
+
+        ColorBlock color = AttackBtn.colors;
+        color.normalColor = Color.yellow;
+        color.highlightedColor = Color.yellow;
+        AttackBtn.colors = color;
+    }
 
     public void SetBtnsEnabled(bool status)
     {
@@ -48,24 +53,28 @@ public class Click : MonoBehaviour {
             movement = BattlePhase.Movement.Charge;
 			messageBoxText.text = "Confirm to Activate Charge.";
 		}
+        SetColor(SkillBtn);
 	}
 
 	public void action_4_btnAttack()
 	{
         movement = BattlePhase.Movement.Attack;
 		messageBoxText.text = "Confirm to Activate Attack.";
+        SetColor(AttackBtn);
 	}
 
 	public void action_4_btnDefend()
 	{
         movement = BattlePhase.Movement.Defense;
 		messageBoxText.text = "Confirm to Activate Defend.";
+        SetColor(DefendBtn);
 	}
 
 	public void action_4_btnEvade()
 	{
         movement = BattlePhase.Movement.Evade;
 		messageBoxText.text = "Confirm to Activate Evade.";
+        SetColor(EvadeBtn);
 	}
 
     public void ConfirmBtnClicked()
@@ -77,4 +86,19 @@ public class Click : MonoBehaviour {
 	{
 		SceneManager.LoadScene("Status");
 	}
+
+    private void SetColor(Button current)
+    {
+        foreach (Button btn in allBtns)
+        {
+            ColorBlock cb = btn.colors;
+            cb.normalColor = Color.white;
+            cb.highlightedColor = Color.white;
+            btn.colors = cb;
+        }
+        ColorBlock color = current.colors;
+        color.normalColor = Color.yellow;
+        color.highlightedColor = Color.yellow;
+        current.colors = color;
+    }
 }

@@ -108,7 +108,7 @@ module.exports = (io) => {
 	  });
 
 	  you.on("battleEnd", (data) => { //戰鬥結束!
-			you.end = data.result;
+			you.end = data;
 			if(you.end && enemy.end){
 				var youResult, enemyResult;
 				if(you.end == enemy.end){

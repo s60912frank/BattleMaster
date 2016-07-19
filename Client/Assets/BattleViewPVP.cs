@@ -2,8 +2,11 @@
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using System.Collections.Generic;
+using SocketIO;
 
-public class BattleView : MonoBehaviour {
+public class BattleViewPVP : MonoBehaviour {
+    private SocketIOComponent socket;
     public GameObject Partner;
     public GameObject Enemy;
     public GameObject PartnerSkillEffect;
@@ -32,24 +35,93 @@ public class BattleView : MonoBehaviour {
     private Click click;
     // Use this for initialization
     void Start () {
+        socket = GameObject.Find("SocketIO").GetComponent<SocketIOComponent>();
+        //socket事件們
+        socket.On("enemyData", OnReceiveEnemyData);
+        socket.On("enemyMovement", OnEnemyMovement);
+        socket.On("attackStart", OnAttackStart);
+        socket.On("enemyMovementResult", OnEnemyMoveMentResult);
+        socket.On("enemyLeave", OnEnemyLeave);
+        socket.On("battleResult2", OnBattleResult);
+
+        
+        click = GameObject.Find("BtnManager").GetComponent<Click>();
+	}
+
+    private void OnReceiveEnemyData(SocketIOEvent e)
+    //取得敵人資訊時存起來
+    {
         JSONObject partnerData = new JSONObject(PlayerPrefs.GetString("userData"))["pet"];
-        JSONObject enemyData = new JSONObject(PlayerPrefs.GetString("enemyAI"));
+        JSONObject enemyData = e.data;
         EnemyHP.text = "Enemy HP:" + enemyData["stamina"].f.ToString();
         EnemyCD.text = "CD:" + enemyData["skill"]["CD"].f.ToString();
         PartnerHP.text = "Partner HP:" + partnerData["stamina"].f.ToString();
         PartnerCD.text = "CD:" + partnerData["skill"]["CD"].f.ToString();
         //Debug.Log("87878787" + enemyData.ToString());
         battlePhase = new BattlePhase(enemyData, partnerData);
-        click = GameObject.Find("BtnManager").GetComponent<Click>();
-	}
+    }
 
-    public void RoundStart(BattlePhase.Movement myMovement)
+    private void OnEnemyMovement(SocketIOEvent e)
+    //當enemy選好動作時觸發
+    {
+        JSONObject data = e.data;
+        battlePhase.SetEnemyMovement((BattlePhase.Movement)data.f);
+        Debug.Log("Enemy:" + data["movement"].f + "!");
+        messageEnemyMove.text = "Enemy is ready.";
+    }
+
+    private void OnAttackStart(SocketIOEvent e)
+    {
+        RoundStart();
+    }
+
+    private void OnEnemyMoveMentResult(SocketIOEvent e)
+    {
+        JSONObject enemyResult = e.data;
+        battlePhase.ProcessEnemyResult(enemyResult["isEnemyNextCritical"].b, (int)enemyResult["enemyDamageTake"].f);
+        //then display result
+        DisplayResult(battlePhase.GetRoundResult());
+    }
+
+    private void OnEnemyLeave(SocketIOEvent e)
+    //敵人離開時觸發
+    {
+        messageEnemyMove.text = "The Enemy leave the battle...";
+        socket.Close();
+        Destroy(GameObject.Find("SocketIO"));
+        //SceneManager.LoadScene("waitForBattle");
+        VictoryPanel.SetActive(true);
+    }
+
+    private void OnBattleResult(SocketIOEvent e)
+    {
+        //JSONObject result = e.data;
+        PlayerPrefs.SetString("BattleResult", e.data.ToString());
+        Debug.Log(e.data.ToString());
+        socket.Close();
+        Destroy(GameObject.Find("SocketIO"));
+        SceneManager.LoadScene("BattleResult");
+    }
+
+    public void SetMyMovement(BattlePhase.Movement myMovement)
+    {
+        battlePhase.SetEnemyMovement(myMovement);
+        socket.Emit("movement", new JSONObject((int)myMovement)); //傳送自己的動作
+    }
+
+    private void RoundStart()
     {
         click.SetBtnsEnabled(false);
-        battlePhase.SetPartnerMovement(myMovement);
-        battlePhase.SetEnemyMovement((BattlePhase.Movement)Random.Range(0, 5));
-        BattleRoundResult result = battlePhase.RoundStart();
-        
+        battlePhase.RoundStart();
+        BattleRoundResult result = battlePhase.GetRoundResult();
+        JSONObject resultToSend = new JSONObject();
+        resultToSend.AddField("isEnemyNextCritical", result.isPartnerNextCritical);
+        resultToSend.AddField("enemyDamageTake", result.partnerDamageTake);
+        socket.Emit("result", resultToSend);
+    }
+
+    private void DisplayResult(BattleRoundResult result)
+    {
         //顯示Partner結果
         messageBoxText.text = result.partnerStatusText;
         EnemyHP.text = "Enemy HP:" + result.enemyHp;
@@ -81,17 +153,17 @@ public class BattleView : MonoBehaviour {
             case "even":
                 VictoryPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
                 yield return battlePhase.WaitForBattleResult(isGameOver);
-                SceneManager.LoadScene("BattleResult");
+                socket.Emit("battleEnd", new JSONObject(isGameOver));
                 break;
             case "win":
                 VictoryPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
                 yield return battlePhase.WaitForBattleResult(isGameOver);
-                SceneManager.LoadScene("BattleResult");
+                socket.Emit("battleEnd", new JSONObject(isGameOver));
                 break;
             case "lose":
                 DefeatPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
                 yield return battlePhase.WaitForBattleResult(isGameOver);
-                SceneManager.LoadScene("BattleResult");
+                socket.Emit("battleEnd", new JSONObject(isGameOver));
                 break;
             default:
                 click.SetBtnsEnabled(true);
