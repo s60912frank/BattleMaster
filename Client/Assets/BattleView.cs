@@ -32,6 +32,7 @@ public class BattleView : MonoBehaviour {
     private Click click;
     // Use this for initialization
     void Start () {
+        //this.gameObject.ac
         JSONObject partnerData = new JSONObject(PlayerPrefs.GetString("userData"))["pet"];
         JSONObject enemyData = new JSONObject(PlayerPrefs.GetString("enemyAI"));
         EnemyHP.text = "Enemy HP:" + enemyData["stamina"].f.ToString();
@@ -43,13 +44,19 @@ public class BattleView : MonoBehaviour {
         click = GameObject.Find("BtnManager").GetComponent<Click>();
 	}
 
-    public void RoundStart(BattlePhase.Movement myMovement)
+    public void SetMyMovement(BattlePhase.Movement myMovement)
+    {
+        battlePhase.SetPartnerMovement(myMovement);
+        RoundStart();
+    }
+
+    private void RoundStart()
     {
         click.SetBtnsEnabled(false);
-        battlePhase.SetPartnerMovement(myMovement);
         battlePhase.SetEnemyMovement((BattlePhase.Movement)Random.Range(0, 5));
-        BattleRoundResult result = battlePhase.RoundStart();
-        
+        battlePhase.RoundStart();
+        BattleRoundResult result = battlePhase.GetRoundResult();
+
         //顯示Partner結果
         messageBoxText.text = result.partnerStatusText;
         EnemyHP.text = "Enemy HP:" + result.enemyHp;

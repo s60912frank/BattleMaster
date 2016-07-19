@@ -3,61 +3,103 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
-public class ClickPVP : MonoBehaviour {
-    public GameObject BattleManager;
-    private BattlePhasePVP battlePhase;
-    public Text btnSkillText;
-    public Text messageBoxText;
-    private int chargeMax;
-    private int charge;
+public class ClickPVP : MonoBehaviour
+{
+    public Button SkillBtn;
+    public Button AttackBtn;
+    public Button DefendBtn;
+    public Button EvadeBtn;
+    public Button ConfirmBtn;
+    private Button[] allBtns;
 
-	private Button[] buttons;
-	// Use this for initialization
-	void Start ()
+    private BattleViewPVP battleView;
+    public Text messageBoxText;
+    private Text SkillBtnText;
+    private BattlePhase.Movement movement;
+    // Use this for initialization
+    void Start()
     {
-        battlePhase = BattleManager.GetComponent<BattlePhasePVP>();
-		btnSkillText.text = battlePhase.partner.ChargeText;
+        allBtns = new Button[] { SkillBtn, AttackBtn, DefendBtn, EvadeBtn, ConfirmBtn };
+        SkillBtnText = SkillBtn.GetComponentInChildren<Text>();
+        battleView = GameObject.Find("BattleManager").GetComponent<BattleViewPVP>();
+
+        ColorBlock color = AttackBtn.colors;
+        color.normalColor = Color.yellow;
+        color.highlightedColor = Color.yellow;
+        AttackBtn.colors = color;
     }
-	
-	// Update is called once per frame
-	void Update () {
-		btnSkillText.text = battlePhase.partner.ChargeText;
-	}
+
+    public void SetBtnsEnabled(bool status)
+    {
+        foreach (Button btn in allBtns)
+        {
+            btn.interactable = status;
+        }
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        SkillBtnText.text = battleView.GetSkillBtnText();
+    }
 
     public void action_4_btnSkill()
     {
-		if (battlePhase.partner.IsSkillReady) 
-		{
-			battlePhase.partnerMovement = BattlePhasePVP.Movement.Skill;
-			messageBoxText.text = "Confirm to Activate Skill.";
-		}
-		else
-		{
-			battlePhase.partnerMovement = BattlePhasePVP.Movement.Charge;
-			messageBoxText.text = "Confirm to Activate Charge.";
-		}
+        movement = BattlePhase.Movement.Charge;
+        if (battleView.IsPartnerSkillReady())
+        {
+            messageBoxText.text = "Confirm to Activate Skill.";
+        }
+        else
+        {
+            messageBoxText.text = "Confirm to Activate Charge.";
+        }
+        SetColor(SkillBtn);
     }
 
     public void action_4_btnAttack()
     {
-		battlePhase.partnerMovement = BattlePhasePVP.Movement.Attack;
+        movement = BattlePhase.Movement.Attack;
         messageBoxText.text = "Confirm to Activate Attack.";
+        SetColor(AttackBtn);
     }
 
     public void action_4_btnDefend()
     {
-		battlePhase.partnerMovement = BattlePhasePVP.Movement.Defense;
+        movement = BattlePhase.Movement.Defense;
         messageBoxText.text = "Confirm to Activate Defend.";
+        SetColor(DefendBtn);
     }
 
     public void action_4_btnEvade()
     {
-		battlePhase.partnerMovement = BattlePhasePVP.Movement.Evade;
+        movement = BattlePhase.Movement.Evade;
         messageBoxText.text = "Confirm to Activate Evade.";
+        SetColor(EvadeBtn);
     }
 
-	public void LeaveBattleClicked()
-	{
-		SceneManager.LoadScene("Status");
-	}
+    public void ConfirmBtnClicked()
+    {
+        battleView.SetMyMovement(movement);
+    }
+
+    public void LeaveBattleClicked()
+    {
+        SceneManager.LoadScene("Status");
+    }
+
+    private void SetColor(Button current)
+    {
+        foreach (Button btn in allBtns)
+        {
+            ColorBlock cb = btn.colors;
+            cb.normalColor = Color.white;
+            cb.highlightedColor = Color.white;
+            btn.colors = cb;
+        }
+        ColorBlock color = current.colors;
+        color.normalColor = Color.yellow;
+        color.highlightedColor = Color.yellow;
+        current.colors = color;
+    }
 }

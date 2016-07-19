@@ -124,17 +124,16 @@ public class BattlePhase {
                 //nothing happened
                 break;
 			case Movement.Charge:
-                if(partner.IsSkillReady)
-                    goto case Movement.Skill;
-                else
-                    partner.Charge();
-                break;
-		    case Movement.Skill:
                 if (partner.IsSkillReady)
                 {
                     partner.Skill(ref enemy);
                     //PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
                     roundResult.isPartnerSkillActivated = true;
+                    partnerMovement = Movement.Skill;
+                }
+                else
+                {
+                    partner.Charge();
                 }
                 break;
         }
@@ -198,6 +197,7 @@ public class BattlePhase {
         roundResult.isPartnerDefenseDropped = partner.IsDenfenseDropped;
         roundResult.isEnemyDefenseDropped = enemy.IsDenfenseDropped;
         roundResult.isEnemyOnfire = enemy.IsOnFire;
+        roundResult.isPartnerOnfire = partner.IsOnFire;
         roundResult.enemyRemainingCD = enemy.RemainingCD;
         roundResult.partnerRemainingCD = partner.RemainingCD;
         roundResult.enemyHp = enemy.Stamina;
@@ -237,23 +237,25 @@ public class BattlePhase {
     {
         roundResult.isEnemyNextCritical = isNextCrit;
         enemy.SetNextCricical(isNextCrit);
+        enemy.TakeDamage(-roundResult.enemyDamageTake);
         roundResult.enemyDamageTake = damageTake;
         enemy.TakeDamage(damageTake);
+        roundResult.enemyHp = enemy.Stamina;
     }
 
-    public IEnumerator WaitForBattleResult(string roundResult)
+    public IEnumerator WaitForBattleResult(string result)
     {
         WWWForm form = new WWWForm();
         form.AddField("enemyName", enemy.Name);
-        form.AddField("roundResult", roundResult);
+        form.AddField("result", result);
         Dictionary<string, string> headers = new Dictionary<string, string>();
         headers.Add("Cookie", PlayerPrefs.GetString("Cookie")); //加入認證過的cookie就不用重新登入了
-        WWW w = new WWW(Constant.SERVER_URL + "/battleAIroundResult", form.data, headers);
+        WWW w = new WWW(Constant.SERVER_URL + "/battleAIResult", form.data, headers);
         yield return w;
         if (string.IsNullOrEmpty(w.error))
         {
             Debug.Log(w.text);
-            PlayerPrefs.SetString("BattleroundResult", w.text);
+            PlayerPrefs.SetString("BattleResult", w.text);
             //SceneManager.LoadScene("BattleroundResult");
         }
         else
@@ -264,18 +266,32 @@ public class BattlePhase {
 
     public string GetSkillBtnText()
     {
-        if (partner.IsSkillReady)
+        try
         {
-            return "Skill";
+            if (partner.IsSkillReady)
+            {
+                return "Skill";
+            }
+            else
+            {
+                return "Charge" + partner.NowCharge + "/" + partner._skillCD;
+            }
         }
-        else
+        catch
         {
-            return "Charge" + partner.NowCharge + "/" + partner._skillCD;
+            return "";
         }
     }
 
     public bool IsPartnerSkillReady()
     {
-        return partner.IsSkillReady;
+        try
+        {
+            return partner.IsSkillReady;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

@@ -26,8 +26,11 @@ module.exports = (app, passport) => {
           battleResult["mileageIncrease"] = Math.round(enemy.reward / 2);
         req.user.game.mileage = req.user.game.mileage + battleResult["mileageIncrease"];
         battleResult["mileage"] = req.user.game.mileage;
+        console.log(battleResult);
         req.user.save((err) =>{
-          if(err) throw err;
+          if(err){
+            console.log(err);
+          }
           console.log(req.user.game.name + "BattleAI SAVED!");
         });
         res.send(battleResult);

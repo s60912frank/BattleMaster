@@ -43,14 +43,13 @@ public class Click : MonoBehaviour {
 
 	public void action_4_btnSkill()
 	{
-		if (battleView.IsPartnerSkillReady()) 
+        movement = BattlePhase.Movement.Charge;
+        if (battleView.IsPartnerSkillReady()) 
 		{
-			movement = BattlePhase.Movement.Skill;
 			messageBoxText.text = "Confirm to Activate Skill.";
 		}
 		else
 		{
-            movement = BattlePhase.Movement.Charge;
 			messageBoxText.text = "Confirm to Activate Charge.";
 		}
         SetColor(SkillBtn);
@@ -79,7 +78,7 @@ public class Click : MonoBehaviour {
 
     public void ConfirmBtnClicked()
     {
-        battleView.RoundStart(movement);
+        battleView.SetMyMovement(movement);
     }
 
 	public void LeaveBattleClicked()

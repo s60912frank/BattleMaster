@@ -91,7 +91,7 @@ module.exports = (io) => {
 
 	  you.on("movement", (data) => { //當client選好動作時觸發
 	    enemy.emit("enemyMovement", data); //把動作傳給敵人(使用者在這時看不到)
-			console.log(data.movement);
+			console.log(data);
 	    you["ready"] = true; //把它設為準備好了
 
 	    if(you.ready && enemy.ready){
@@ -108,7 +108,8 @@ module.exports = (io) => {
 	  });
 
 	  you.on("battleEnd", (data) => { //戰鬥結束!
-			you.end = data;
+			console.log("BATTLE END!" + you.request.user.game.name + " " + data.result + "!");
+			you.end = data.result;
 			if(you.end && enemy.end){
 				var youResult, enemyResult;
 				if(you.end == enemy.end){
@@ -137,8 +138,16 @@ module.exports = (io) => {
 	  });
 
 	  you.on("disconnect", () => { //我離線了
-	      enemy.emit("enemyLeave", {}); //告訴對方我離線了
+			//如果我戰鬥途中退出....
+			if(!enemy.end && !you.end){
+				enemy.emit("enemyLeave", {}); //告訴對方我離線了
+				MileageProcess(you.request.user, 'lose');
+				enemyResult = MileageProcess(enemy.request.user, 'win');
+				enemy['end'] = 'win';
+				enemy.emit("battleResult2", enemyResult);
 				delete(you);
+				enemy.disconnect();
+			}
 	  });
 	}
 };
@@ -159,7 +168,7 @@ var MileageProcess = (user, result) => {
 	battleResult["mileage"] = user.game.mileage;
 	user.save((err) => {
 		if(err) console.log(err);
-		console.log(user.game.name + " now have " + user.game.mileage + "mileage!");
+		console.log(user.game.name + " now have " + user.game.mileage + "(" + battleResult.mileageIncrease + ")mileage!");
 	});
 	return battleResult;
 }

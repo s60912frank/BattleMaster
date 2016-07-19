@@ -32,7 +32,7 @@ public class BattleViewPVP : MonoBehaviour {
     public GameObject DefeatPanel;
 
     private BattlePhase battlePhase;
-    private Click click;
+    private ClickPVP click;
     // Use this for initialization
     void Start () {
         socket = GameObject.Find("SocketIO").GetComponent<SocketIOComponent>();
@@ -45,7 +45,10 @@ public class BattleViewPVP : MonoBehaviour {
         socket.On("battleResult2", OnBattleResult);
 
         
-        click = GameObject.Find("BtnManager").GetComponent<Click>();
+        click = GameObject.Find("BtnManager").GetComponent<ClickPVP>();
+        //click.SetBtnsEnabled(false);
+
+        socket.Emit("battleSceneReady");
 	}
 
     private void OnReceiveEnemyData(SocketIOEvent e)
@@ -57,7 +60,8 @@ public class BattleViewPVP : MonoBehaviour {
         EnemyCD.text = "CD:" + enemyData["skill"]["CD"].f.ToString();
         PartnerHP.text = "Partner HP:" + partnerData["stamina"].f.ToString();
         PartnerCD.text = "CD:" + partnerData["skill"]["CD"].f.ToString();
-        //Debug.Log("87878787" + enemyData.ToString());
+        Debug.Log("87878787" + enemyData.ToString());
+        click.SetBtnsEnabled(true);
         battlePhase = new BattlePhase(enemyData, partnerData);
     }
 
@@ -65,8 +69,8 @@ public class BattleViewPVP : MonoBehaviour {
     //當enemy選好動作時觸發
     {
         JSONObject data = e.data;
-        battlePhase.SetEnemyMovement((BattlePhase.Movement)data.f);
-        Debug.Log("Enemy:" + data["movement"].f + "!");
+        battlePhase.SetEnemyMovement((BattlePhase.Movement)(int.Parse(data["movement"].str)));
+        Debug.Log("Enemy:" + data["movement"].str + "!");
         messageEnemyMove.text = "Enemy is ready.";
     }
 
@@ -79,6 +83,7 @@ public class BattleViewPVP : MonoBehaviour {
     {
         JSONObject enemyResult = e.data;
         battlePhase.ProcessEnemyResult(enemyResult["isEnemyNextCritical"].b, (int)enemyResult["enemyDamageTake"].f);
+        Debug.Log("ENEMYDAMAGETAKE:" + (int)enemyResult["enemyDamageTake"].f);
         //then display result
         DisplayResult(battlePhase.GetRoundResult());
     }
@@ -87,9 +92,9 @@ public class BattleViewPVP : MonoBehaviour {
     //敵人離開時觸發
     {
         messageEnemyMove.text = "The Enemy leave the battle...";
-        socket.Close();
+        /*socket.Close();
         Destroy(GameObject.Find("SocketIO"));
-        //SceneManager.LoadScene("waitForBattle");
+        //SceneManager.LoadScene("waitForBattle");*/
         VictoryPanel.SetActive(true);
     }
 
@@ -105,18 +110,19 @@ public class BattleViewPVP : MonoBehaviour {
 
     public void SetMyMovement(BattlePhase.Movement myMovement)
     {
-        battlePhase.SetEnemyMovement(myMovement);
-        socket.Emit("movement", new JSONObject((int)myMovement)); //傳送自己的動作
+        click.SetBtnsEnabled(false);
+        battlePhase.SetPartnerMovement(myMovement);
+        socket.Emit("movement", new JSONObject(new Dictionary<string, string>() { { "movement", ((int)myMovement).ToString() } })); //傳送自己的動作
     }
 
     private void RoundStart()
     {
-        click.SetBtnsEnabled(false);
         battlePhase.RoundStart();
         BattleRoundResult result = battlePhase.GetRoundResult();
         JSONObject resultToSend = new JSONObject();
         resultToSend.AddField("isEnemyNextCritical", result.isPartnerNextCritical);
         resultToSend.AddField("enemyDamageTake", result.partnerDamageTake);
+        Debug.Log("PARTNERDMGTAKE:" + result.partnerDamageTake);
         socket.Emit("result", resultToSend);
     }
 
@@ -142,28 +148,30 @@ public class BattleViewPVP : MonoBehaviour {
         if (result.isPartnerSkillActivated)
             PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
 
-        StartCoroutine(CheckGameOver());
+        CheckGameOver();
     }
 
-    private IEnumerator CheckGameOver()
+    private void CheckGameOver()
     {
         string isGameOver = battlePhase.CheckIfGameOver();
+        JSONObject result = new JSONObject();
+        result.AddField("result", isGameOver);
         switch (isGameOver)
         {
             case "even":
                 VictoryPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-                yield return battlePhase.WaitForBattleResult(isGameOver);
-                socket.Emit("battleEnd", new JSONObject(isGameOver));
+                //yield return battlePhase.WaitForBattleResult(isGameOver);
+                socket.Emit("battleEnd", result);
                 break;
             case "win":
                 VictoryPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-                yield return battlePhase.WaitForBattleResult(isGameOver);
-                socket.Emit("battleEnd", new JSONObject(isGameOver));
+                //yield return battlePhase.WaitForBattleResult(isGameOver);
+                socket.Emit("battleEnd", result);
                 break;
             case "lose":
                 DefeatPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-                yield return battlePhase.WaitForBattleResult(isGameOver);
-                socket.Emit("battleEnd", new JSONObject(isGameOver));
+                //yield return battlePhase.WaitForBattleResult(isGameOver);
+                socket.Emit("battleEnd", result);
                 break;
             default:
                 click.SetBtnsEnabled(true);
@@ -178,11 +186,26 @@ public class BattleViewPVP : MonoBehaviour {
 
     public string GetSkillBtnText()
     {
-        return battlePhase.GetSkillBtnText();
+        try
+        {
+            return battlePhase.GetSkillBtnText();
+        }
+        catch
+        {
+            return "";
+        }
+        
     }
 
     public bool IsPartnerSkillReady()
     {
-        return battlePhase.IsPartnerSkillReady();
+        try
+        {
+            return battlePhase.IsPartnerSkillReady();
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

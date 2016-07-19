@@ -56,12 +56,11 @@ public class PVPRooms : MonoBehaviour {
 		Destroy (GameObject.Find (room ["Id"].ToString ()));
 	}
 
-	private void OnBattleStart(SocketIOEvent e)
-	{
-		DontDestroyOnLoad (socketIOObject);
-		SceneManager.LoadScene("BattlePVP");
-	}
-
+    private void OnBattleStart(SocketIOEvent e)
+    {
+        DontDestroyOnLoad(socketIOObject);
+        SceneManager.LoadScene("BattlePVP2");
+    }
 
 	private void createButton(JSONObject room)
 		//在列表中加入按鈕
