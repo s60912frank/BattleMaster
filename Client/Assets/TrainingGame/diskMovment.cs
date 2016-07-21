@@ -13,8 +13,8 @@ public class diskMovment : Pauseable {
     // Use this for initialization
     void Start () {
         reference = GameObject.Find("GameScript").GetComponent<statsMinigame>();
-        reference.AddPauseableObject(this);
-        //StartCoroutine(DirtyWay());
+        //reference.AddPauseableObject(this);
+        StartCoroutine(DirtyWay());
 	}
 
     private IEnumerator DirtyWay()

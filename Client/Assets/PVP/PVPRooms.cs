@@ -52,8 +52,7 @@ public class PVPRooms : MonoBehaviour {
 	private void OnRoomRemoved(SocketIOEvent e)
 	{
 		Debug.Log ("A room removed!");
-		JSONObject room = e.data;
-		Destroy (GameObject.Find (room ["Id"].ToString ()));
+		Destroy (GameObject.Find (e.data["Id"].str));
 	}
 
     private void OnBattleStart(SocketIOEvent e)
@@ -66,8 +65,8 @@ public class PVPRooms : MonoBehaviour {
 		//在列表中加入按鈕
 	{
 		GameObject btn = GameObject.Instantiate (originalBtn);
-		btn.GetComponentInChildren<Text> ().text = room ["name"].ToString().Replace("\"", "");
-		btn.name = room ["Id"].ToString();
+		btn.GetComponentInChildren<Text> ().text = room["name"].str;
+		btn.name = room ["Id"].str;
 		btn.GetComponent<Button> ().onClick.AddListener (delegate {
 			selectedRoomId = btn.name;
 			confirmPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;

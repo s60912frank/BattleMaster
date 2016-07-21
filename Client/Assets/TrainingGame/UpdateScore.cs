@@ -53,7 +53,6 @@ public class UpdateScore : Pauseable {
             }
         } while (time > 0);
         //結算訓練成果
-        Time.timeScale = 0;
         yield return TrainingResult();
     }
 

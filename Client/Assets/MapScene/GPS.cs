@@ -87,6 +87,7 @@ public class GPS {
             }
             else
             {
+                //Input.location.lastData.
                 return new Vector2(lonOrigin, latOrigin);
             }
         }

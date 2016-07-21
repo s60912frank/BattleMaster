@@ -1,5 +1,5 @@
 var rooms = [];
-var roomCount = 0;
+var shortid = require('shortid');
 
 module.exports = (io) => {
 	this.ioInstance = io;
@@ -7,13 +7,17 @@ module.exports = (io) => {
 		console.log(socket.request.user.game.name + " connected to socket!");
 		socket.emit("roomList", { "data": rooms });
 		socket.on('createRoom', (data) => {
-			roomCount++; //感覺會出問題w
+			for(i = 0;i < rooms.length;i++){
+				if(rooms[i].user1 == socket.id){
+					return;
+				}
+			}
 			var room = {
-				"Id": roomCount,
+				"Id": shortid.generate(),
 				"name": data.name,
 				"user1": socket.id
 			}
-			console.log(room.name + " CREATED!");
+			console.log(room.Id + " CREATED!");
 			rooms.push(room);
 			console.log("房間數:" + rooms.length);
 			socket.join("Room" + room.Id); //加入某房間
@@ -32,8 +36,9 @@ module.exports = (io) => {
 		});
 
 		socket.on('joinRoom', (data) => {
+			console.log(socket.request.user.game.name + " want to join room!");
 			for(i = 0;i < rooms.length;i++){
-				if(rooms[i].Id == data.Id){
+				if(rooms[i].Id == data.Id  && rooms[i].user1 != socket.id){
 					var userNumber = io.sockets.adapter.rooms['Room' + data.Id].length;
 					console.log("COUNT:" + userNumber);
 					if(userNumber == 1){
@@ -51,11 +56,15 @@ module.exports = (io) => {
 						socket.emit('joinResult', {
 							"status": "BAD"
 						});
-						console.log("加入房間失敗!")
+						console.log("加入房間失敗!因為人數錯誤")
 					}
 					return;
 				}
 			}
+			socket.emit('joinResult', {
+				"status": "BAD"
+			});
+			console.log("加入房間失敗!因為找不到這個房間")
 		});
 
 		socket.on('disconnect', () => { //client離線時觸發
@@ -63,6 +72,7 @@ module.exports = (io) => {
 			for(i = 0;i < rooms.length;i++){
 				if(rooms[i].user1 == socket.id){
 					io.sockets.emit('roomRemoved', rooms[i]); //通知全體有房間刪除了
+					//console.log(rooms[i].name + " DELETED!");
 					rooms.splice(i, 1);
 					return;
 				}
@@ -104,7 +114,7 @@ module.exports = (io) => {
 
 	  you.on("result", (data) => { //clients計算自己受到的傷害並回傳
 	    enemy.emit("enemyMovementResult", data); //將自己受到的傷害傳給對方
-			console.log("DAMAGE:" + data.damage);
+			console.log("DAMAGE:" + data.enemyDamageTake);
 	  });
 
 	  you.on("battleEnd", (data) => { //戰鬥結束!

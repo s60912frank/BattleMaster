@@ -31,8 +31,10 @@ public class statsMinigame : MonoBehaviour {
     {
         while (true)
         {
+            Debug.Log("WHHHE DISK!!! " + run);
             if (run)
             {
+                Debug.Log("WHHHE DISK!!!");
                 generateRandomColorDisk();
                 //間隔interval的時間產生一個disk
             }
