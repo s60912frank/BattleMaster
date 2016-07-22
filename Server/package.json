@@ -18,7 +18,8 @@
     "express-session": "latest",
     "socket.io": "latest",
     "request": "latest",
-    "shortid": "latest"
+    "shortid": "latest",
+    "lokijs": "latest"
   },
   "scripts": {
     "start": "node server.js"

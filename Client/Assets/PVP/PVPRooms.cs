@@ -36,8 +36,7 @@ public class PVPRooms : MonoBehaviour {
 
 	private void OnGetRoomList(SocketIOEvent e)
 	{
-		JSONObject roomList = e.data["data"];
-		foreach (JSONObject room in roomList.list) 
+		foreach (JSONObject room in e.data["data"].list) 
 		{
 			createButton (room);
 		}
@@ -52,7 +51,7 @@ public class PVPRooms : MonoBehaviour {
 	private void OnRoomRemoved(SocketIOEvent e)
 	{
 		Debug.Log ("A room removed!");
-		Destroy (GameObject.Find (e.data["Id"].str));
+		Destroy (GameObject.Find (e.data["id"].str));
 	}
 
     private void OnBattleStart(SocketIOEvent e)
@@ -66,7 +65,7 @@ public class PVPRooms : MonoBehaviour {
 	{
 		GameObject btn = GameObject.Instantiate (originalBtn);
 		btn.GetComponentInChildren<Text> ().text = room["name"].str;
-		btn.name = room ["Id"].str;
+		btn.name = room ["id"].str;
 		btn.GetComponent<Button> ().onClick.AddListener (delegate {
 			selectedRoomId = btn.name;
 			confirmPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
@@ -77,7 +76,7 @@ public class PVPRooms : MonoBehaviour {
 	public void JoinRoom() //加入房間
 	{
 		Dictionary<string,string> data = new Dictionary<string, string>();
-		data.Add ("Id", selectedRoomId.ToString ());
+		data.Add ("id", selectedRoomId.ToString ());
 		socket.Emit("joinRoom", new JSONObject(data));
 	}
 

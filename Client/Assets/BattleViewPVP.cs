@@ -95,6 +95,7 @@ public class BattleViewPVP : MonoBehaviour {
         /*socket.Close();
         Destroy(GameObject.Find("SocketIO"));
         //SceneManager.LoadScene("waitForBattle");*/
+        Debug.Log("ENEMY LEAVED!");
         VictoryPanel.SetActive(true);
     }
 

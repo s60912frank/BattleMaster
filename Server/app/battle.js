@@ -1,56 +1,52 @@
-var rooms = [];
+var loki = require('lokijs'); //in memory db
+var db = new loki('rooms.db');
+var rooms = db.addCollection('rooms',{ unique: ["id"] });
 var shortid = require('shortid');
 
 module.exports = (io) => {
 	this.ioInstance = io;
 	io.on('connection', (socket) => {
 		console.log(socket.request.user.game.name + " connected to socket!");
-		socket.emit("roomList", { "data": rooms });
+		console.log(rooms.find());
+		socket.emit("roomList", { "data" : rooms.find() });
 		socket.on('createRoom', (data) => {
-			for(i = 0;i < rooms.length;i++){
-				if(rooms[i].user1 == socket.id){
-					return;
+			if(!rooms.findOne({ 'user1': socket.id })){
+				var room = {
+					"id": shortid.generate(),
+					"name": data.name,
+					"user1": socket.id
 				}
+				rooms.insert(room);
+				console.log(room.name + "(" + room.id + ") CREATED!");
+				console.log("房間數:" + rooms.find().length);
+				socket.join(room.id); //加入某房間
+				io.sockets.emit('roomAdded', room); //通知全體有房間建立了
 			}
-			var room = {
-				"Id": shortid.generate(),
-				"name": data.name,
-				"user1": socket.id
-			}
-			console.log(room.Id + " CREATED!");
-			rooms.push(room);
-			console.log("房間數:" + rooms.length);
-			socket.join("Room" + room.Id); //加入某房間
-			io.sockets.emit('roomAdded', room); //通知全體有房間建立了
 		});
 
 		socket.on('leaveRoom', (data) => {
-			for(i = 0;i < rooms.length;i++){
-				if(rooms[i].user1 == socket.id){
-					console.log(socket.request.user.game.name + "離開了房間!");
-					io.sockets.emit('roomRemoved', rooms[i]); //通知全體有房間刪除了
-					rooms.splice(i, 1);
-					return;
-				}
+			var roomToRemove = rooms.findOne({ "user1": socket.id });
+			if(roomToRemove){
+				console.log(socket.request.user.game.name + "離開了房間!");
+				io.sockets.emit('roomRemoved', roomToRemove); //通知全體有房間刪除了
+				if(roomToRemove)  rooms.remove(roomToRemove);
 			}
 		});
 
 		socket.on('joinRoom', (data) => {
 			console.log(socket.request.user.game.name + " want to join room!");
-			for(i = 0;i < rooms.length;i++){
-				if(rooms[i].Id == data.Id  && rooms[i].user1 != socket.id){
-					var userNumber = io.sockets.adapter.rooms['Room' + data.Id].length;
-					console.log("COUNT:" + userNumber);
-					if(userNumber == 1){
-						socket.join("Room" + data.Id);
-						io.sockets.emit('roomRemoved', rooms[i]); //通知全體有房間刪除了
-						rooms.splice(i, 1);
+			var roomToJoin = rooms.findOne({ "id": data.id });
+			if(roomToJoin){
+				if(roomToJoin.user1 != socket.id){
+					if(io.sockets.adapter.rooms[data.id].length && io.sockets.adapter.rooms[data.id].length == 1){
+						socket.join(data.id);
+						io.sockets.emit('roomRemoved', roomToJoin); //通知全體有房間刪除了
 						socket.emit('joinResult', {
 							"status": "GOOD"
 						});
-						console.log("加入房間成功!")
-						battle('Room' + data.Id);
-						return;
+						console.log("加入房間成功!");
+						rooms.remove(roomToJoin);
+						battle(data.id);
 					}
 					else{
 						socket.emit('joinResult', {
@@ -58,32 +54,34 @@ module.exports = (io) => {
 						});
 						console.log("加入房間失敗!因為人數錯誤")
 					}
-					return;
+				}
+				else{
+					socket.emit('joinResult', {
+						"status": "BAD"
+					});
+					console.log("加入房間失敗!因為創房又加房");
 				}
 			}
-			socket.emit('joinResult', {
-				"status": "BAD"
-			});
-			console.log("加入房間失敗!因為找不到這個房間")
+			else{
+				socket.emit('joinResult', {
+					"status": "BAD"
+				});
+				console.log("加入房間失敗!因為找不到這個房間")
+			}
 		});
 
 		socket.on('disconnect', () => { //client離線時觸發
-			console.log(socket.id + "disconnected!");
-			for(i = 0;i < rooms.length;i++){
-				if(rooms[i].user1 == socket.id){
-					io.sockets.emit('roomRemoved', rooms[i]); //通知全體有房間刪除了
-					//console.log(rooms[i].name + " DELETED!");
-					rooms.splice(i, 1);
-					return;
-				}
-			}
+			console.log(socket.request.user.game.name + " disconnected!");
+			var roomToRemove = rooms.findOne({ "user1": socket.id });
+			io.sockets.emit('roomRemoved', roomToRemove); //通知全體有房間刪除了
+			if(roomToRemove)
+				rooms.remove(roomToRemove);
 	  });
 	});
 
 
 	//BATTLE!!!!!!!!!!///////////////////////////////////////////////////
 	var battle = (roomName) => {
-	  io.to(roomName).emit("battleStart", {}); //告訴房間所有人戰鬥開始了
 		var room = io.sockets.adapter.rooms[roomName].sockets;
 		var clients = [];
 		if (room) {
@@ -91,11 +89,14 @@ module.exports = (io) => {
 	      clients.push(io.sockets.adapter.nsp.connected[id]);
 	    }
 	  }
+		io.to(roomName).emit("battleStart", {}); //告訴房間所有人戰鬥開始了
+		console.log("BATTLE START!!!");
 	  battlePhase(roomName, clients[0], clients[1]); //戰鬥囉
 	  battlePhase(roomName, clients[1], clients[0]);
 	}
 
 	var battlePhase = (roomName, you, enemy) => {
+		you.removeAllListeners('disconnect');
 		//等client準備好了就把敵人資料給他
 		you.on("battleSceneReady", (data) => you.emit("enemyData", enemy.request.user.game.pet));
 
@@ -148,9 +149,12 @@ module.exports = (io) => {
 	  });
 
 	  you.on("disconnect", () => { //我離線了
+			console.log(you.request.user.game.name + " disconnected!");
 			//如果我戰鬥途中退出....
 			if(!enemy.end && !you.end){
+				console.log("wHEHEHBEHEBEKE:" + enemy.connected);
 				enemy.emit("enemyLeave", {}); //告訴對方我離線了
+				console.log("wHEHEHBEHEBEKE:" + enemy.connected);
 				MileageProcess(you.request.user, 'lose');
 				enemyResult = MileageProcess(enemy.request.user, 'win');
 				enemy['end'] = 'win';
