@@ -55,6 +55,15 @@ module.exports = (app, passport) => {
 
     app.get('/enterTraning', isLoggedIn, consume100Mileage);
 
+    app.post('/mileageGain', isLoggedIn, (req, res) => {
+      req.user.game.mileage += parseInt(req.body.mileageGain);
+      req.user.save((err) => {
+        if(err) throw err;
+        console.log(req.user.game.name + "取得了" + req.body.mileageGain + "里程!");
+      });
+      res.send(req.user.game);
+    });
+
     app.post('/traningResult', isLoggedIn, (req, res) => {
       req.user.game.pet.stamina += parseInt(req.body.staminaIncrease);
       req.user.game.pet.attack += parseInt(req.body.attackIncrease);
@@ -72,9 +81,6 @@ module.exports = (app, passport) => {
         res.send(data);
       });
       console.log(req.user.game.name + "取得了怪物資訊!");
-      /*Enemy.SomeValue.find({}).select({ "name": 1, "_id": 0}).query.exec((err, data) => {
-        res.send(data);
-      });*/
     });
 
     app.get('/isLoggedIn', isLoggedIn, (req, res) => {

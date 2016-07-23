@@ -18,4 +18,9 @@ public class ShowUserInfo : MonoBehaviour {
 	void Update () {
 	
 	}
+
+    public void UpdateUserInfo()
+    {
+        Start();
+    }
 }

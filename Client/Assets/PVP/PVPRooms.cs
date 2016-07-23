@@ -64,7 +64,10 @@ public class PVPRooms : MonoBehaviour {
 		//在列表中加入按鈕
 	{
 		GameObject btn = GameObject.Instantiate (originalBtn);
-		btn.GetComponentInChildren<Text> ().text = room["name"].str;
+        SetRoomButton setScript = btn.GetComponent<SetRoomButton>();
+        setScript.SetRoomName(room["name"].str);
+        setScript.SetRoomOwner(room["user1"]["id"].str, room["user1"]["name"].str);
+		//btn.GetComponentInChildren<Text> ().text = room["name"].str;
 		btn.name = room ["id"].str;
 		btn.GetComponent<Button> ().onClick.AddListener (delegate {
 			selectedRoomId = btn.name;

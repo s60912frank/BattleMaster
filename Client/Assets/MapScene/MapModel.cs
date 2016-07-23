@@ -179,4 +179,9 @@ public class MapModel {
             return gps.GPSStatus;
         }
     }
+
+    public void StopGps()
+    {
+        gps.StopGPS();
+    }
 }

@@ -2,10 +2,11 @@
 using UnityEngine.UI;
 using System.Collections;
 
+
 public class GPS {
     private int zoom = 15; //放大倍率，1~19
-    private float latOrigin = 25.0417534f;
-    private float lonOrigin = 121.5339142f;
+    private float latOrigin = 0;
+    private float lonOrigin = 0;
     //public Text gpsStatus;
     public string GPSStatus = "";
 
@@ -61,16 +62,46 @@ public class GPS {
         else
         {
             Debug.Log("起始OK");
+            GPSStatus = "GPS OK";
             lonOrigin = Input.location.lastData.longitude;
             latOrigin = Input.location.lastData.latitude;
-            //gpsStatus.text = "longitude:" + MapProcessor.lonOrigin + "    latitude:" + MapProcessor.latOrigin;
-            //mp.requestMap(MapProcessor.lonOrigin, MapProcessor.latOrigin);
-            //loading End
-            //loadingPanel.GetComponent<LoadingScript>().EndLoading();
-            //yield return UpdateLocation();
             location(Location);
+            //更新里程
+            UpdateMileage(Location);
             yield break;
         }
+    }
+
+    private void UpdateMileage(Vector2 location)
+    {
+        if (PlayerPrefs.HasKey("lastLongitude") && PlayerPrefs.HasKey("lastLatitude"))
+        {
+            Vector2 lastPos = new Vector2(PlayerPrefs.GetFloat("lastLongitude"), PlayerPrefs.GetFloat("lastLatitude"));
+            float distance = HaversineDistance(lastPos, location);
+            int mileageGain = Mathf.FloorToInt(distance);
+            //先把里程取得存起來 統一到主畫面再向server更新
+            if (PlayerPrefs.HasKey("MileageGainToUpdate"))
+            {
+                float oldGain = PlayerPrefs.GetFloat("MileageGainToUpdate");
+                PlayerPrefs.SetFloat("MileageGainToUpdate", oldGain + mileageGain);
+            }
+            else
+            {
+                PlayerPrefs.SetFloat("MileageGainToUpdate", mileageGain);
+            }
+        }
+        else
+        {
+            PlayerPrefs.SetFloat("MileageGainToUpdate", 0);
+        }
+        PlayerPrefs.SetFloat("lastLongitude", location.x);
+        PlayerPrefs.SetFloat("lastLatitude", location.y);
+    }
+
+    public void StopGPS()
+    {
+        UpdateMileage(new Vector2(Input.location.lastData.longitude, Input.location.lastData.latitude));
+        Input.location.Stop();
     }
 
     public Vector2 PlayerLocation
@@ -91,5 +122,18 @@ public class GPS {
                 return new Vector2(lonOrigin, latOrigin);
             }
         }
+    }
+
+    public float HaversineDistance(Vector2 pos1, Vector2 pos2)
+    {
+        float R = 6371;
+        float lat = (pos2.y - pos1.y) * Mathf.Deg2Rad;
+        float lng = (pos2.x - pos1.x) * Mathf.Deg2Rad;
+        float h1 = Mathf.Sin(lat / 2) * Mathf.Sin(lat / 2) +
+                      Mathf.Cos(pos1.y * Mathf.Deg2Rad) * Mathf.Cos(pos2.y * Mathf.Deg2Rad) *
+                      Mathf.Sin(lng / 2) * Mathf.Sin(lng / 2);
+        //float h2 = 2 * Mathf.Asin(Mathf.Min(1, Mathf.Sqrt(h1)));
+        float h2 = 2 * Mathf.Atan2(Mathf.Sqrt(h1), Mathf.Sqrt(1 - h1));
+        return R * h2 * 1000;
     }
 }

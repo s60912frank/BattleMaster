@@ -11,6 +11,7 @@ public class ButtonManager : MonoBehaviour {
 
     public void GoBackScene()
     {
+        GameObject.Find("Map").GetComponent<MapView>().StopGps();
         SceneManager.LoadScene("Status");
     }
 }

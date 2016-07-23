@@ -145,10 +145,6 @@ public class MapView : MonoBehaviour {
         plane.transform.localScale = new Vector3(data.mapBoundary.width / 10.0f, 1, data.mapBoundary.height / 10.0f);
         plane.transform.position = new Vector3(data.mapBoundary.center.x, data.mapBoundary.center.y);
         plane.GetComponent<Renderer>().material = Resources.Load<Material>("plane");
-        //DrawSomeCircle(plane);
-        Debug.Log("WHEEEEAREAAREA!!!!");
-        //float maxRad = (mapBoundary.Width + mapBoundary.Height) / 2.0f;
-        //float getRad = Random.Range(maxRad * 0.15f, maxRad * 0.85f);
         float rad = (data.mapBoundary.width + data.mapBoundary.height) / 8.0f;
         Vector2[] poss = new Vector2[] {
             new Vector2(plane.transform.position.x - rad, plane.transform.position.y + rad),
@@ -171,4 +167,8 @@ public class MapView : MonoBehaviour {
         }
     }
 
+    public void StopGps()
+    {
+        model.StopGps();
+    }
 }

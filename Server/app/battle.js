@@ -10,11 +10,14 @@ module.exports = (io) => {
 		console.log(rooms.find());
 		socket.emit("roomList", { "data" : rooms.find() });
 		socket.on('createRoom', (data) => {
-			if(!rooms.findOne({ 'user1': socket.id })){
+			if(!rooms.findOne({ 'user1.id': socket.request.user._id })){
 				var room = {
 					"id": shortid.generate(),
 					"name": data.name,
-					"user1": socket.id
+					"user1": {
+						"id": socket.request.user._id,
+						"name": socket.request.user.game.name
+					}
 				}
 				rooms.insert(room);
 				console.log(room.name + "(" + room.id + ") CREATED!");
@@ -25,11 +28,11 @@ module.exports = (io) => {
 		});
 
 		socket.on('leaveRoom', (data) => {
-			var roomToRemove = rooms.findOne({ "user1": socket.id });
+			var roomToRemove = rooms.findOne({ 'user1.id': socket.request.user._id });
 			if(roomToRemove){
 				console.log(socket.request.user.game.name + "離開了房間!");
 				io.sockets.emit('roomRemoved', roomToRemove); //通知全體有房間刪除了
-				if(roomToRemove)  rooms.remove(roomToRemove);
+				rooms.remove(roomToRemove);
 			}
 		});
 
@@ -37,7 +40,7 @@ module.exports = (io) => {
 			console.log(socket.request.user.game.name + " want to join room!");
 			var roomToJoin = rooms.findOne({ "id": data.id });
 			if(roomToJoin){
-				if(roomToJoin.user1 != socket.id){
+				if(roomToJoin.user1.id != socket.request.user._id){
 					if(io.sockets.adapter.rooms[data.id].length && io.sockets.adapter.rooms[data.id].length == 1){
 						socket.join(data.id);
 						io.sockets.emit('roomRemoved', roomToJoin); //通知全體有房間刪除了
@@ -72,7 +75,7 @@ module.exports = (io) => {
 
 		socket.on('disconnect', () => { //client離線時觸發
 			console.log(socket.request.user.game.name + " disconnected!");
-			var roomToRemove = rooms.findOne({ "user1": socket.id });
+			var roomToRemove = rooms.findOne({ "user1.id": socket.request.user._id });
 			io.sockets.emit('roomRemoved', roomToRemove); //通知全體有房間刪除了
 			if(roomToRemove)
 				rooms.remove(roomToRemove);
@@ -89,10 +92,15 @@ module.exports = (io) => {
 	      clients.push(io.sockets.adapter.nsp.connected[id]);
 	    }
 	  }
-		io.to(roomName).emit("battleStart", {}); //告訴房間所有人戰鬥開始了
-		console.log("BATTLE START!!!");
-	  battlePhase(roomName, clients[0], clients[1]); //戰鬥囉
-	  battlePhase(roomName, clients[1], clients[0]);
+		if(clients.length == 2){
+			io.to(roomName).emit("battleStart", {}); //告訴房間所有人戰鬥開始了
+			console.log("BATTLE START!!!");
+		  battlePhase(roomName, clients[0], clients[1]); //戰鬥囉
+		  battlePhase(roomName, clients[1], clients[0]);
+		}
+		else{
+			console.log("準備進入戰鬥可是人數錯了嗚嗚");
+		}
 	}
 
 	var battlePhase = (roomName, you, enemy) => {

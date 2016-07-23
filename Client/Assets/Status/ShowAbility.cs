@@ -24,21 +24,16 @@ public class ShowAbility : MonoBehaviour {
         JSONObject petData = data["pet"];
         Debug.Log(petData);
 
-        StaminaText.GetComponent<Text>().text = STAMINA + GetString(petData, "stamina");
-        AttackText.GetComponent<Text>().text = ATTACK + GetString(petData, "attack");
-        DefenseText.GetComponent<Text>().text = DEFENSE + GetString(petData, "defense");
-        EvadeText.GetComponent<Text>().text = EVADE + GetString(petData, "evade");
-        SkillText.GetComponent<Text>().text = SKILL + GetString(petData["skill"], "SkillDesc");
-        SkillCDText.GetComponent<Text>().text = SKILLCD + GetString(petData["skill"], "CD");
+        StaminaText.GetComponent<Text>().text = STAMINA + petData["stamina"].str;
+        AttackText.GetComponent<Text>().text = ATTACK + petData["attack"].str;
+        DefenseText.GetComponent<Text>().text = DEFENSE + petData["defense"].str;
+        EvadeText.GetComponent<Text>().text = EVADE + petData["evade"].str;
+        SkillText.GetComponent<Text>().text = SKILL + petData["skill"]["SkillDesc"].str;
+        SkillCDText.GetComponent<Text>().text = SKILLCD + petData["skill"]["CD"].str;
     }
 	
 	// Update is called once per frame
 	void Update () {
 	
 	}
-
-    private string GetString(JSONObject data, string property)
-    {
-        return data[property].ToString().Replace("\"", "");
-    }
 }
