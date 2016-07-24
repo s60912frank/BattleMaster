@@ -10,15 +10,9 @@ public class MapModel {
     private const int ZOOM = 15;
     private const float TIMES = 3276.8f;
     public Rect mapBoundry;
-    //????????
-    //private int xTile;  //儲存現在camera所在的地圖格(大概 不是很準)
-    //private int yTile;
     public Vector2 TileNum;
     public float latOrigin = 25.0417534f;
     public float lonOrigin = 121.5339142f;
-    //private List<MapTile> mapTiles; //儲存現在畫面上的mapTiles
-    //private int mapTileIndex = -1;
-    //????????
     private JSONObject EnemyData;
     private MapProcessor2 process;
     private GPS gps;
@@ -64,17 +58,12 @@ public class MapModel {
 
     public IEnumerator RequestMap(float lon, float lat)
     {
-        //mapTiles.Add(new MapTile(lon, lat, ZOOM));
-        //mapTileIndex++;
+        Debug.Log(lon + "/" + lat);
         TileNum = WorldToTilePos(lon, lat);
-        //int xTile2 = mapTiles[mapTileIndex].xTile;
-        //int yTile2 = mapTiles[mapTileIndex].yTile;
         string filePath = Application.persistentDataPath + "/" + ZOOM.ToString() + "_" + TileNum.x.ToString() + "_" + TileNum.y.ToString() + ".json";
         if (File.Exists(filePath))
         {
             process.JsonProcessor(File.ReadAllText(filePath));
-
-            //JsonProssor();
         }
         //沒的話跟伺服器要
         else
@@ -86,9 +75,8 @@ public class MapModel {
 
     public IEnumerator RequestMap(int xTile, int yTile) //要地圖塊
     {
+        Debug.Log(xTile + "/" + yTile);
         TileNum = new Vector2(xTile, yTile);
-        //mapTiles.Add(new MapTile(xTile, yTile, ZOOM));
-        //mapTileIndex++;
         string filePath = Application.persistentDataPath + "/" + ZOOM.ToString() + "_" + xTile.ToString() + "_" + yTile.ToString() + ".json";
         //如果之前有存過此地圖塊那就直接讀檔
         if (File.Exists(filePath))

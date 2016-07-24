@@ -6,13 +6,13 @@ using System.Collections.Generic;
 public class CamController : MonoBehaviour {
     private Transform trans;
     private MapView map;
-    public float perspectiveZoomSpeed = 0.003f;        // The rate of change of the field of view in perspective mode.
     //private Vector3 nowHit;
     //private float lastDistance;
     private float panDiff;
     private bool rayCasting = true;
     //臭
     public bool MouseRay = true;
+    private Vector2 startPos;
 	// Use this for initialization
 	void Start () {
         trans = gameObject.transform;
@@ -22,7 +22,7 @@ public class CamController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetMouseButtonUp(0) && MouseRay)
+        /*if (Input.GetMouseButtonUp(0) && MouseRay)
         {
             bool found = false;
             RaycastHit[] hits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition));
@@ -42,7 +42,7 @@ public class CamController : MonoBehaviour {
                 map.ShowEnemyData();
                 MouseRay = false;
             }
-        }
+        }*/
 
         //方向建移動cam
         if (Input.GetKey(KeyCode.UpArrow))
@@ -72,47 +72,44 @@ public class CamController : MonoBehaviour {
             trans.position -= Vector3.forward * 0.4f;
         }
 
-        if (Input.touchCount == 1 && Input.GetTouch(0).phase == TouchPhase.Moved)
+        if(Input.touchCount == 1)
         {
-            Vector2 touchDeltaPosition = Input.GetTouch(0).deltaPosition;
-            transform.Translate(-touchDeltaPosition * 0.025f);
+            Touch touch = Input.GetTouch(0);
+            if(touch.phase == TouchPhase.Began)
+            {
+                startPos = touch.position;
+            }
+            else if (touch.phase == TouchPhase.Moved)
+            {
+                //drag-移動地圖而不跳出敵人訊息
+                Vector2 touchDeltaPosition = touch.deltaPosition;
+                transform.Translate(touchDeltaPosition * 0.0025f * transform.position.z);
+            }
+            else if (touch.phase == TouchPhase.Ended && touch.position == startPos && MouseRay)
+            {
+                //tap-查看敵人訊息
+                bool found = false;
+                RaycastHit[] hits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition));
+                foreach (RaycastHit hit in hits)
+                {
+                    if (hit.transform.tag == "Area")
+                    {
+                        //showMonsterData
+                        MouseRay = false;
+                        map.ShowEnemyData(hit.transform);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found)
+                {
+                    map.ShowEnemyData();
+                    MouseRay = false;
+                }
+                startPos = Vector2.zero;
+            }
         }
 
-        //雙指縮放,未測試
-        /*if (Input.touchCount == 2)
-        {
-			//Vector2 one = Input.GetTouch (0).deltaPosition;
-			//Vector2 two = Input.GetTouch (1).deltaPosition;
-			//Debug.Log ("ONE:" + (one - two).ToString());
-            //float touchDelta = Mathf.Sqrt((Input.GetTouch(0).deltaPosition - Input.GetTouch(1).deltaPosition).sqrMagnitude);
-            //trans.position -= Vector3.forward * touchDelta * 0.05f;
-
-            if(Input.touches[0].phase == TouchPhase.Began && Input.touches[1].phase == TouchPhase.Began)
-            {
-                panDiff = Mathf.Sqrt((Input.touches[0].position - Input.touches[1].position).sqrMagnitude);
-            }
-            else if (Input.touches[0].phase == TouchPhase.Moved && Input.touches[1].phase == TouchPhase.Moved)
-            {
-                float diff = Mathf.Sqrt((Input.touches[0].position - Input.touches[1].position).sqrMagnitude);
-                float dir = panDiff - diff;
-                if (dir < 0)
-                {
-                    //放大
-                    float times = Mathf.Abs(diff / panDiff);
-                    trans.position.Set(trans.position.x, trans.position.y, trans.position.z * times);
-                    //trans.position -= Vector3.forward * dir * 0.0015f;
-                }
-                else
-                {
-                    //縮小
-                    float times = Mathf.Abs(diff / panDiff);
-                    trans.position.Set(trans.position.x, trans.position.y, trans.position.z * times);
-                    trans.position -= Vector3.forward * dir * 0.0015f;
-                }
-                panDiff = diff;
-                Debug.Log(dir);
-            }
-        }*/
         // If there are two touches on the device...
         if (Input.touchCount == 2)
         {
@@ -129,13 +126,9 @@ public class CamController : MonoBehaviour {
             float touchDeltaMag = (touchZero.position - touchOne.position).magnitude;
 
             // Find the difference in the distances between each frame.
-            float deltaMagnitudeDiff = prevTouchDeltaMag - touchDeltaMag;
-
-            Camera temp = GetComponent<Camera>();
-            // Otherwise change the field of view based on the change in distance between the touches.
-            temp.fieldOfView += deltaMagnitudeDiff * perspectiveZoomSpeed;
-            // Clamp the field of view to make sure it's between 0 and 180.
-            temp.fieldOfView = Mathf.Clamp(temp.fieldOfView, 0.1f, 179.9f);
+            float deltaMagnitudeDiff = (prevTouchDeltaMag - touchDeltaMag) * 0.08f;
+            Debug.Log("PANDIFF:" + deltaMagnitudeDiff);
+            trans.position = new Vector3(trans.position.x, trans.position.y, trans.position.z - deltaMagnitudeDiff);
         }
 
         //起始y=-10,-5時可視面積1/4所以zoom+1,-20時可視面積4倍所以zoom-1
@@ -219,6 +212,7 @@ public class CamController : MonoBehaviour {
                 try
                 {
                     string[] tileNum = hit.transform.name.Split('/');
+                    Debug.Log("CAMCONTROL!:" + tileNum[0]  + "/" + tileNum[1]);
                     return new int[] { int.Parse(tileNum[0]), int.Parse(tileNum[1]) };
                 }
                 catch

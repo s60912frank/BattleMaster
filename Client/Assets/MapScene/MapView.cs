@@ -25,6 +25,7 @@ public class MapView : MonoBehaviour {
         }
         SetPlane(result);
         LoadingPanel.GetComponent<LoadingScript>().EndLoading();
+        yield return UpdateGPS();
     }
 	
 	// Update is called once per frame
@@ -38,7 +39,8 @@ public class MapView : MonoBehaviour {
         {
             yield return new WaitForSeconds(1);
             Vector2 newPos = model.PlayerLocation;
-            Player.transform.position.Set(newPos.x, newPos.y, Player.transform.position.z);
+            //Player.transform.position.Set(newPos.x, newPos.y, Player.transform.position.z);
+            Player.transform.position = new Vector3(newPos.x, newPos.y, Player.transform.position.z);
             GPSText.text = model.GPSStatus;
         }
     }

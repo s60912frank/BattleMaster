@@ -5,9 +5,8 @@ using System.Collections;
 
 public class GPS {
     private int zoom = 15; //放大倍率，1~19
-    private float latOrigin = 0;
-    private float lonOrigin = 0;
-    //public Text gpsStatus;
+    private float latOrigin = 25.158591f;
+    private float lonOrigin = 121.434593f;
     public string GPSStatus = "";
 
     private Vector2 Location
@@ -100,7 +99,8 @@ public class GPS {
 
     public void StopGPS()
     {
-        UpdateMileage(new Vector2(Input.location.lastData.longitude, Input.location.lastData.latitude));
+        if(Input.location.lastData.timestamp != 0)
+            UpdateMileage(new Vector2(Input.location.lastData.longitude, Input.location.lastData.latitude));
         Input.location.Stop();
     }
 
@@ -119,9 +119,19 @@ public class GPS {
             else
             {
                 //Input.location.lastData.
-                return new Vector2(lonOrigin, latOrigin);
+                //debug only
+                Vector2 whee = new Vector2(lonOrigin, latOrigin);
+                //return new Vector2(lonOrigin + 0.1f, latOrigin+0.1f);
+                Debug.Log(whee);
+                return whee;
             }
         }
+    }
+
+    public void whee()
+    {
+        lonOrigin += 0.3f;
+        latOrigin += 0.3f;
     }
 
     public float HaversineDistance(Vector2 pos1, Vector2 pos2)
