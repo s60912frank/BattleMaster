@@ -11,7 +11,7 @@ public class ShowUserInfo : MonoBehaviour {
         JSONObject data = new JSONObject(PlayerPrefs.GetString("userData"));
         UserNameText.text = data["name"].str;
         //顯示里程
-        MileageText.text = data["mileage"].f.ToString();
+        MileageText.text = string.Format("里程:{0}", data["mileage"].f);
     }
 	
 	// Update is called once per frame

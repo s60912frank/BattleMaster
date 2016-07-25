@@ -27,6 +27,7 @@ public class BtnFunctions : MonoBehaviour {
     public void GoToMap()
     {
         //SceneManager.LoadScene("map");//移到地圖
+        LoadingPanel.GetComponent<LoadingScript>().StartLoading();
         StartCoroutine(CheckGPS());
     }
 
@@ -34,7 +35,7 @@ public class BtnFunctions : MonoBehaviour {
     {
         GPS gps = new GPS();
         yield return gps.GPSInit((loc) => { });
-        if(gps.GPSStatus != "GPS OK")
+        if (gps.GPSStatus != "GPS OK")
         {
             notify.SetText(gps.GPSStatus);
             notify.Show();
@@ -43,6 +44,7 @@ public class BtnFunctions : MonoBehaviour {
         {
             SceneManager.LoadScene("map");//移到地圖
         }
+        LoadingPanel.GetComponent<LoadingScript>().EndLoading();
     }
 
     public void SearchEnemy()

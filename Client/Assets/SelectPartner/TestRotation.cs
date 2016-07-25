@@ -5,14 +5,18 @@ public class TestRotation : MonoBehaviour {
     private float rotateDelta = 0;
     private bool isRotating = false;
     private Vector3 CylinderAxis;
+    private GameObject UniformObj;
 	// Use this for initialization
 	void Start () {
-        CylinderAxis = Quaternion.AngleAxis(-15, Vector3.up).eulerAngles;
+        CylinderAxis = new Quaternion(0, 1, 0, 15).eulerAngles;
+        UniformObj = GameObject.Find("UniformObj");
+        Debug.Log(CylinderAxis);
     }
 	
 	// Update is called once per frame
 	void Update () {
         transform.Rotate(CylinderAxis, rotateDelta);
+        UniformObj.transform.Rotate(CylinderAxis, rotateDelta);
     }
 
     public void TurnLeft()

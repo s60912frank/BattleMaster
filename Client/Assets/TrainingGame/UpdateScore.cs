@@ -58,12 +58,17 @@ public class UpdateScore : Pauseable {
 
     private IEnumerator TrainingResult()
     {
-        //JSONObject userData = new JSONObject(PlayerPrefs.GetString("userData"));
+        JSONObject trainingResult = new JSONObject();
         WWWForm postData = new WWWForm();
         postData.AddField("staminaIncrease", staminaScore);
+        trainingResult.AddField("staminaIncrease", staminaScore);
         postData.AddField("attackIncrease", attackScore);
+        trainingResult.AddField("attackIncrease", attackScore);
         postData.AddField("evadeIncrease", 0);
+        trainingResult.AddField("evadeIncrease", 0);
         postData.AddField("defenseIncrease", defenseScore);
+        trainingResult.AddField("defenseIncrease", defenseScore);
+        PlayerPrefs.SetString("trainingResult", trainingResult.ToString());
         Dictionary<string, string> headers = new Dictionary<string, string>();
         headers.Add("Cookie", PlayerPrefs.GetString("Cookie")); //加入cookie
         WWW w = new WWW(Constant.SERVER_URL + "/traningResult", postData.data, headers);
@@ -72,7 +77,7 @@ public class UpdateScore : Pauseable {
         {
             PlayerPrefs.SetString("userData", w.text);
             //先直接回到狀態scene 之後改
-            SceneManager.LoadScene("Status");
+            SceneManager.LoadScene("TrainingResultScene");
         }
         else{
             Debug.Log(w.error);
