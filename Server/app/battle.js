@@ -17,10 +17,6 @@ module.exports = (io) => {
 					"owner": {
 						"id": socket.request.user._id,
 						"name": socket.request.user.game.name
-					},
-					"rival": {
-						"id": "",
-						"name": ""
 					}
 				}
 				rooms.insert(room);
@@ -32,6 +28,8 @@ module.exports = (io) => {
 			}
 		});
 
+
+		//還在改這裡
 		socket.on('leaveRoom', (data) => {
 			var room = rooms.findOne({ 'id': data.id });
 			if(room){
@@ -39,11 +37,23 @@ module.exports = (io) => {
 				socket.leave(socket.room);
 				delete(socket.room);
 				if(room.owner.id == socket.request.user._id){
-					///////////////////從這裡繼續
+					if(room.rival){
+						room.owner = room.rival;
+						delete(room.owner);
+					}
 				}
-				//不刪房
-				io.sockets.emit('roomRemoved', room); //通知全體有房間刪除了
-				rooms.remove(room);
+				else if(room.rival.id == socket.request.user._id){
+					delete(room.rival);
+				}
+
+				if(!room.owner && !room.rival){
+					io.sockets.emit('roomRemoved', room); //通知全體有房間刪除了
+					rooms.remove(room);
+				}
+				else{
+					io.sockets.emit('roomAvaliable', room); //通知全體有房間刪除了
+					io.to(room.id).emit("roomChanged", { "data": room });
+				}
 			}
 		});
 
