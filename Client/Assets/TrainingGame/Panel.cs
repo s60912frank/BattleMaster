@@ -42,4 +42,9 @@ public class Panel : MonoBehaviour {
     {
         ConfirmButton.onClick.AddListener(delegate { listener(); });
     }
+
+    public void SetNoListener(System.Action listener)
+    {
+
+    }
 }

@@ -36,13 +36,28 @@ public class EnemyPanel : MonoBehaviour {
     private void Show()
     {
         gameObject.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+        gameObject.GetComponent<Animator>().SetTrigger("StartShow");
     }
 
     public void Hide()
     {
-        gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-1000, 0);
+        gameObject.GetComponent<Animator>().SetTrigger("StartHide");
+        //gameObject.GetComponent<Animator>().
+        //gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-1000, 0);
         //e臭
-        StartCoroutine(Dirty());
+        //StartCoroutine(Dirty());
+    }
+
+    public void HidePanel()
+    {
+        gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-1000, 0);
+    }
+
+    public void HideAndSetMouseRay()
+    {
+        gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-1000, 0);
+        //臭
+        Camera.main.gameObject.GetComponent<CamController>().MouseRay = true;
     }
 
     private IEnumerator Dirty()
