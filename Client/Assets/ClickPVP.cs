@@ -16,6 +16,8 @@ public class ClickPVP : MonoBehaviour
     public Text messageBoxText;
     private Text SkillBtnText;
     private BattlePhase.Movement movement;
+
+    private Panel exitPanel;
     // Use this for initialization
     void Start()
     {
@@ -27,6 +29,8 @@ public class ClickPVP : MonoBehaviour
         color.normalColor = Color.yellow;
         color.highlightedColor = Color.yellow;
         AttackBtn.colors = color;
+
+        exitPanel = GameObject.Find("ConfirmExitPanel").GetComponent<Panel>();
     }
 
     public void SetBtnsEnabled(bool status)
@@ -85,7 +89,14 @@ public class ClickPVP : MonoBehaviour
 
     public void LeaveBattleClicked()
     {
-        SceneManager.LoadScene("Status");
+        exitPanel.SetText("確定要離開嗎?敵方將會無條件勝利。");
+        exitPanel.SetConfirmListener(() =>
+        {
+            battleView.LeaveBattle();
+            //這裡會有里程不更新的問題
+            SceneManager.LoadScene("Status");
+        });
+        exitPanel.Show();
     }
 
     private void SetColor(Button current)

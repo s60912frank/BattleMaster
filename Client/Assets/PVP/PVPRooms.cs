@@ -20,13 +20,13 @@ public class PVPRooms : MonoBehaviour {
         socket = socketIOObject.AddComponent<SocketIOComponent>();
         originalBtn = Resources.Load("RoomListButton") as GameObject;
 		grid = GameObject.Find ("Grid");
-        //yield return new WaitForSeconds(0.5f);
-        //socket.socket.Url = Constant.SOCKET_URL;
 		userData = new JSONObject(PlayerPrefs.GetString("userData")); //讀取userData
 		socket.On ("roomList", OnGetRoomList);
 		socket.On ("roomAdded", OnRoomAdded);
 		socket.On ("roomRemoved", OnRoomRemoved);
-		socket.On ("battleStart", OnBattleStart);
+        socket.On("roomAvaliable", OnRoomAvaliable);
+        socket.On("roomFull", OnRoomFull);
+        socket.On("joinResult", OnJoinResult);
         string rawSid = PlayerPrefs.GetString("Cookie");
         //附上登入過後server給我們的餅乾再連線
         socket.socket.SetCookie(new WebSocketSharp.Net.Cookie("connect.sid", rawSid.Replace("connect.sid=", "")));
@@ -48,32 +48,47 @@ public class PVPRooms : MonoBehaviour {
 		Debug.Log (e.data ["name"].ToString () + " added!");
 	}
 
-	private void OnRoomRemoved(SocketIOEvent e)
+    private void OnJoinResult(SocketIOEvent e)
+    {
+        if (e.data["success"].b)
+        {
+            //進入房間內場景
+            PlayerPrefs.SetString("RoomInfo", e.data["room"].ToString());
+            DontDestroyOnLoad(socketIOObject);
+            SceneManager.LoadScene("PVPWait");
+        }
+    }
+
+    private void OnRoomRemoved(SocketIOEvent e)
 	{
 		Debug.Log ("A room removed!");
 		Destroy (GameObject.Find (e.data["id"].str));
 	}
 
-    private void OnBattleStart(SocketIOEvent e)
+    private void OnRoomAvaliable(SocketIOEvent e)
     {
-        DontDestroyOnLoad(socketIOObject);
-        SceneManager.LoadScene("BattlePVP2");
+        GameObject.Find(e.data["id"].str).GetComponent<Button>().interactable = true;
     }
 
-	private void createButton(JSONObject room)
+    private void OnRoomFull(SocketIOEvent e)
+    {
+        GameObject.Find(e.data["id"].str).GetComponent<Button>().interactable = false;
+    }
+
+    private void createButton(JSONObject room)
 		//在列表中加入按鈕
 	{
 		GameObject btn = GameObject.Instantiate (originalBtn);
         SetRoomButton setScript = btn.GetComponent<SetRoomButton>();
         setScript.SetRoomName(room["name"].str);
-        setScript.SetRoomOwner(room["user1"]["id"].str, room["user1"]["name"].str);
-		//btn.GetComponentInChildren<Text> ().text = room["name"].str;
-		btn.name = room ["id"].str;
+        setScript.SetRoomOwner(room["owner"]["id"].str, room["owner"]["name"].str);
+		btn.name = room["id"].str;
 		btn.GetComponent<Button> ().onClick.AddListener (delegate {
 			selectedRoomId = btn.name;
 			confirmPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
 		});
-		btn.transform.SetParent (grid.transform, false);
+        btn.GetComponent<Button>().interactable = !room["isFull"].b;
+        btn.transform.SetParent (grid.transform, false);
 	}
 
 	public void JoinRoom() //加入房間
@@ -102,8 +117,11 @@ public class PVPRooms : MonoBehaviour {
 		Dictionary<string,string> data = new Dictionary<string, string> ();
 		data.Add ("name", roomName);
 		socket.Emit ("createRoom", new JSONObject(data));
-		createRoomPanel.transform.FindChild ("Title").GetComponent<Text>().text = "等待對手中";
-		createRoomPanel.transform.FindChild ("CreateOK").GetComponent<Button> ().interactable = false;
+		//createRoomPanel.transform.FindChild ("Title").GetComponent<Text>().text = "等待對手中";
+		//createRoomPanel.transform.FindChild ("CreateOK").GetComponent<Button> ().interactable = false;
+
+        //載入中....
+        //server會以join result回應
 	}
 
 	public void LeaveRoom()

@@ -15,8 +15,10 @@ public class Click : MonoBehaviour {
 	public Text messageBoxText;
     private Text SkillBtnText;
     private BattlePhase.Movement movement;
-	// Use this for initialization
-	void Start ()
+
+    private Panel exitPanel;
+    // Use this for initialization
+    void Start ()
 	{
         allBtns = new Button[] { SkillBtn, AttackBtn, DefendBtn, EvadeBtn, ConfirmBtn };
         SkillBtnText = SkillBtn.GetComponentInChildren<Text>();
@@ -26,6 +28,8 @@ public class Click : MonoBehaviour {
         color.normalColor = Color.yellow;
         color.highlightedColor = Color.yellow;
         AttackBtn.colors = color;
+
+        exitPanel = GameObject.Find("ConfirmExitPanel").GetComponent<Panel>();
     }
 
     public void SetBtnsEnabled(bool status)
@@ -81,11 +85,6 @@ public class Click : MonoBehaviour {
         battleView.SetMyMovement(movement);
     }
 
-	public void LeaveBattleClicked()
-	{
-		SceneManager.LoadScene("Status");
-	}
-
     private void SetColor(Button current)
     {
         foreach (Button btn in allBtns)
@@ -99,5 +98,15 @@ public class Click : MonoBehaviour {
         color.normalColor = Color.yellow;
         color.highlightedColor = Color.yellow;
         current.colors = color;
+    }
+
+    public void LeaveBattleClicked()
+    {
+        exitPanel.SetText("確定要離開嗎?消耗的里程將不會返還。");
+        exitPanel.SetConfirmListener(() =>
+        {
+            SceneManager.LoadScene("Status");
+        });
+        exitPanel.Show();
     }
 }

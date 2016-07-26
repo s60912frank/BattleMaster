@@ -72,7 +72,8 @@ namespace SocketIO
 		private Parser parser;
 
 		private Dictionary<string, List<Action<SocketIOEvent>>> handlers;
-		private List<Ack> ackList;
+
+        private List<Ack> ackList;
 
 		private int packetId;
 

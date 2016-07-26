@@ -7,6 +7,8 @@ using SocketIO;
 
 public class BattleViewPVP : MonoBehaviour {
     private SocketIOComponent socket;
+    private GameObject SocketIOObj;
+
     public GameObject Partner;
     public GameObject Enemy;
     public GameObject PartnerSkillEffect;
@@ -33,9 +35,11 @@ public class BattleViewPVP : MonoBehaviour {
 
     private BattlePhase battlePhase;
     private ClickPVP click;
+    
     // Use this for initialization
     void Start () {
-        socket = GameObject.Find("SocketIO").GetComponent<SocketIOComponent>();
+        SocketIOObj = GameObject.Find("SocketIO");
+        socket = SocketIOObj.GetComponent<SocketIOComponent>();
         //socket事件們
         socket.On("enemyData", OnReceiveEnemyData);
         socket.On("enemyMovement", OnEnemyMovement);
@@ -208,5 +212,11 @@ public class BattleViewPVP : MonoBehaviour {
         {
             return false;
         }
+    }
+
+    public void LeaveBattle()
+    {
+        socket.Close();
+        Destroy(SocketIOObj);
     }
 }
