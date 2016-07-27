@@ -33,6 +33,23 @@ public class MapView : MonoBehaviour {
         
     }
 
+    public void CurrentLoactionClicked()
+    {
+        StartCoroutine(MoveCamToPlayer());
+    }
+
+    private IEnumerator MoveCamToPlayer()
+    {
+        Transform cam = Camera.main.transform;
+        while(cam.position.x != Player.transform.position.x && cam.position.y != Player.transform.position.y)
+        {
+            cam.position = new Vector3(Mathf.MoveTowards(cam.position.x, Player.transform.position.x, 0.1f),
+                                   Mathf.MoveTowards(cam.position.y, Player.transform.position.y, 0.1f),
+                                   cam.position.z);
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
     private IEnumerator UpdateGPS()
     {
         while (true)
