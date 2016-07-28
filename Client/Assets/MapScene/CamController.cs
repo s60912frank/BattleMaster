@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class CamController : MonoBehaviour {
     private Transform trans;
@@ -88,23 +91,25 @@ public class CamController : MonoBehaviour {
             else if (touch.phase == TouchPhase.Ended && touch.position == startPos && MouseRay)
             {
                 //tap-查看敵人訊息
-                bool found = false;
-                RaycastHit[] hits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition));
-                foreach (RaycastHit hit in hits)
+
+                //I wish I have better solution.....
+                RaycastHit2D btnHit = Physics2D.Raycast(this.transform.position, Input.mousePosition);
+                if(btnHit.collider == null)
                 {
+                    RaycastHit hit;
+                    Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit);
+                    Debug.Log("HIT:" + hit.transform.tag);
                     if (hit.transform.tag == "Area")
                     {
                         //showMonsterData
                         MouseRay = false;
                         map.ShowEnemyData(hit.transform);
-                        found = true;
-                        break;
                     }
-                }
-                if (!found)
-                {
-                    map.ShowEnemyData();
-                    MouseRay = false;
+                    else if (hit.transform.tag == "MapPlane")
+                    {
+                        map.ShowEnemyData();
+                        MouseRay = false;
+                    }
                 }
                 startPos = Vector2.zero;
             }
@@ -175,28 +180,28 @@ public class CamController : MonoBehaviour {
                 int[] tileNum = DetermineCurrentTile();
                 if(tileNum != null)
                     yield return map.GetNewTile(tileNum[0] - 1, tileNum[1]);
-                Debug.Log("LEFT!");
+                //Debug.Log("LEFT!");
             }
             if (!Physics.Raycast(right))
             {
                 int[] tileNum = DetermineCurrentTile();
                 if (tileNum != null)
                     yield return map.GetNewTile(tileNum[0] + 1, tileNum[1]);
-                Debug.Log("RIGHT!");
+                //Debug.Log("RIGHT!");
             }
             if (!Physics.Raycast(top))
             {
                 int[] tileNum = DetermineCurrentTile();
                 if (tileNum != null)
                     yield return map.GetNewTile(tileNum[0], tileNum[1] - 1);
-                Debug.Log("TOP!");
+                //Debug.Log("TOP!");
             }
             if (!Physics.Raycast(down))
             {
                 int[] tileNum = DetermineCurrentTile();
                 if (tileNum != null)
                     yield return map.GetNewTile(tileNum[0], tileNum[1] + 1);
-                Debug.Log("Down!");
+                //Debug.Log("Down!");
             }
         }
     }

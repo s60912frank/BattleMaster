@@ -122,7 +122,7 @@ public class GPS {
                 //debug only
                 Vector2 whee = new Vector2(lonOrigin, latOrigin);
                 //return new Vector2(lonOrigin + 0.1f, latOrigin+0.1f);
-                Debug.Log(whee);
+                //Debug.Log(whee);
                 return whee;
             }
         }
