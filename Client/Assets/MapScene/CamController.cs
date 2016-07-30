@@ -46,7 +46,7 @@ public class CamController : MonoBehaviour {
                 MouseRay = false;
             }
         }*/
-
+        Debug.Log("MOUSERAY:" + MouseRay);
         //方向建移動cam
         if (Input.GetKey(KeyCode.UpArrow))
         {
@@ -91,7 +91,7 @@ public class CamController : MonoBehaviour {
             else if (touch.phase == TouchPhase.Ended && touch.position == startPos && MouseRay)
             {
                 //tap-查看敵人訊息
-
+                
                 //I wish I have better solution.....
                 RaycastHit2D btnHit = Physics2D.Raycast(this.transform.position, Input.mousePosition);
                 if(btnHit.collider == null)
@@ -110,6 +110,10 @@ public class CamController : MonoBehaviour {
                         map.ShowEnemyData();
                         MouseRay = false;
                     }
+                }
+                else
+                {
+                    Debug.Log(btnHit.collider.name);
                 }
                 startPos = Vector2.zero;
             }

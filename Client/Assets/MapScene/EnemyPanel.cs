@@ -48,11 +48,6 @@ public class EnemyPanel : MonoBehaviour {
         //StartCoroutine(Dirty());
     }
 
-    public void HidePanel()
-    {
-        gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-1000, 0);
-    }
-
     public void HideAndSetMouseRay()
     {
         gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-1000, 0);

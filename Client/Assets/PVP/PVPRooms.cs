@@ -15,8 +15,11 @@ public class PVPRooms : MonoBehaviour {
 	public GameObject createRoomPanel;
 	private JSONObject userData;
 	private string selectedRoomId;
+    public GameObject LoadingPanel;
+    private LoadingScript panelScript;
 	// Use this for initialization
 	void Start () {
+        panelScript = LoadingPanel.GetComponent<LoadingScript>();
         socket = socketIOObject.AddComponent<SocketIOComponent>();
         originalBtn = Resources.Load("RoomListButton") as GameObject;
 		grid = GameObject.Find ("Grid");
@@ -32,6 +35,8 @@ public class PVPRooms : MonoBehaviour {
         socket.socket.SetCookie(new WebSocketSharp.Net.Cookie("connect.sid", rawSid.Replace("connect.sid=", "")));
         //連線!!只要有登入過就會連線成功
         socket.Connect();
+        panelScript.SetText("取得房間列表中");
+        panelScript.StartLoading();
     }
 
 	private void OnGetRoomList(SocketIOEvent e)
@@ -40,6 +45,7 @@ public class PVPRooms : MonoBehaviour {
 		{
 			createButton (room);
 		}
+        panelScript.EndLoading();
 	}
 
 	private void OnRoomAdded(SocketIOEvent e)

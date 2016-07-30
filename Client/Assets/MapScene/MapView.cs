@@ -4,15 +4,15 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class MapView : MonoBehaviour {
-    public GameObject LoadingPanel;
+    //public GameObject LoadingPanel;
     public GameObject EnemyDataPanel;
     public Text GPSText;
     public GameObject Player;
     private MapModel model;
 	// Use this for initialization
 	IEnumerator Start () {
-        LoadingPanel.GetComponent<LoadingScript>().Start();
-        LoadingPanel.GetComponent<LoadingScript>().StartLoading();
+        //LoadingPanel.GetComponent<LoadingScript>().Start();
+        //LoadingPanel.GetComponent<LoadingScript>().StartLoading();
         model = new MapModel();
         yield return model.MapInit();
         MapProcessor2 result = model.GetMapResult();
@@ -24,7 +24,7 @@ public class MapView : MonoBehaviour {
             }
         }
         SetPlane(result);
-        LoadingPanel.GetComponent<LoadingScript>().EndLoading();
+        //LoadingPanel.GetComponent<LoadingScript>().EndLoading();
         yield return UpdateGPS();
     }
 	
@@ -87,7 +87,7 @@ public class MapView : MonoBehaviour {
 
     public IEnumerator GetNewTile(int xTile, int yTile)
     {
-        LoadingPanel.GetComponent<LoadingScript>().StartLoading();
+        //LoadingPanel.GetComponent<LoadingScript>().StartLoading();
         yield return model.RequestMap(xTile, yTile);
         MapProcessor2 result = model.GetMapResult();
         foreach (KeyValuePair<string, List<Vector2[]>> mapObj in result.outputData)
@@ -98,7 +98,7 @@ public class MapView : MonoBehaviour {
             }
         }
         SetPlane(result);
-        LoadingPanel.GetComponent<LoadingScript>().EndLoading();
+        //LoadingPanel.GetComponent<LoadingScript>().EndLoading();
     }
 
     private void DrawMapObj(string type, Vector2[] vertices2D) //畫地圖物件

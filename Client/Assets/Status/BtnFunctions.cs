@@ -7,12 +7,14 @@ public class BtnFunctions : MonoBehaviour {
     public GameObject LoadingPanel;
     public GameObject NotifyPanelObj;
     private NotifyPanel notify;
+    private LoadingScript panelScript;
     // Use this for initialization
 
     void Awake()
     {
         NotifyPanelObj = GameObject.Find("NotifyPanel");
         notify = NotifyPanelObj.GetComponent<NotifyPanel>();
+        panelScript = LoadingPanel.GetComponent<LoadingScript>();
     }
 
     IEnumerator Start () {
@@ -27,26 +29,41 @@ public class BtnFunctions : MonoBehaviour {
     public void GoToMap()
     {
         //SceneManager.LoadScene("map");//移到地圖
-        LoadingPanel.GetComponent<LoadingScript>().StartLoading();
         StartCoroutine(CheckGPS());
     }
 
     private IEnumerator CheckGPS()
     {
+        panelScript.StartLoading();
+        float startTime = Time.time;
         GPS gps = new GPS();
-        
         yield return gps.GPSInit((loc) => { });
         if (gps.GPSStatus != "GPS OK")
         {
             notify.SetText(gps.GPSStatus);
-            notify.Show();
+            panelScript.OnHidedCallback(() =>
+            {
+                notify.Show();
+            });
         }
         else
         {
-            SceneManager.LoadScene("map");//移到地圖
-            //AsyncOperation asy = SceneManager
+            AsyncOperation nextScene = SceneManager.LoadSceneAsync("map");
+            nextScene.allowSceneActivation = false;
+            while(nextScene.progress < 0.9f)
+            {
+                yield return null;
+            }
+            while (Time.time - startTime < 0.8f)
+            {
+                yield return null;
+            }
+            panelScript.OnHidedCallback(() =>
+            {
+                nextScene.allowSceneActivation = true;
+            });
         }
-        LoadingPanel.GetComponent<LoadingScript>().EndLoading();
+        panelScript.EndLoading();
     }
 
     public void SearchEnemy()
@@ -56,8 +73,6 @@ public class BtnFunctions : MonoBehaviour {
 
     public void TrainingClicked()
     {
-        //有點臭
-        LoadingPanel.GetComponent<LoadingScript>().StartLoading();
         JSONObject data = new JSONObject(PlayerPrefs.GetString("userData"));
         if(data["mileage"].f > 100)
         {
@@ -66,11 +81,14 @@ public class BtnFunctions : MonoBehaviour {
         else
         {
             //出去走走好嗎
+            //顯示錯誤訊息
         }
     }
 
     private IEnumerator EnterTraningGame()
     {
+        float startTime = Time.time;
+        panelScript.StartLoading();
         Dictionary<string, string> headers = new Dictionary<string, string>();
         headers.Add("Cookie", PlayerPrefs.GetString("Cookie")); //加入cookie
         WWW w = new WWW(Constant.SERVER_URL + "/enterTraning", null, headers);
@@ -78,14 +96,29 @@ public class BtnFunctions : MonoBehaviour {
         if (string.IsNullOrEmpty(w.error))
         {
             PlayerPrefs.SetString("userData", w.text);
+            AsyncOperation nextScene = SceneManager.LoadSceneAsync("StatsTraining");
+            nextScene.allowSceneActivation = false;
+            while (nextScene.progress < 0.9f)
+            {
+                yield return null;
+            }
+            while (Time.time - startTime < 0.8f)
+            {
+                yield return null;
+            }
+            panelScript.OnHidedCallback(() =>
+            {
+                nextScene.allowSceneActivation = true;
+            });
         }
         else
         {
             //你4不4偷改數據
             Debug.Log(w.error);
+            //顯示錯誤訊息
         }
-        LoadingPanel.GetComponent<LoadingScript>().EndLoading();
-        SceneManager.LoadScene("StatsTraining");
+        panelScript.EndLoading();
+        //SceneManager.LoadScene("StatsTraining");
     }
 
     public void LocationUpdateClicked()

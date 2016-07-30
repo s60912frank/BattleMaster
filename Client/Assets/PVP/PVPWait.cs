@@ -10,10 +10,12 @@ public class PVPWait : MonoBehaviour {
     public Text RivalText;
     public Text OwnerReadyText;
     public Text RivalReadyText;
+    public GameObject LoadingPanel;
     private GameObject socketIOObj;
     private SocketIOComponent socket;
     private JSONObject roomInfo;
     private bool amIready = false;
+    private LoadingScript panelScript;
 	// Use this for initialization
 	void Start () {
         socketIOObj = GameObject.Find("SocketIO");
@@ -22,6 +24,7 @@ public class PVPWait : MonoBehaviour {
         socket.On("unReady", OnUnReady);
         socket.On("roomChanged", OnRoomChanged);
         socket.On("battleStart", OnBattleStart);
+        panelScript = LoadingPanel.GetComponent<LoadingScript>();
 
         roomInfo = new JSONObject(PlayerPrefs.GetString("RoomInfo"));
         if (roomInfo.HasField("enemyReady") && roomInfo["enemyReady"].b)
@@ -72,7 +75,31 @@ public class PVPWait : MonoBehaviour {
     {
         DontDestroyOnLoad(socketIOObj);
         //轉去戰鬥畫面
-        SceneManager.LoadScene("BattlePVP2");
+        StartCoroutine(GoBattle());
+    }
+
+    private IEnumerator GoBattle()
+    {
+        panelScript.StartLoading();
+        float timeStart = Time.time;
+        AsyncOperation loadScene = SceneManager.LoadSceneAsync("BattlePVP2");
+        loadScene.allowSceneActivation = false;
+        while (loadScene.progress < 0.9f)
+        {
+            //Debug.Log("PROGRESS:" + loadScene.progress);
+            yield return null;
+        }
+        while (Time.time - timeStart < 0.8f)
+        {
+            //Debug.Log(Time.time - timeStart);
+            yield return null;
+        }
+        panelScript.OnHidedCallback(() =>
+        {
+            //在動畫撥放完成後轉到新場景
+            loadScene.allowSceneActivation = true;
+        });
+        panelScript.EndLoading();
     }
 
     private void OnRoomChanged(SocketIOEvent e)

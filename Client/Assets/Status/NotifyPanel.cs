@@ -4,12 +4,14 @@ using System.Collections;
 
 public class NotifyPanel : MonoBehaviour {
     private RectTransform rt;
+    private Animator animator;
     private Text ContentText;
     private Button ConfirmButton;
 
     public void Awake()
     {
         Debug.Log("AWAKE!");
+        animator = gameObject.GetComponent<Animator>();
         rt = gameObject.GetComponent<RectTransform>();
         ContentText = transform.FindChild("Panel").FindChild("ContentText").GetComponent<Text>();
         ConfirmButton = transform.FindChild("Panel").FindChild("ConfirmButton").GetComponent<Button>();
@@ -39,9 +41,15 @@ public class NotifyPanel : MonoBehaviour {
     {
         Debug.Log("SHOW!");
         rt.anchoredPosition = new Vector2(0, 0);
+        animator.SetTrigger("StartShow");
     }
 
     public void Hide()
+    {
+        animator.SetTrigger("StartHide");
+    }
+
+    public void HidePanel()
     {
         rt.anchoredPosition = new Vector2(2000, 0);
     }

@@ -12,9 +12,15 @@ public class statsMinigame : MonoBehaviour {
     private bool run = true;
     public Button PauseButton;
     public GameObject ConfirmPanel;
+    private Panel confirmScript;
     private Text PauseButtonText;
     // Use this for initialization
+
     void Start() {
+        confirmScript = ConfirmPanel.GetComponent<Panel>();
+        //confirmScript.OnHideCallback(ConfirmExitButtonClicked);
+        confirmScript.SetNoListener(ConfirmNoButtonClicked);
+        confirmScript.SetConfirmListener(ConfirmExitButtonClicked);
         PauseButtonText = PauseButton.GetComponentInChildren<Text>();
         //所有disk種類先擺
         disks = new GameObject[] {
@@ -31,10 +37,10 @@ public class statsMinigame : MonoBehaviour {
     {
         while (true)
         {
-            Debug.Log("WHHHE DISK!!! " + run);
+            //Debug.Log("WHHHE DISK!!! " + run);
             if (run)
             {
-                Debug.Log("WHHHE DISK!!!");
+                //Debug.Log("WHHHE DISK!!!");
                 generateRandomColorDisk();
                 //間隔interval的時間產生一個disk
             }
@@ -44,7 +50,7 @@ public class statsMinigame : MonoBehaviour {
 
     public void ExitClicked()
     {
-        ConfirmPanel.GetComponent<Panel>().Show();
+        confirmScript.Show();
         run = false;
         foreach (Pauseable obj in pauseables)
         {
@@ -52,14 +58,13 @@ public class statsMinigame : MonoBehaviour {
         }
     }
 
-    public void ConfirmButtonClicked()
+    private void ConfirmExitButtonClicked()
     {
         SceneManager.LoadScene("Status");
     }
 
-    public void NoButtonCliked()
+    private void ConfirmNoButtonClicked()
     {
-        ConfirmPanel.GetComponent<Panel>().Hide();
         PauseButtonText.text = "暫停";
         run = true;
         foreach (Pauseable obj in pauseables)
