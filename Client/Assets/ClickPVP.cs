@@ -31,6 +31,7 @@ public class ClickPVP : MonoBehaviour
         AttackBtn.colors = color;
 
         exitPanel = GameObject.Find("ConfirmExitPanel").GetComponent<Panel>();
+        
     }
 
     public void SetBtnsEnabled(bool status)

@@ -21,7 +21,7 @@ public class BtnFunctions : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
+        
 	}
 
     public void GoToMap()
@@ -34,6 +34,7 @@ public class BtnFunctions : MonoBehaviour {
     private IEnumerator CheckGPS()
     {
         GPS gps = new GPS();
+        
         yield return gps.GPSInit((loc) => { });
         if (gps.GPSStatus != "GPS OK")
         {
@@ -43,6 +44,7 @@ public class BtnFunctions : MonoBehaviour {
         else
         {
             SceneManager.LoadScene("map");//移到地圖
+            //AsyncOperation asy = SceneManager
         }
         LoadingPanel.GetComponent<LoadingScript>().EndLoading();
     }

@@ -13,6 +13,7 @@ public class NotifyPanel : MonoBehaviour {
         rt = gameObject.GetComponent<RectTransform>();
         ContentText = transform.FindChild("Panel").FindChild("ContentText").GetComponent<Text>();
         ConfirmButton = transform.FindChild("Panel").FindChild("ConfirmButton").GetComponent<Button>();
+        
     }
 
     // Use this for initialization

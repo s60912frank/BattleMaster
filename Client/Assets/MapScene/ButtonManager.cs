@@ -6,7 +6,7 @@ public class ButtonManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	
+        
 	}
 
     public void GoBackScene()
