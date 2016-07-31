@@ -27,12 +27,15 @@ public class BattleView : MonoBehaviour {
 
     public GameObject VictoryPanel;
     public GameObject DefeatPanel;
+    public GameObject SpriteMgr;
 
     private BattlePhase battlePhase;
+    private AnimationController animationController;
     private Click click;
     // Use this for initialization
     void Start () {
         //this.gameObject.ac
+        animationController = SpriteMgr.GetComponent<AnimationController>();
         JSONObject partnerData = new JSONObject(PlayerPrefs.GetString("userData"))["pet"];
         JSONObject enemyData = new JSONObject(PlayerPrefs.GetString("enemyAI"));
         EnemyHP.text = "Enemy HP:" + enemyData["stamina"].f.ToString();
@@ -47,17 +50,20 @@ public class BattleView : MonoBehaviour {
     public void SetMyMovement(BattlePhase.Movement myMovement)
     {
         battlePhase.SetPartnerMovement(myMovement);
-        RoundStart();
+        StartCoroutine(RoundStart());
     }
 
-    private void RoundStart()
+    private IEnumerator RoundStart()
     {
         click.SetBtnsEnabled(false);
         battlePhase.SetEnemyMovement((BattlePhase.Movement)Random.Range(0, 5));
         battlePhase.RoundStart();
         BattleRoundResult result = battlePhase.GetRoundResult();
 
-        //顯示Partner結果
+        //這裡要來撥放動畫了
+        yield return animationController.BattleAnimation(result);
+
+        //顯示Enemy結果
         messageBoxText.text = result.partnerStatusText;
         EnemyHP.text = "Enemy HP:" + result.enemyHp;
         EnemyCD.text = "CD:" + result.enemyRemainingCD.ToString();
@@ -67,7 +73,7 @@ public class BattleView : MonoBehaviour {
         if (result.isEnemySkillActivated)
             EnemySkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
 
-        //顯示Enemy結果
+        //顯示Partner結果
         messageEnemyMove.text = result.enemyStatusText;
         PartnerHP.text = "Partner HP:" + result.partnerHp;
         PartnerCD.text = "CD:" + result.partnerRemainingCD.ToString();
@@ -77,7 +83,7 @@ public class BattleView : MonoBehaviour {
         if (result.isPartnerSkillActivated)
             PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
 
-        StartCoroutine(CheckGameOver());
+        yield return CheckGameOver();
     }
 
     private IEnumerator CheckGameOver()

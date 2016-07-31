@@ -44,11 +44,14 @@ public class BattlePhase {
         {
 			case Movement.Attack:
                 roundResult.enemyStatusText = "The enemy attacked!";
+                //暫時這樣如果有迴避掉下面會改 其他情況寫在這比較方便
+                //roundResult.enemyResultType = ResultType.AttackAndBeingAttacked;
                 //yourEvadeNumber = Random.Range(0, 100);
                 /* See Enemy's attack below */
                 break;
             case Movement.Defense:
                 roundResult.enemyStatusText = "The enemy tried to defend your attack.";
+                //roundResult.enemyResultType = ResultType.Defensed;
                 break;
             case Movement.Evade:
                 roundResult.enemyStatusText = "The enemy tried to evade your attack.";
@@ -103,6 +106,7 @@ public class BattlePhase {
                     else
                     {
                         roundResult.partnerStatusText = "The Enemy evaded your attack...";
+                        roundResult.isEnemyEvaded = true;
                         if (enemyMovement == Movement.Evade)
                         {
                             enemy.SetNextCricical(true);
@@ -175,6 +179,7 @@ public class BattlePhase {
                 {
                     //迴避成功
                     roundResult.partnerStatusText = "You dodged the enemy's attack.";
+                    roundResult.isPartnerEvaded = true;
                     if (partnerMovement == Movement.Evade)
                     {
                         partner.SetNextCricical(true);
@@ -202,6 +207,8 @@ public class BattlePhase {
         roundResult.partnerRemainingCD = partner.RemainingCD;
         roundResult.enemyHp = enemy.Stamina;
         roundResult.partnerHp = partner.Stamina;
+        roundResult.partnerMovement = partnerMovement;
+        roundResult.enemyMovement = enemyMovement;
         //ROUND OVER
     }
 
