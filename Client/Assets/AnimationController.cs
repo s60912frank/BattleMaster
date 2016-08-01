@@ -134,6 +134,24 @@ public class AnimationController : MonoBehaviour {
             yield return enemy.WaitForFinish();
             yield return partner.WaitForFinish();
         }
+
+        if (result.isEnemyNextCritical)
+        {
+            enemy.SetTrigger("SetNextCritical");
+        }
+        else
+        {
+            enemy.SetTrigger("SetNotCritical");
+        }
+
+        if (result.isPartnerNextCritical)
+        {
+            partner.SetTrigger("SetNextCritical");
+        }
+        else
+        {
+            partner.SetTrigger("SetNotCritical");
+        }
     }
 
     /*

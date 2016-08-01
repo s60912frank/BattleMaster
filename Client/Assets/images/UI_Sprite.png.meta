@@ -1,0 +1,255 @@
+fileFormatVersion: 2
+guid: 3d6d1820440b449418468c5f2540579a
+timeCreated: 1470023671
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: UI_Sprite_0
+    21300002: UI_Sprite_1
+    21300004: UI_Sprite_2
+    21300006: UI_Sprite_3
+    21300008: UI_Sprite_4
+    21300010: UI_Sprite_5
+    21300012: UI_Sprite_6
+    21300014: UI_Sprite_7
+    21300016: UI_Sprite_8
+    21300018: UI_Sprite_9
+    21300020: UI_Sprite_10
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: UI_Sprite_0
+      rect:
+        serializedVersion: 2
+        x: 27
+        y: 534
+        width: 93
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -45.5, y: 44}
+        - {x: -46.5, y: 42}
+        - {x: -46.5, y: -23}
+        - {x: -14.5, y: -44}
+        - {x: 15.5, y: -44}
+        - {x: 46.5, y: 0}
+        - {x: 46.5, y: 39}
+        - {x: 42.5, y: 44}
+    - name: UI_Sprite_1
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 534
+        width: 961
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 480.5, y: 39}
+        - {x: 479.5, y: 40}
+        - {x: 475.5, y: 45}
+        - {x: -473.5, y: 45}
+        - {x: -479.5, y: 40}
+        - {x: -479.5, y: 39}
+        - {x: -480.5, y: 38}
+        - {x: -480.5, y: -38}
+        - {x: -475.5, y: -44}
+        - {x: -474.5, y: -44}
+        - {x: -473.5, y: -45}
+        - {x: 473.5, y: -45}
+        - {x: 479.5, y: -40}
+        - {x: 479.5, y: -39}
+        - {x: 480.5, y: -38}
+    - name: UI_Sprite_2
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 486
+        width: 917
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -456.5, y: 21}
+        - {x: -458.5, y: 19}
+        - {x: -458.5, y: -21}
+        - {x: 458.5, y: -21}
+        - {x: 458.5, y: 20}
+        - {x: 457.5, y: 21}
+    - name: UI_Sprite_3
+      rect:
+        serializedVersion: 2
+        x: 90
+        y: 439
+        width: 35
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -10.5, y: 20.5}
+        - {x: -17.5, y: 18.5}
+        - {x: -17.5, y: -7.5}
+        - {x: -9.5, y: -20.5}
+        - {x: 8.5, y: -20.5}
+        - {x: 17.5, y: -8.5}
+        - {x: 17.5, y: 18.5}
+        - {x: 12.5, y: 20.5}
+    - name: UI_Sprite_4
+      rect:
+        serializedVersion: 2
+        x: 132
+        y: 439
+        width: 917
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -458.5, y: 20.5}
+        - {x: -458.5, y: -19.5}
+        - {x: -457.5, y: -20.5}
+        - {x: 456.5, y: -20.5}
+        - {x: 458.5, y: -18.5}
+        - {x: 458.5, y: 20.5}
+    - name: UI_Sprite_5
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 385
+        width: 901
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: UI_Sprite_6
+      rect:
+        serializedVersion: 2
+        x: 59
+        y: 335
+        width: 39
+        height: 41
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -17.5, y: 20.5}
+        - {x: -19.5, y: 14.5}
+        - {x: -19.5, y: -16.5}
+        - {x: -13.5, y: -20.5}
+        - {x: 12.5, y: -20.5}
+        - {x: 19.5, y: -12.5}
+        - {x: 19.5, y: 12.5}
+        - {x: 11.5, y: 20.5}
+    - name: UI_Sprite_7
+      rect:
+        serializedVersion: 2
+        x: 188
+        y: 303
+        width: 932
+        height: 65
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: -462, y: 32.5}
+        - {x: -466, y: 28.5}
+        - {x: -466, y: -30.5}
+        - {x: -465, y: -32.5}
+        - {x: 466, y: -32.5}
+        - {x: 466, y: 28.5}
+        - {x: 462, y: 32.5}
+    - name: UI_Sprite_8
+      rect:
+        serializedVersion: 2
+        x: 214
+        y: 249
+        width: 806
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    - name: UI_Sprite_9
+      rect:
+        serializedVersion: 2
+        x: 214
+        y: 180
+        width: 849
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 421.5, y: 32}
+        - {x: -420.5, y: 32}
+        - {x: -424.5, y: 28}
+        - {x: -424.5, y: -29}
+        - {x: -422.5, y: -32}
+        - {x: 421.5, y: -32}
+        - {x: 424.5, y: -30}
+        - {x: 424.5, y: 29}
+    - name: UI_Sprite_10
+      rect:
+        serializedVersion: 2
+        x: 214
+        y: 139
+        width: 806
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

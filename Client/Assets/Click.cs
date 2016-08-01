@@ -57,6 +57,7 @@ public class Click : MonoBehaviour {
 			messageBoxText.text = "Confirm to Activate Charge.";
 		}
         SetColor(SkillBtn);
+        Debug.Log("lujfnjdfndfjnfdkjngfkjgn");
 	}
 
 	public void action_4_btnAttack()

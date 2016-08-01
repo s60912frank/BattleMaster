@@ -199,8 +199,10 @@ public class BattlePhase {
 		enemy.Burn ();
         roundResult.isPartnerNextCritical = partner.IsNextCritical;
         roundResult.isEnemyNextCritical = enemy.IsNextCritical;
-        roundResult.isPartnerDefenseDropped = partner.IsDenfenseDropped;
-        roundResult.isEnemyDefenseDropped = enemy.IsDenfenseDropped;
+        //roundResult.isPartnerDefenseDropped = partner.IsDenfenseDropped;
+        //roundResult.isEnemyDefenseDropped = enemy.IsDenfenseDropped;
+        roundResult.enemyDefense = enemy.Defense;
+        roundResult.partnerDefense = partner.Defense;
         roundResult.isEnemyOnfire = enemy.IsOnFire;
         roundResult.isPartnerOnfire = partner.IsOnFire;
         roundResult.enemyRemainingCD = enemy.RemainingCD;

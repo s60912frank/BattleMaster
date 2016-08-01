@@ -111,15 +111,10 @@ public class MonsterData2 {
 
     public void Skill(ref MonsterData2 enemy)
     {
-        //int damage = int.Parse(GetString(_skillParams, "damage"));
-        //int recover = int.Parse(GetString(_skillParams, "recover"));
-        //int attIncrease = int.Parse(GetString(_skillParams, "attIncrease"));
         enemy._burnDamage = SkillBurn;
         _stamina += SkillRecover;
         enemy._stamina -= SkillDamage;
         _attack += SkillAttIncrease;
-        //技能特效還要再想辦法
-        //PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
         _charge = 0;
         Debug.Log("Your skill activated!");
     }
@@ -149,11 +144,13 @@ public class MonsterData2 {
     public void Charge()
     {
         _charge++;
+        if (_charge > _skillCD)
+            _charge = _skillCD;
     }
 
     public void DropDefense()
     {
-        _defense -= 5;
+        _defense -= Mathf.FloorToInt((float)_initialDefense * 0.5f);
         if (_defense <= 0)
             _defense = 0;
     }

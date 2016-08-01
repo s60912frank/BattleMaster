@@ -138,7 +138,7 @@ public class BattleViewPVP : MonoBehaviour {
         EnemyHP.text = "Enemy HP:" + result.enemyHp;
         EnemyCD.text = "CD:" + result.enemyRemainingCD.ToString();
         EnemyCrit.text = result.isEnemyNextCritical ? "爆擊" : "";
-        EnemyDefDrop.text = result.isEnemyDefenseDropped ? "降防" : "";
+        //EnemyDefDrop.text = result.isEnemyDefenseDropped ? "降防" : "";
         EnemyOnFire.text = result.isEnemyOnfire ? "燃燒" : "";
         if (result.isEnemySkillActivated)
             EnemySkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
@@ -148,7 +148,7 @@ public class BattleViewPVP : MonoBehaviour {
         PartnerHP.text = "Partner HP:" + result.partnerHp;
         PartnerCD.text = "CD:" + result.partnerRemainingCD.ToString();
         PartnerCrit.text = result.isPartnerNextCritical ? "爆擊" : "";
-        PartnerDefDrop.text = result.isPartnerDefenseDropped ? "降防" : "";
+        //PartnerDefDrop.text = result.isPartnerDefenseDropped ? "降防" : "";
         PartnerOnFire.text = result.isPartnerOnfire ? "燃燒" : "";
         if (result.isPartnerSkillActivated)
             PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
