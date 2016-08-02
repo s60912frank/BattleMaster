@@ -9,26 +9,18 @@ public class BattleViewPVP : MonoBehaviour {
     private SocketIOComponent socket;
     private GameObject SocketIOObj;
 
-    public GameObject Partner;
-    public GameObject Enemy;
     public GameObject PartnerSkillEffect;
     public GameObject EnemySkillEffect;//<---
         
     //Enemy顯示
-    public Text EnemyHP;
-    public Text EnemyCD;
-    public Text EnemyCrit;
-    public Text EnemyDefDrop;
     public Text EnemyOnFire;
     public Text messageEnemyMove;
+    public GameObject enemyStatus;
 
     //Partner顯示
-    public Text PartnerHP;
-    public Text PartnerCD;
-    public Text PartnerCrit;
-    public Text PartnerDefDrop;
     public Text PartnerOnFire;
     public Text messageBoxText;
+    public GameObject partnerStatus;
 
     public GameObject VictoryPanel;
     public GameObject DefeatPanel;
@@ -60,10 +52,10 @@ public class BattleViewPVP : MonoBehaviour {
     {
         JSONObject partnerData = new JSONObject(PlayerPrefs.GetString("userData"))["pet"];
         JSONObject enemyData = e.data;
-        EnemyHP.text = "Enemy HP:" + enemyData["stamina"].f.ToString();
-        EnemyCD.text = "CD:" + enemyData["skill"]["CD"].f.ToString();
-        PartnerHP.text = "Partner HP:" + partnerData["stamina"].f.ToString();
-        PartnerCD.text = "CD:" + partnerData["skill"]["CD"].f.ToString();
+        //EnemyHP.text = "Enemy HP:" + enemyData["stamina"].f.ToString();
+        //EnemyCD.text = "CD:" + enemyData["skill"]["CD"].f.ToString();
+        //PartnerHP.text = "Partner HP:" + partnerData["stamina"].f.ToString();
+        //PartnerCD.text = "CD:" + partnerData["skill"]["CD"].f.ToString();
         Debug.Log("87878787" + enemyData.ToString());
         click.SetBtnsEnabled(true);
         battlePhase = new BattlePhase(enemyData, partnerData);
@@ -135,9 +127,9 @@ public class BattleViewPVP : MonoBehaviour {
     {
         //顯示Partner結果
         messageBoxText.text = result.partnerStatusText;
-        EnemyHP.text = "Enemy HP:" + result.enemyHp;
-        EnemyCD.text = "CD:" + result.enemyRemainingCD.ToString();
-        EnemyCrit.text = result.isEnemyNextCritical ? "爆擊" : "";
+        //EnemyHP.text = "Enemy HP:" + result.enemyHp;
+        //EnemyCD.text = "CD:" + result.enemyRemainingCD.ToString();
+        //EnemyCrit.text = result.isEnemyNextCritical ? "爆擊" : "";
         //EnemyDefDrop.text = result.isEnemyDefenseDropped ? "降防" : "";
         EnemyOnFire.text = result.isEnemyOnfire ? "燃燒" : "";
         if (result.isEnemySkillActivated)
@@ -145,9 +137,9 @@ public class BattleViewPVP : MonoBehaviour {
 
         //顯示Enemy結果
         messageEnemyMove.text = result.enemyStatusText;
-        PartnerHP.text = "Partner HP:" + result.partnerHp;
-        PartnerCD.text = "CD:" + result.partnerRemainingCD.ToString();
-        PartnerCrit.text = result.isPartnerNextCritical ? "爆擊" : "";
+        //PartnerHP.text = "Partner HP:" + result.partnerHp;
+        //PartnerCD.text = "CD:" + result.partnerRemainingCD.ToString();
+        //PartnerCrit.text = result.isPartnerNextCritical ? "爆擊" : "";
         //PartnerDefDrop.text = result.isPartnerDefenseDropped ? "降防" : "";
         PartnerOnFire.text = result.isPartnerOnfire ? "燃燒" : "";
         if (result.isPartnerSkillActivated)

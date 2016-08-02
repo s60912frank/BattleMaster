@@ -141,7 +141,6 @@ public class AnimationController : MonoBehaviour {
             yield return enemy.WaitForFinish();
             yield return partner.WaitForFinish();
         }
-
         //enemy.SetBool("IsNextCritical", result.isEnemyNextCritical);
         //partner.SetBool("IsNextCritical", result.isPartnerNextCritical);
 
@@ -162,6 +161,8 @@ public class AnimationController : MonoBehaviour {
         {
             partner.SetTrigger("SetNotCritical");
         }
+
+        
     }
 
     /*

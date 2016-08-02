@@ -4,19 +4,15 @@ using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class BattleView : MonoBehaviour {
-    public GameObject Partner;
-    public GameObject Enemy;
     public GameObject PartnerSkillEffect;
     public GameObject EnemySkillEffect;//<---
         
     //Enemy顯示
-    public Text EnemyCrit;
     public Text EnemyOnFire;
     public Text messageEnemyMove;
     public GameObject enemyStatus;
 
     //Partner顯示
-    public Text PartnerCrit;
     public Text PartnerOnFire;
     public Text messageBoxText;
     public GameObject partnerStatus;
@@ -69,7 +65,7 @@ public class BattleView : MonoBehaviour {
 
         //顯示Enemy結果
         messageBoxText.text = result.partnerStatusText;
-        EnemyCrit.text = result.isEnemyNextCritical ? "爆擊" : "";
+        //EnemyCrit.text = result.isEnemyNextCritical ? "爆擊" : "";
         //EnemyDefDrop.text = result.isEnemyDefenseDropped ? "降防" : "";
         EnemyOnFire.text = result.isEnemyOnfire ? "燃燒" : "";
         if (result.isEnemySkillActivated)
@@ -77,7 +73,7 @@ public class BattleView : MonoBehaviour {
 
         //顯示Partner結果
         messageEnemyMove.text = result.enemyStatusText;
-        PartnerCrit.text = result.isPartnerNextCritical ? "爆擊" : "";
+        //PartnerCrit.text = result.isPartnerNextCritical ? "爆擊" : "";
         PartnerOnFire.text = result.isPartnerOnfire ? "燃燒" : "";
         if (result.isPartnerSkillActivated)
             PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;

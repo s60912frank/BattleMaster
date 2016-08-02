@@ -43,4 +43,10 @@ public class SpriteController : MonoBehaviour {
         animator.SetTrigger(trigger);
         isFinished = false;
     }
+
+    public void SetBool(string property, bool value)
+    {
+        animator.SetBool(property, value);
+        //isFinished = false;
+    }
 }
