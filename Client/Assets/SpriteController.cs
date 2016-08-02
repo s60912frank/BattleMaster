@@ -19,7 +19,6 @@ public class SpriteController : MonoBehaviour {
     public void HideSprite()
     {
         transform.position = new Vector2(0, -100);
-        //if (callback != null) callback();
         Debug.Log(gameObject.name + " hide sprite!");
         isFinished = true;
     }
@@ -28,17 +27,6 @@ public class SpriteController : MonoBehaviour {
     {
         isFinished = true;
     }
-
-    //this might not be a good idea
-    /*public void SetFinishCallback(System.Action callback)
-    {
-        this.callback = callback;
-    }
-
-    public void ClearCallback()
-    {
-        callback = null;
-    }*/
 
     public IEnumerator WaitForFinish()
     {

@@ -27,13 +27,17 @@ public class AnimationController : MonoBehaviour {
             //等待直到結束
             yield return partner.WaitForFinish();
             yield return enemy.WaitForFinish();
+            //攻擊後就一定沒有爆擊
+            //partner.SetTrigger("SetNotCritical");
+
             enemy.SetTrigger("StartAttack");
-            if(result.isPartnerEvaded)
+            if (result.isPartnerEvaded)
                 partner.SetTrigger("StartEvade");
             else
                 partner.SetTrigger("BeingAttack");
             yield return enemy.WaitForFinish();
             yield return partner.WaitForFinish();
+            //enemy.SetTrigger("SetNotCritical");
         }
         else if(result.enemyMovement == BattlePhase.Movement.Attack && result.partnerMovement != BattlePhase.Movement.Attack)
         {
@@ -69,6 +73,7 @@ public class AnimationController : MonoBehaviour {
             }
             yield return enemy.WaitForFinish();
             yield return partner.WaitForFinish();
+            //enemy.SetTrigger("SetNotCritical");
         }
         else if (result.enemyMovement != BattlePhase.Movement.Attack && result.partnerMovement == BattlePhase.Movement.Attack)
         {
@@ -94,6 +99,8 @@ public class AnimationController : MonoBehaviour {
             }
             yield return enemy.WaitForFinish();
             yield return partner.WaitForFinish();
+            //partner.SetTrigger("SetNotCritical");
+
             //換敵人
             if (result.enemyMovement == BattlePhase.Movement.Charge)
             {
@@ -134,6 +141,9 @@ public class AnimationController : MonoBehaviour {
             yield return enemy.WaitForFinish();
             yield return partner.WaitForFinish();
         }
+
+        //enemy.SetBool("IsNextCritical", result.isEnemyNextCritical);
+        //partner.SetBool("IsNextCritical", result.isPartnerNextCritical);
 
         if (result.isEnemyNextCritical)
         {
