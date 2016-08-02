@@ -6,8 +6,8 @@ public class AnimationController : MonoBehaviour {
     private SpriteController enemy;
     // Use this for initialization
     void Start () {
-        partner = transform.FindChild("Partner").GetComponent<SpriteController>();
-        enemy = transform.FindChild("Enemy").GetComponent<SpriteController>();
+        partner = transform.FindChild("PartnerParent").FindChild("Partner").GetComponent<SpriteController>();
+        enemy = transform.FindChild("EnemyParent").FindChild("Enemy").GetComponent<SpriteController>();
     }
 	
 	// Update is called once per frame
@@ -19,9 +19,9 @@ public class AnimationController : MonoBehaviour {
     {
         if(result.enemyMovement == BattlePhase.Movement.Attack && result.partnerMovement == BattlePhase.Movement.Attack)
         {
-            partner.SetTrigger("StartAttack");
+            partner.SetTrigger("PartnerStartAttack");
             if (result.isEnemyEvaded)
-                enemy.SetTrigger("StartEvade");
+                enemy.SetTrigger("EnemyStartEvade");
             else
                 enemy.SetTrigger("BeingAttack");
             //等待直到結束
@@ -30,9 +30,9 @@ public class AnimationController : MonoBehaviour {
             //攻擊後就一定沒有爆擊
             //partner.SetTrigger("SetNotCritical");
 
-            enemy.SetTrigger("StartAttack");
+            enemy.SetTrigger("EnemyStartAttack");
             if (result.isPartnerEvaded)
-                partner.SetTrigger("StartEvade");
+                partner.SetTrigger("PartnerStartEvade");
             else
                 partner.SetTrigger("BeingAttack");
             yield return enemy.WaitForFinish();
@@ -52,7 +52,7 @@ public class AnimationController : MonoBehaviour {
                 //技能動畫 等等補
             }
             //換敵人攻擊
-            enemy.SetTrigger("StartAttack");
+            enemy.SetTrigger("EnemyStartAttack");
             if (result.partnerMovement == BattlePhase.Movement.Defense)
             {
                 partner.SetTrigger("StartDefend");
@@ -60,14 +60,14 @@ public class AnimationController : MonoBehaviour {
             else if (result.partnerMovement == BattlePhase.Movement.Evade)
             {
                 if (result.isPartnerEvaded)
-                    partner.SetTrigger("StartEvade");
+                    partner.SetTrigger("PartnerStartEvade");
                 else
                     partner.SetTrigger("BeingAttack");
             }
             else
             {
                 if (result.isPartnerEvaded)
-                    partner.SetTrigger("StartEvade");
+                    partner.SetTrigger("PartnerStartEvade");
                 else
                     partner.SetTrigger("BeingAttack");
             }
@@ -78,7 +78,7 @@ public class AnimationController : MonoBehaviour {
         else if (result.enemyMovement != BattlePhase.Movement.Attack && result.partnerMovement == BattlePhase.Movement.Attack)
         {
             //我攻擊
-            partner.SetTrigger("StartAttack");
+            partner.SetTrigger("PartnerStartAttack");
             if (result.enemyMovement == BattlePhase.Movement.Defense)
             {
                 enemy.SetTrigger("StartDefend");
@@ -86,14 +86,14 @@ public class AnimationController : MonoBehaviour {
             else if (result.enemyMovement == BattlePhase.Movement.Evade)
             {
                 if (result.isEnemyEvaded)
-                    enemy.SetTrigger("StartEvade");
+                    enemy.SetTrigger("EnemyStartEvade");
                 else
                     enemy.SetTrigger("BeingAttack");
             }
             else
             {
                 if (result.isEnemyEvaded)
-                    enemy.SetTrigger("StartEvade");
+                    enemy.SetTrigger("EnemyStartEvade");
                 else
                     enemy.SetTrigger("BeingAttack");
             }
@@ -117,7 +117,7 @@ public class AnimationController : MonoBehaviour {
             if (result.enemyMovement == BattlePhase.Movement.Defense)
                 enemy.SetTrigger("StartDefend");
             else if (result.enemyMovement == BattlePhase.Movement.Evade)
-                enemy.SetTrigger("StartEvade");
+                enemy.SetTrigger("EnemyStartEvade");
             else if (result.enemyMovement == BattlePhase.Movement.Charge)
                 enemy.SetTrigger("StartCharge");
             else if (result.enemyMovement == BattlePhase.Movement.Skill)
@@ -129,7 +129,7 @@ public class AnimationController : MonoBehaviour {
             if (result.partnerMovement == BattlePhase.Movement.Defense)
                 partner.SetTrigger("StartDefend");
             else if (result.partnerMovement == BattlePhase.Movement.Evade)
-                partner.SetTrigger("StartEvade");
+                partner.SetTrigger("PartnerStartEvade");
             else if (result.partnerMovement == BattlePhase.Movement.Charge)
                 partner.SetTrigger("StartCharge");
             else if (result.partnerMovement == BattlePhase.Movement.Skill)
@@ -141,10 +141,14 @@ public class AnimationController : MonoBehaviour {
             yield return enemy.WaitForFinish();
             yield return partner.WaitForFinish();
         }
-        //enemy.SetBool("IsNextCritical", result.isEnemyNextCritical);
-        //partner.SetBool("IsNextCritical", result.isPartnerNextCritical);
 
-        if (result.isEnemyNextCritical)
+        enemy.SetBool("IsNextCritical", result.isEnemyNextCritical);
+        partner.SetBool("IsNextCritical", result.isPartnerNextCritical);
+
+        enemy.SetBool("IsBurning", result.isEnemyOnfire);
+        partner.SetBool("IsBurning", result.isPartnerOnfire);
+
+        /*if (result.isEnemyNextCritical)
         {
             enemy.SetTrigger("SetNextCritical");
         }
@@ -160,9 +164,9 @@ public class AnimationController : MonoBehaviour {
         else
         {
             partner.SetTrigger("SetNotCritical");
-        }
+        }*/
 
-        
+
     }
 
     /*

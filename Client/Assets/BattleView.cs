@@ -8,12 +8,10 @@ public class BattleView : MonoBehaviour {
     public GameObject EnemySkillEffect;//<---
         
     //Enemy顯示
-    public Text EnemyOnFire;
     public Text messageEnemyMove;
     public GameObject enemyStatus;
 
     //Partner顯示
-    public Text PartnerOnFire;
     public Text messageBoxText;
     public GameObject partnerStatus;
 
@@ -34,8 +32,6 @@ public class BattleView : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        //this.gameObject.ac
-        //partnerBar = partnerStatus.GetComponent<StatusScript>();
         animationController = SpriteMgr.GetComponent<AnimationController>();
         JSONObject partnerData = new JSONObject(PlayerPrefs.GetString("userData"))["pet"];
         JSONObject enemyData = new JSONObject(PlayerPrefs.GetString("enemyAI"));
@@ -65,16 +61,11 @@ public class BattleView : MonoBehaviour {
 
         //顯示Enemy結果
         messageBoxText.text = result.partnerStatusText;
-        //EnemyCrit.text = result.isEnemyNextCritical ? "爆擊" : "";
-        //EnemyDefDrop.text = result.isEnemyDefenseDropped ? "降防" : "";
-        EnemyOnFire.text = result.isEnemyOnfire ? "燃燒" : "";
         if (result.isEnemySkillActivated)
             EnemySkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
 
         //顯示Partner結果
         messageEnemyMove.text = result.enemyStatusText;
-        //PartnerCrit.text = result.isPartnerNextCritical ? "爆擊" : "";
-        PartnerOnFire.text = result.isPartnerOnfire ? "燃燒" : "";
         if (result.isPartnerSkillActivated)
             PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
 

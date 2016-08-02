@@ -82,7 +82,7 @@ public class PVPWait : MonoBehaviour {
     {
         panelScript.StartLoading();
         float timeStart = Time.time;
-        AsyncOperation loadScene = SceneManager.LoadSceneAsync("BattlePVP2");
+        AsyncOperation loadScene = SceneManager.LoadSceneAsync("BattlePVP");
         loadScene.allowSceneActivation = false;
         while (loadScene.progress < 0.9f)
         {

@@ -30,9 +30,12 @@ public class SpriteController : MonoBehaviour {
 
     public IEnumerator WaitForFinish()
     {
-        while (!isFinished)
+        //failsafe,finding bugs....
+        int counter = 60;
+        while (!isFinished && counter > 0)
         {
             Debug.Log(gameObject.name + " is waiting for finish!");
+            counter--;
             yield return null;
         }
     }

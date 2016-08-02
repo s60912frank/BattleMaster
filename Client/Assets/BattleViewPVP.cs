@@ -13,23 +13,32 @@ public class BattleViewPVP : MonoBehaviour {
     public GameObject EnemySkillEffect;//<---
         
     //Enemy顯示
-    public Text EnemyOnFire;
     public Text messageEnemyMove;
     public GameObject enemyStatus;
 
     //Partner顯示
-    public Text PartnerOnFire;
     public Text messageBoxText;
     public GameObject partnerStatus;
 
     public GameObject VictoryPanel;
     public GameObject DefeatPanel;
+    public GameObject SpriteMgr;
 
     private BattlePhase battlePhase;
+    private AnimationController animationController;
     private ClickPVP click;
-    
+    private StatusScript partnerBar;
+    private StatusScript enemyBar;
+
+    void Awake()
+    {
+        partnerBar = partnerStatus.GetComponent<StatusScript>();
+        enemyBar = enemyStatus.GetComponent<StatusScript>();
+    }
+
     // Use this for initialization
     void Start () {
+        animationController = SpriteMgr.GetComponent<AnimationController>();
         SocketIOObj = GameObject.Find("SocketIO");
         socket = SocketIOObj.GetComponent<SocketIOComponent>();
         //socket事件們
@@ -52,10 +61,8 @@ public class BattleViewPVP : MonoBehaviour {
     {
         JSONObject partnerData = new JSONObject(PlayerPrefs.GetString("userData"))["pet"];
         JSONObject enemyData = e.data;
-        //EnemyHP.text = "Enemy HP:" + enemyData["stamina"].f.ToString();
-        //EnemyCD.text = "CD:" + enemyData["skill"]["CD"].f.ToString();
-        //PartnerHP.text = "Partner HP:" + partnerData["stamina"].f.ToString();
-        //PartnerCD.text = "CD:" + partnerData["skill"]["CD"].f.ToString();
+        partnerBar.SetMax((int)partnerData["stamina"].f, (int)partnerData["skill"]["CD"].f, (int)partnerData["defense"].f);
+        enemyBar.SetMax((int)enemyData["stamina"].f, (int)enemyData["skill"]["CD"].f, (int)enemyData["defense"].f);
         Debug.Log("87878787" + enemyData.ToString());
         click.SetBtnsEnabled(true);
         battlePhase = new BattlePhase(enemyData, partnerData);
@@ -81,20 +88,19 @@ public class BattleViewPVP : MonoBehaviour {
         battlePhase.ProcessEnemyResult(enemyResult["isEnemyNextCritical"].b, (int)enemyResult["enemyDamageTake"].f);
         Debug.Log("ENEMYDAMAGETAKE:" + (int)enemyResult["enemyDamageTake"].f);
         //then display result
-        DisplayResult(battlePhase.GetRoundResult());
+        StartCoroutine(DisplayResult(battlePhase.GetRoundResult()));
     }
 
     private void OnEnemyLeave(SocketIOEvent e)
     //敵人離開時觸發
     {
         messageEnemyMove.text = "The Enemy leave the battle...";
-        /*socket.Close();
-        Destroy(GameObject.Find("SocketIO"));
-        //SceneManager.LoadScene("waitForBattle");*/
         Debug.Log("ENEMY LEAVED!");
         VictoryPanel.SetActive(true);
     }
 
+
+    //戰鬥整個結束的時候
     private void OnBattleResult(SocketIOEvent e)
     {
         //JSONObject result = e.data;
@@ -123,25 +129,20 @@ public class BattleViewPVP : MonoBehaviour {
         socket.Emit("result", resultToSend);
     }
 
-    private void DisplayResult(BattleRoundResult result)
+    private IEnumerator DisplayResult(BattleRoundResult result)
     {
+        //這裡要來撥放動畫了
+        yield return animationController.BattleAnimation(result);
+        StartCoroutine(enemyBar.UpdateStatus(result.enemyHp, result.enemyRemainingCD, result.enemyDefense));
+        yield return partnerBar.UpdateStatus(result.partnerHp, result.partnerRemainingCD, result.partnerDefense);
+
         //顯示Partner結果
         messageBoxText.text = result.partnerStatusText;
-        //EnemyHP.text = "Enemy HP:" + result.enemyHp;
-        //EnemyCD.text = "CD:" + result.enemyRemainingCD.ToString();
-        //EnemyCrit.text = result.isEnemyNextCritical ? "爆擊" : "";
-        //EnemyDefDrop.text = result.isEnemyDefenseDropped ? "降防" : "";
-        EnemyOnFire.text = result.isEnemyOnfire ? "燃燒" : "";
         if (result.isEnemySkillActivated)
             EnemySkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
 
         //顯示Enemy結果
         messageEnemyMove.text = result.enemyStatusText;
-        //PartnerHP.text = "Partner HP:" + result.partnerHp;
-        //PartnerCD.text = "CD:" + result.partnerRemainingCD.ToString();
-        //PartnerCrit.text = result.isPartnerNextCritical ? "爆擊" : "";
-        //PartnerDefDrop.text = result.isPartnerDefenseDropped ? "降防" : "";
-        PartnerOnFire.text = result.isPartnerOnfire ? "燃燒" : "";
         if (result.isPartnerSkillActivated)
             PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
 
