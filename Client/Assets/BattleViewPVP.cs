@@ -9,8 +9,8 @@ public class BattleViewPVP : MonoBehaviour {
     private SocketIOComponent socket;
     private GameObject SocketIOObj;
 
-    public GameObject PartnerSkillEffect;
-    public GameObject EnemySkillEffect;//<---
+    //public GameObject PartnerSkillEffect;
+    //public GameObject EnemySkillEffect;//<---
         
     //Enemy顯示
     public Text messageEnemyMove;
@@ -138,13 +138,13 @@ public class BattleViewPVP : MonoBehaviour {
 
         //顯示Partner結果
         messageBoxText.text = result.partnerStatusText;
-        if (result.isEnemySkillActivated)
-            EnemySkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
+        /*if (result.isEnemySkillActivated)
+            EnemySkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;*/
 
         //顯示Enemy結果
         messageEnemyMove.text = result.enemyStatusText;
-        if (result.isPartnerSkillActivated)
-            PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
+        /*if (result.isPartnerSkillActivated)
+            PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;*/
 
         CheckGameOver();
     }

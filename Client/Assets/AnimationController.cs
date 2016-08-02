@@ -4,8 +4,14 @@ using System.Collections;
 public class AnimationController : MonoBehaviour {
     private SpriteController partner;
     private SpriteController enemy;
+    public GameObject PartnerSkillEffect;
+    public GameObject EnemySkillEffect;
+    private SpriteController partnerSkill;
+    private SpriteController enemySkill;
     // Use this for initialization
     void Start () {
+        partnerSkill = PartnerSkillEffect.GetComponent<SpriteController>();
+        enemySkill = EnemySkillEffect.GetComponent<SpriteController>(); ;
         partner = transform.FindChild("PartnerParent").FindChild("Partner").GetComponent<SpriteController>();
         enemy = transform.FindChild("EnemyParent").FindChild("Enemy").GetComponent<SpriteController>();
     }
@@ -49,7 +55,8 @@ public class AnimationController : MonoBehaviour {
             }
             else if(result.partnerMovement == BattlePhase.Movement.Skill)
             {
-                //技能動畫 等等補
+                partnerSkill.SetTrigger("ActiveSkill");
+                yield return partnerSkill.WaitForFinish();
             }
             //換敵人攻擊
             enemy.SetTrigger("EnemyStartAttack");
@@ -109,7 +116,8 @@ public class AnimationController : MonoBehaviour {
             }
             else if (result.enemyMovement == BattlePhase.Movement.Skill)
             {
-                //技能動畫 等等補
+                enemySkill.SetTrigger("ActiveSkill");
+                yield return enemySkill.WaitForFinish();
             }
         }
         else
@@ -121,7 +129,10 @@ public class AnimationController : MonoBehaviour {
             else if (result.enemyMovement == BattlePhase.Movement.Charge)
                 enemy.SetTrigger("StartCharge");
             else if (result.enemyMovement == BattlePhase.Movement.Skill)
-                Debug.Log("WHEESkill");
+            {
+                enemySkill.SetTrigger("ActiveSkill");
+                enemySkill.WaitForFinish();
+            }
             //技能動畫等等補
             else
                 Debug.LogError("邏輯錯誤!");
@@ -133,7 +144,10 @@ public class AnimationController : MonoBehaviour {
             else if (result.partnerMovement == BattlePhase.Movement.Charge)
                 partner.SetTrigger("StartCharge");
             else if (result.partnerMovement == BattlePhase.Movement.Skill)
-                Debug.Log("WHEESkill");
+            {
+                partnerSkill.SetTrigger("ActiveSkill");
+                yield return partnerSkill.WaitForFinish();
+            }
             //技能動畫等等補
             else
                 Debug.LogError("邏輯錯誤!");
@@ -147,26 +161,6 @@ public class AnimationController : MonoBehaviour {
 
         enemy.SetBool("IsBurning", result.isEnemyOnfire);
         partner.SetBool("IsBurning", result.isPartnerOnfire);
-
-        /*if (result.isEnemyNextCritical)
-        {
-            enemy.SetTrigger("SetNextCritical");
-        }
-        else
-        {
-            enemy.SetTrigger("SetNotCritical");
-        }
-
-        if (result.isPartnerNextCritical)
-        {
-            partner.SetTrigger("SetNextCritical");
-        }
-        else
-        {
-            partner.SetTrigger("SetNotCritical");
-        }*/
-
-
     }
 
     /*
