@@ -85,7 +85,7 @@ public class BattleViewPVP : MonoBehaviour {
     private void OnEnemyMoveMentResult(SocketIOEvent e)
     {
         JSONObject enemyResult = e.data;
-        battlePhase.ProcessEnemyResult(enemyResult["isEnemyNextCritical"].b, (int)enemyResult["enemyDamageTake"].f);
+        battlePhase.ProcessEnemyResult(enemyResult["isEnemyNextCritical"].b, (int)enemyResult["enemyDamageTake"].f, enemyResult["isEnemyEvaded"].b);
         Debug.Log("ENEMYDAMAGETAKE:" + (int)enemyResult["enemyDamageTake"].f);
         //then display result
         StartCoroutine(DisplayResult(battlePhase.GetRoundResult()));
@@ -125,6 +125,7 @@ public class BattleViewPVP : MonoBehaviour {
         JSONObject resultToSend = new JSONObject();
         resultToSend.AddField("isEnemyNextCritical", result.isPartnerNextCritical);
         resultToSend.AddField("enemyDamageTake", result.partnerDamageTake);
+        resultToSend.AddField("isEnemyEvaded", result.isPartnerEvaded);
         Debug.Log("PARTNERDMGTAKE:" + result.partnerDamageTake);
         socket.Emit("result", resultToSend);
     }

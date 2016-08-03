@@ -50,7 +50,7 @@ public class BattleView : MonoBehaviour {
     private IEnumerator RoundStart()
     {
         click.SetBtnsEnabled(false);
-        battlePhase.SetEnemyMovement((BattlePhase.Movement)Random.Range(0, 5));
+        battlePhase.SetEnemyMovement((BattlePhase.Movement)Random.Range(0, 4));
         battlePhase.RoundStart();
         BattleRoundResult result = battlePhase.GetRoundResult();
 

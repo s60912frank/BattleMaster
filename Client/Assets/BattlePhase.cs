@@ -242,7 +242,7 @@ public class BattlePhase {
         return "no";
 	}
 
-    public void ProcessEnemyResult(bool isNextCrit, int damageTake)
+    public void ProcessEnemyResult(bool isNextCrit, int damageTake, bool isEnemyEvaded)
     {
         roundResult.isEnemyNextCritical = isNextCrit;
         enemy.SetNextCricical(isNextCrit);
@@ -250,6 +250,7 @@ public class BattlePhase {
         roundResult.enemyDamageTake = damageTake;
         enemy.TakeDamage(damageTake);
         roundResult.enemyHp = enemy.Stamina;
+        roundResult.isEnemyEvaded = isEnemyEvaded;
     }
 
     public IEnumerator WaitForBattleResult(string result)
