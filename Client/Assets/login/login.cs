@@ -8,14 +8,18 @@ using Facebook.Unity;
 public class login : MonoBehaviour {
     public GameObject SignUpPanel;
     public GameObject NameInput;
+    public GameObject LoadingPanel;
     private string type;
     private string token;
     private string fbid;
+    private LoadingScript loadingPanel;
     // Use this for initialization
     void Start () {
         //先清空userData
-        PlayerPrefs.DeleteAll();
-	}
+        PlayerPrefs.DeleteKey("userData");
+        PlayerPrefs.DeleteKey("Cookie");
+        loadingPanel = LoadingPanel.GetComponent<LoadingScript>();
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -24,6 +28,7 @@ public class login : MonoBehaviour {
 
     public void LocalLoginClicked()
     {
+        loadingPanel.StartLoading();
         //本地登入 使用DeviceID
         type = "local";
         token = SystemInfo.deviceUniqueIdentifier;
@@ -32,6 +37,7 @@ public class login : MonoBehaviour {
 
     public void FBLoginCLicked()
     {
+        loadingPanel.StartLoading();
         //使用FB API登入
         FB.Init(OnInitComplete, OnHideUnity);
     }
@@ -39,6 +45,7 @@ public class login : MonoBehaviour {
     public void SignUpClicked()
     {
         //註冊按鈕被按時觸發
+        loadingPanel.StartLoading();
         StartCoroutine(WaitForSignUp());
     }
 
@@ -123,6 +130,7 @@ public class login : MonoBehaviour {
             SignUpPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
             Debug.Log(w.error);
         }
+        loadingPanel.EndLoading();
     }
 
     private IEnumerator WaitForSignUp()
@@ -153,6 +161,7 @@ public class login : MonoBehaviour {
             //註冊失敗
             Debug.Log("註冊失敗喔!" + w2.error);
         }
+        loadingPanel.EndLoading();
     }
 
     private void SetUserData(WWW w)

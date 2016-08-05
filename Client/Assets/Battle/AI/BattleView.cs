@@ -61,13 +61,9 @@ public class BattleView : MonoBehaviour {
 
         //顯示Enemy結果
         messageBoxText.text = result.partnerStatusText;
-        /*if (result.isEnemySkillActivated)
-            EnemySkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;*/
 
         //顯示Partner結果
         messageEnemyMove.text = result.enemyStatusText;
-        /*if (result.isPartnerSkillActivated)
-            PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;*/
 
         yield return CheckGameOver();
     }
