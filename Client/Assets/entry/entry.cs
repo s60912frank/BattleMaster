@@ -69,9 +69,18 @@ public class entry : MonoBehaviour {
             {
                 //沒有錯誤就直接登入了
                 //到status畫面
-                isLoaded = "status";
                 JSONObject newUserData = new JSONObject(w.text);
-                newUserData.AddField("cookie", userData["cookie"]);
+                if (newUserData["pet"].HasField("name"))
+                {
+                    //已經選過partner
+                    isLoaded = "status";
+                }
+                else
+                {
+                    //還沒選過partner
+                    isLoaded = "SelectScene";
+                }
+                //newUserData.AddField("cookie", userData["cookie"]);
                 PlayerPrefs.SetString("userData", newUserData.ToString());
             }
             else
@@ -101,6 +110,11 @@ public class entry : MonoBehaviour {
             case "status":
                 if (Input.GetMouseButtonDown(0))
                     SceneManager.LoadScene("Status");
+                entryText.GetComponentInChildren<Text>().text = "點擊螢幕進入遊戲";
+                break;
+            case "SelectScene":
+                if (Input.GetMouseButtonDown(0))
+                    SceneManager.LoadScene("SelectScene");
                 entryText.GetComponentInChildren<Text>().text = "點擊螢幕進入遊戲";
                 break;
             case "connectionRefused":

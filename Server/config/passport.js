@@ -39,7 +39,7 @@ module.exports = (passport) => {
         newUser.token = req.body.token;
         newUser.provider = "local";
         newUser.game.mileage = 500;
-        newUser.game.pet = petDefault(req.body.name);
+        //newUser.game.pet = petDefault(req.body.name);
         // save the user
         newUser.save((err) => {
           if (err) throw err;
@@ -64,7 +64,7 @@ module.exports = (passport) => {
             newUser.token = req.body.token;
             newUser.provider = "facebook";
             newUser.game.mileage = 500;
-            newUser.game.pet = petDefault(req.body.name);
+            //newUser.game.pet = petDefault(req.body.name);
             // save the user
             newUser.save((err) => {
               if (err) throw err;
@@ -133,24 +133,3 @@ module.exports = (passport) => {
       });
     }));
 };
-
-var petDefault = (name) => {
-  return { //這是目前的初始數值
-    "name": name,
-    stamina: 50,
-    attack: 12,
-    defense: 2,
-    evade: 30,
-    skill: {
-      ID: 1,
-      CD: 3,
-      SkillDesc: "Drain 15 Hp from Enemy and boost 5 attack",
-      params: {
-        damage: 15,
-        recover: 15,
-        burn: 3,
-        attIncrease: 5
-      }
-    }
-  };
-}

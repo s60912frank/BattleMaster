@@ -1,5 +1,6 @@
 var User = require('./models/user'); //資料庫USER的shema
 var Enemy = require('./models/enemy'); //資料庫ENEMY的shema
+var petDefaults = require('./models/petDefault');
 module.exports = (app, passport) => {
   app.get('/isAlive', (req, res) => {
     res.send("Yes!");
@@ -126,6 +127,30 @@ module.exports = (app, passport) => {
     app.post('/loginFacebook', passport.authenticate('facebook-login') ,(req, res) => {
       if(req.user){
         res.send(req.user.game); //登入成功
+      }
+    });
+
+    //註冊一開始不會有寵物資訊 post這個決定
+    app.post('/setPartner', isLoggedIn, (req, res) => {
+      if(!req.user.game.pet.name){
+        req.user.game["pet"] = petDefaults(req.body.type);
+        req.user.save((err) =>{
+          if(err){
+            console.log(err);
+            res.status(500);
+            res.send(err);
+          }
+          else{
+            console.log(req.user.game.name + "選好夥伴了!");
+            res.send(req.user.game);
+            res.end();
+          }
+        });
+      }
+      else{
+        res.status(401);
+        res.send('You already set partner!');
+        console.log(req.user.game.name + "重複選夥伴欸!");
       }
     });
 };

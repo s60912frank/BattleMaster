@@ -118,7 +118,7 @@ public class login : MonoBehaviour {
         {
             //登入成功
             SetUserData(w);
-            //進入狀態畫面
+            //進入選status畫面
             SceneManager.LoadScene("Status");
         }
         else
@@ -154,7 +154,8 @@ public class login : MonoBehaviour {
         {
             //註冊成功
             SetUserData(w2);
-            SceneManager.LoadScene("Status");
+            //進入選partner畫面
+            SceneManager.LoadScene("SelectScene");
         }
         else
         {
