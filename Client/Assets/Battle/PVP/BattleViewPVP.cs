@@ -15,10 +15,14 @@ public class BattleViewPVP : MonoBehaviour {
     //Enemy顯示
     public Text messageEnemyMove;
     public GameObject enemyStatus;
+    public GameObject enemyIcon;
+    public GameObject enemySkillEffectIcon;
 
     //Partner顯示
     public Text messageBoxText;
     public GameObject partnerStatus;
+    public GameObject partnerIcon;
+    public GameObject partnerSkillEffectIcon;
 
     public GameObject VictoryPanel;
     public GameObject DefeatPanel;
@@ -52,7 +56,6 @@ public class BattleViewPVP : MonoBehaviour {
         
         click = GameObject.Find("BtnManager").GetComponent<ClickPVP>();
         //click.SetBtnsEnabled(false);
-
         socket.Emit("battleSceneReady");
 	}
 
@@ -63,9 +66,24 @@ public class BattleViewPVP : MonoBehaviour {
         JSONObject enemyData = e.data;
         partnerBar.SetMax((int)partnerData["stamina"].f, (int)partnerData["skill"]["CD"].f, (int)partnerData["defense"].f);
         enemyBar.SetMax((int)enemyData["stamina"].f, (int)enemyData["skill"]["CD"].f, (int)enemyData["defense"].f);
+        //將圖片改成他們所選的夥伴
+        SetBothIcons(partnerData["name"].str, enemyData["name"].str);
         Debug.Log("87878787" + enemyData.ToString());
         click.SetBtnsEnabled(true);
         battlePhase = new BattlePhase(enemyData, partnerData);
+    }
+
+    private void SetBothIcons(string partnerName, string enemyName)
+    {
+        Sprite partnerSprite = Resources.Load<Sprite>(partnerName);
+        float partnerRatio = partnerSprite.texture.height / partnerSprite.texture.width;
+        Sprite enemySprite = Resources.Load<Sprite>(enemyName);
+        float enemyRatio = enemySprite.texture.height / enemySprite.texture.width;
+        partnerIcon.GetComponent<SpriteRenderer>().sprite = partnerSprite;
+        enemyIcon.GetComponent<SpriteRenderer>().sprite = enemySprite;
+        //testing
+        partnerSkillEffectIcon.GetComponent<Image>().sprite = partnerSprite;
+        enemySkillEffectIcon.GetComponent<Image>().sprite = enemySprite;
     }
 
     private void OnEnemyMovement(SocketIOEvent e)
