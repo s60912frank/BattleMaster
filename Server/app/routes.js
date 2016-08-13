@@ -1,42 +1,43 @@
 var User = require('./models/user'); //資料庫USER的shema
 var Enemy = require('./models/enemy'); //資料庫ENEMY的shema
-var petDefaults = require('./models/petDefault');
+var petDefaults = require('./models/petDefault'); //三種pets的初始值
 module.exports = (app, passport) => {
   app.get('/isAlive', (req, res) => {
     res.send("Yes!");
     res.end();
   });
-    //跟AI打
-    app.post('/battle', isLoggedIn, (req, res) => {
-      //收到怪物類型，伺服器回傳怪物資訊，在client上打
-      Enemy.findOne({'name': req.body.enemyName }, (err, enemy) => res.send(enemy));
-    });
+
+  //跟AI打
+  app.post('/battle', isLoggedIn, (req, res) => {
+    //收到怪物類型，伺服器回傳怪物資訊，在client上打
+    Enemy.findOne({'name': req.body.enemyName }, (err, enemy) => res.send(enemy));
+  });
 
     //可能還要再改良
-    app.post('/battleAIResult', isLoggedIn, (req, res) => {
-      //收到怪物類型，伺服器回傳怪物資訊，在client上打
-      Enemy.findOne({'name': req.body.enemyName }, (err, enemy) => {
-        if(err) throw err;
-        var battleResult = {};
-        battleResult.result = req.body.result;
-        if(req.body.result == 'win')
-          battleResult["mileageIncrease"] = enemy.reward;
-        else if(req.body.result == 'lose')
-          battleResult["mileageIncrease"] = Math.round(enemy.reward / 10);
-        else if(req.body.result == 'even')
-          battleResult["mileageIncrease"] = Math.round(enemy.reward / 2);
-        req.user.game.mileage = req.user.game.mileage + battleResult["mileageIncrease"];
-        battleResult["mileage"] = req.user.game.mileage;
-        console.log(battleResult);
-        req.user.save((err) =>{
-          if(err){
-            console.log(err);
-          }
-          console.log(req.user.game.name + "BattleAI SAVED!");
-        });
-        res.send(battleResult);
+  app.post('/battleAIResult', isLoggedIn, (req, res) => {
+    //收到怪物類型，伺服器回傳怪物資訊，在client上打
+    Enemy.findOne({'name': req.body.enemyName }, (err, enemy) => {
+      if(err) throw err;
+      var battleResult = {};
+      battleResult.result = req.body.result;
+      if(req.body.result == 'win')
+        battleResult["mileageIncrease"] = enemy.reward;
+      else if(req.body.result == 'lose')
+        battleResult["mileageIncrease"] = Math.round(enemy.reward / 10);
+      else if(req.body.result == 'even')
+        battleResult["mileageIncrease"] = Math.round(enemy.reward / 2);
+      req.user.game.mileage = req.user.game.mileage + battleResult["mileageIncrease"];
+      battleResult["mileage"] = req.user.game.mileage;
+      console.log(battleResult);
+      req.user.save((err) =>{
+        if(err){
+          console.log(err);
+        }
+        console.log(req.user.game.name + "BattleAI SAVED!");
       });
+      res.send(battleResult);
     });
+  });
 
     var consume100Mileage = (req, res) => {
       if(req.user.game.mileage >= 100){

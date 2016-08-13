@@ -67,23 +67,22 @@ public class BattleViewPVP : MonoBehaviour {
         partnerBar.SetMax((int)partnerData["stamina"].f, (int)partnerData["skill"]["CD"].f, (int)partnerData["defense"].f);
         enemyBar.SetMax((int)enemyData["stamina"].f, (int)enemyData["skill"]["CD"].f, (int)enemyData["defense"].f);
         //將圖片改成他們所選的夥伴
-        SetBothIcons(partnerData["name"].str, enemyData["name"].str);
+        SetIcon(partnerIcon, partnerSkillEffectIcon, partnerData["name"].str);
+        SetIcon(enemyIcon, enemySkillEffectIcon, enemyData["name"].str);
+
         Debug.Log("87878787" + enemyData.ToString());
         click.SetBtnsEnabled(true);
         battlePhase = new BattlePhase(enemyData, partnerData);
     }
 
-    private void SetBothIcons(string partnerName, string enemyName)
+    private void SetIcon(GameObject icon, GameObject skill, string name)
     {
-        Sprite partnerSprite = Resources.Load<Sprite>(partnerName);
-        float partnerRatio = partnerSprite.texture.height / partnerSprite.texture.width;
-        Sprite enemySprite = Resources.Load<Sprite>(enemyName);
-        float enemyRatio = enemySprite.texture.height / enemySprite.texture.width;
-        partnerIcon.GetComponent<SpriteRenderer>().sprite = partnerSprite;
-        enemyIcon.GetComponent<SpriteRenderer>().sprite = enemySprite;
-        //testing
-        partnerSkillEffectIcon.GetComponent<Image>().sprite = partnerSprite;
-        enemySkillEffectIcon.GetComponent<Image>().sprite = enemySprite;
+        SpriteRenderer renderer = icon.GetComponent<SpriteRenderer>();
+        Sprite sprite = Resources.Load<Sprite>(name);
+        float scale = (icon.transform.localScale.x * renderer.sprite.texture.width) / sprite.texture.width;
+        icon.transform.localScale = Vector3.one * scale;
+        renderer.sprite = sprite;
+        skill.GetComponent<Image>().sprite = sprite;
     }
 
     private void OnEnemyMovement(SocketIOEvent e)

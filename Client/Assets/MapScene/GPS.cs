@@ -4,9 +4,8 @@ using System.Collections;
 
 
 public class GPS {
-    private int zoom = 15; //放大倍率，1~19
-    private float latOrigin = 25.158591f;
-    private float lonOrigin = 121.434593f;
+    private float latOrigin;
+    private float lonOrigin;
     public string GPSStatus = "";
 
     private Vector2 Location
@@ -62,11 +61,13 @@ public class GPS {
         {
             Debug.Log("起始OK");
             GPSStatus = "GPS OK";
+            //臭爆
+            yield return new WaitForSeconds(0.5f);
             lonOrigin = Input.location.lastData.longitude;
             latOrigin = Input.location.lastData.latitude;
-            location(Location);
             //更新里程
             UpdateMileage(Location);
+            location(Location);
             yield break;
         }
     }
@@ -75,6 +76,7 @@ public class GPS {
     {
         if (PlayerPrefs.HasKey("lastLongitude") && PlayerPrefs.HasKey("lastLatitude"))
         {
+
             Vector2 lastPos = new Vector2(PlayerPrefs.GetFloat("lastLongitude"), PlayerPrefs.GetFloat("lastLatitude"));
             float distance = HaversineDistance(lastPos, location);
             int mileageGain = Mathf.FloorToInt(distance);

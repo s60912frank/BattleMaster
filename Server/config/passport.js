@@ -1,5 +1,4 @@
 // load all the things we need
-//var LocalStrategy = require('passport-local').Strategy;
 var CustomStrategy = require('passport-custom').Strategy;
 
 // load up the user model
@@ -7,39 +6,29 @@ var User = require('../app/models/user');
 
 //跟FB驗證需要的
 var request = require('request');
-var auth = require('./auth.js')
 
 // expose this function to our app using module.exports
 module.exports = (passport) => {
-
-  // =========================================================================
-  // passport session setup ==================================================
-  // =========================================================================
-  // required for persistent login sessions
-  // passport needs ability to serialize and unserialize users out of session
-
-  // used to serialize the user for the session
+  // user變cookie
   passport.serializeUser((user, done) => done(null, user._id));
 
-  // used to deserialize the user
+  // cookie變user
   passport.deserializeUser((id, done) => {
     User.findOne({'_id': id}, (err, user) => done(err, user));
   });
-
+  
   //本地資料庫註冊
   passport.use('local-signup', new CustomStrategy((req, done) => {
     //搜尋這個使用者是否在資料庫內
     User.findOne({ 'token': req.body.token }, (err, user) => {
       // if there are any errors, return the error
-      if (err) return done(err);
+      if (err) throw err;
       if (user) return done(null, false, "You already have an account!");
       else {
         var newUser = new User();
         newUser.game.name = req.body.name;
         newUser.token = req.body.token;
         newUser.provider = "local";
-        newUser.game.mileage = 500;
-        //newUser.game.pet = petDefault(req.body.name);
         // save the user
         newUser.save((err) => {
           if (err) throw err;
@@ -63,8 +52,6 @@ module.exports = (passport) => {
             newUser.fbid = req.body.fbid;
             newUser.token = req.body.token;
             newUser.provider = "facebook";
-            newUser.game.mileage = 500;
-            //newUser.game.pet = petDefault(req.body.name);
             // save the user
             newUser.save((err) => {
               if (err) throw err;

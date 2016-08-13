@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class EnemyPanel : MonoBehaviour {
+    private const float IMAGE_MAX_HEIGHT = 400;
     public RawImage EnemyImage;
     public Text NameText;
     public Text StaminaText;
@@ -25,10 +26,17 @@ public class EnemyPanel : MonoBehaviour {
     {
         Debug.Log(data.ToString());
         PlayerPrefs.SetString("enemyAI", data.ToString());
-        NameText.text = "名稱:" + data["name"].str;
-        StaminaText.text = "血量:" + data["stamina"].f.ToString();
-        AttackText.text = "攻擊:" + data["attack"].f.ToString();
-        RewardText.text = "獎勵:" + data["reward"].f.ToString();
+        NameText.text = string.Format("名稱: {0}", data["name"].str);
+
+        //load image part
+        Texture image = Resources.Load<Texture>(data["name"].str);
+        float ratio = (float)image.width / (float)image.height;
+        EnemyImage.texture = Resources.Load<Texture>(data["name"].str);
+        EnemyImage.gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(IMAGE_MAX_HEIGHT * ratio, IMAGE_MAX_HEIGHT);
+
+        StaminaText.text = string.Format("血量: {0}", data["stamina"].f);
+        AttackText.text = string.Format("攻擊: {0}", data["attack"].f);
+        RewardText.text = string.Format("獎勵: {0}", data["reward"].f);
         BattleButton.interactable = data["inRange"].b;
         Show();
     }

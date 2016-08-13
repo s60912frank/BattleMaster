@@ -41,6 +41,6 @@ public class ShowAbility : MonoBehaviour {
         float width = ICON_MAX_HEIGHT * ratio;
         PetIcon.GetComponent<Image>().sprite = Resources.Load<Sprite>(name);
         PetIcon.GetComponent<Image>().SetNativeSize();
-       PetIcon.GetComponent<RectTransform>().sizeDelta = new Vector2(width, ICON_MAX_HEIGHT);
+        PetIcon.GetComponent<RectTransform>().sizeDelta = new Vector2(width, ICON_MAX_HEIGHT);
     }
 }

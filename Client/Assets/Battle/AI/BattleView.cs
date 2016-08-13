@@ -10,10 +10,14 @@ public class BattleView : MonoBehaviour {
     //Enemy顯示
     public Text messageEnemyMove;
     public GameObject enemyStatus;
+    public GameObject enemyIcon;
+    public GameObject enemySkillEffectIcon;
 
     //Partner顯示
     public Text messageBoxText;
     public GameObject partnerStatus;
+    public GameObject partnerIcon;
+    public GameObject partnerSkillEffectIcon;
 
     public GameObject VictoryPanel;
     public GameObject DefeatPanel;
@@ -37,9 +41,21 @@ public class BattleView : MonoBehaviour {
         JSONObject enemyData = new JSONObject(PlayerPrefs.GetString("enemyAI"));
         partnerBar.SetMax((int)partnerData["stamina"].f, (int)partnerData["skill"]["CD"].f, (int)partnerData["defense"].f);
         enemyBar.SetMax((int)enemyData["stamina"].f, (int)enemyData["skill"]["CD"].f, (int)enemyData["defense"].f);
+        SetIcon(partnerIcon, partnerSkillEffectIcon, partnerData["name"].str);
+        SetIcon(enemyIcon, enemySkillEffectIcon, enemyData["name"].str);
         battlePhase = new BattlePhase(enemyData, partnerData);
         click = GameObject.Find("BtnManager").GetComponent<Click>();
 	}
+
+    private void SetIcon(GameObject icon, GameObject skill, string name)
+    {
+        SpriteRenderer renderer = icon.GetComponent<SpriteRenderer>();
+        Sprite sprite = Resources.Load<Sprite>(name);
+        float scale = (icon.transform.localScale.x * renderer.sprite.texture.width) / sprite.texture.width;
+        icon.transform.localScale = Vector3.one * scale;
+        renderer.sprite = sprite;
+        skill.GetComponent<Image>().sprite = sprite;
+    }
 
     public void SetMyMovement(BattlePhase.Movement myMovement)
     {
