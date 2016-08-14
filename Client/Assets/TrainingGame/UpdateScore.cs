@@ -5,9 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class UpdateScore : Pauseable {
-    public Text AttackText;
-    public Text DefenseText;
-    public Text StaminaText;
     public Text TimerText;
     private int attackScore = 0;
     private int defenseScore = 0;
@@ -87,18 +84,15 @@ public class UpdateScore : Pauseable {
     public void UpdateAttackIncrease()
     {
         attackScore++;
-        AttackText.text = "攻擊提升:" + defenseScore.ToString();
     }
 
     public void UpdateDefenseScore()
     {
         defenseScore++;
-        DefenseText.text = "防禦提升:" + defenseScore.ToString();
     }
 
     public void UpdateStaminaScore()
     {
         staminaScore++;
-        StaminaText.text = "血量提升:" + staminaScore.ToString();
     }
 }

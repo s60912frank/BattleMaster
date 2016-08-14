@@ -6,8 +6,10 @@ using SocketIO;
 
 public class PVPWait : MonoBehaviour {
     public Text RoomNameText;
-    public Text OwnerText;
-    public Text RivalText;
+    public Text OwnerNameText;
+    public Text OwnerIDText;
+    public Text RivalNameText;
+    public Text RivalIDText;
     public Text OwnerReadyText;
     public Text RivalReadyText;
     public GameObject LoadingPanel;
@@ -38,8 +40,27 @@ public class PVPWait : MonoBehaviour {
     {
         Debug.Log("有對手?:" + roomInfo.HasField("rival"));
         RoomNameText.text = roomInfo["name"].str;
-        OwnerText.text = roomInfo.HasField("owner") ? string.Format("({0}){1}", roomInfo["owner"]["id"].str, roomInfo["owner"]["name"].str) : "";
-        RivalText.text = roomInfo.HasField("rival") ? string.Format("({0}){1}", roomInfo["rival"]["id"].str, roomInfo["rival"]["name"].str) : "";
+        if (roomInfo.HasField("owner"))
+        {
+            OwnerNameText.text = roomInfo["owner"]["name"].str;
+            OwnerIDText.text = string.Format("({0})", roomInfo["owner"]["id"].str);
+        }
+        else
+        {
+            OwnerNameText.text = "";
+            OwnerIDText.text = "";
+        }
+
+        if (roomInfo.HasField("rival"))
+        {
+            RivalNameText.text = roomInfo["rival"]["name"].str;
+            RivalIDText.text = string.Format("({0})", roomInfo["rival"]["id"].str);
+        }
+        else
+        {
+            RivalNameText.text = "";
+            RivalIDText.text = "";
+        }
     }
 	
 	// Update is called once per frame
@@ -86,12 +107,10 @@ public class PVPWait : MonoBehaviour {
         loadScene.allowSceneActivation = false;
         while (loadScene.progress < 0.9f)
         {
-            //Debug.Log("PROGRESS:" + loadScene.progress);
             yield return null;
         }
         while (Time.time - timeStart < 0.8f)
         {
-            //Debug.Log(Time.time - timeStart);
             yield return null;
         }
         panelScript.OnHidedCallback(() =>

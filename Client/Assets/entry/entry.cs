@@ -50,7 +50,6 @@ public class entry : MonoBehaviour {
         else
         {
             userData = new JSONObject(PlayerPrefs.GetString("userData"));
-            Debug.Log(PlayerPrefs.GetString("userData"));
             StartCoroutine(CheckIfLoggedIn());
         }
     }
@@ -69,24 +68,37 @@ public class entry : MonoBehaviour {
             {
                 //沒有錯誤就直接登入了
                 //到status畫面
-                JSONObject newUserData = new JSONObject(w.text);
-                if (newUserData["pet"].HasField("name"))
+                Debug.Log(w.text);
+                JSONObject response = new JSONObject(w.text);
+                if (response["ok"].b)
                 {
-                    //已經選過partner
-                    isLoaded = "status";
+                    //登入成功
+                    JSONObject newUserData = response["data"];
+                    if (newUserData["pet"].HasField("name"))
+                    {
+                        //已經選過partner
+                        isLoaded = "status";
+                    }
+                    else
+                    {
+                        //還沒選過partner
+                        isLoaded = "SelectScene";
+                    }
+                    PlayerPrefs.SetString("userData", newUserData.ToString());
                 }
                 else
                 {
-                    //還沒選過partner
-                    isLoaded = "SelectScene";
+                    //註冊or登入去
+                    isLoaded = "login";
                 }
-                //newUserData.AddField("cookie", userData["cookie"]);
-                PlayerPrefs.SetString("userData", newUserData.ToString());
             }
             else
             {
-                //收到錯誤就註冊去
-                isLoaded = "login";
+                //伺服器錯誤
+                Debug.LogError("Server error");
+                //就無法連接伺服器w
+                isLoaded = "connectionRefused";
+                retryCount = 0;
             }
         }
         else

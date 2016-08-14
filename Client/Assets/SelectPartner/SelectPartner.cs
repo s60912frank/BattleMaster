@@ -14,14 +14,26 @@ public class SelectPartner : MonoBehaviour {
     private Panel confirmPanelScript;
     private string[] partner;
     private int selectedIndex = 0;
+
+    void Awake()
+    {
+    }
+
     // Use this for initialization
     void Start () {
         partner = new string[] { "Augu", "Charmander", "V" };
-        confirmPanelScript = ConfirmExitPanel.GetComponent<Panel>();
-        confirmPanelScript.SetText("確定是這個夥伴嗎?選擇之後就不能再更改了");
         CylinderAxis = new Quaternion(0, 1, 0, 15).eulerAngles;
         UniformObj = GameObject.Find("UniformObj");
         Debug.Log(CylinderAxis);
+
+        confirmPanelScript = ConfirmExitPanel.GetComponent<Panel>();
+        confirmPanelScript.SetText("確定是這個夥伴嗎?選擇之後就不能再更改了");
+        //設定按下確定要執行啥
+        confirmPanelScript.SetConfirmListener(() =>
+        {
+            //這裡要加loading畫面
+            StartCoroutine(WaitForSetPartner());
+        });
     }
 	
 	// Update is called once per frame
@@ -49,11 +61,6 @@ public class SelectPartner : MonoBehaviour {
     public void SelectButtonClicked()
     {
         confirmPanelScript.Show();
-        confirmPanelScript.SetConfirmListener(() =>
-        {
-            //這裡要加loading畫面
-            StartCoroutine(WaitForSetPartner());            
-        });
     }
 
     private IEnumerator SmoothRotate(int angle)

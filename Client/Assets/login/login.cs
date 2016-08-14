@@ -9,16 +9,23 @@ public class login : MonoBehaviour {
     public GameObject SignUpPanel;
     public GameObject NameInput;
     public GameObject LoadingPanel;
+    public GameObject NotifyPanel;
+
     private string type;
     private string token;
     private string fbid;
     private LoadingScript loadingPanel;
+    private NotifyPanel notifyScript;
+    private SignUpPanelController signUpPanel;
+
     // Use this for initialization
     void Start () {
         //先清空userData
         PlayerPrefs.DeleteKey("userData");
         PlayerPrefs.DeleteKey("Cookie");
         loadingPanel = LoadingPanel.GetComponent<LoadingScript>();
+        notifyScript = NotifyPanel.GetComponent<NotifyPanel>();
+        signUpPanel = SignUpPanel.GetComponent<SignUpPanelController>();
     }
 	
 	// Update is called once per frame
@@ -28,11 +35,15 @@ public class login : MonoBehaviour {
 
     public void LocalLoginClicked()
     {
-        loadingPanel.StartLoading();
         //本地登入 使用DeviceID
         type = "local";
         token = SystemInfo.deviceUniqueIdentifier;
         StartCoroutine(WaitForLogin());
+    }
+
+    public void CancelButtonClicked()
+    {
+        signUpPanel.Hide();
     }
 
     public void FBLoginCLicked()
@@ -100,6 +111,7 @@ public class login : MonoBehaviour {
 
     private IEnumerator WaitForLogin()
     {
+        loadingPanel.StartLoading();
         WWWForm form = new WWWForm();
         form.AddField("token", token); //用token登入，deviceID or FB
         string requestUrl = Constant.SERVER_URL;
@@ -116,28 +128,48 @@ public class login : MonoBehaviour {
         yield return w;
         if (string.IsNullOrEmpty(w.error))
         {
-            //登入成功
-            SetUserData(w);
-            //進入選status畫面
-            SceneManager.LoadScene("Status");
+            JSONObject response = new JSONObject(w.text);
+            if (response["ok"].b)
+            {
+                //登入成功
+                SetUserData(w);
+                //進入選status畫面
+                SceneManager.LoadScene("Status");
+            }
+            else
+            {
+                string message = response["message"].str;
+                if(message == "找不到此帳號，請先註冊")
+                {
+                    //登入失敗 準備註冊
+                    //移入輸入暱稱面板
+                    signUpPanel.Show();
+                }
+                else
+                {
+                    //show特殊錯誤訊息
+                    Debug.LogError(message);
+                    notifyScript.SetText(message);
+                    notifyScript.Show();
+                }
+            }
         }
         else
         {
-            //要是出現其他錯誤可能會出錯
-
-            //登入失敗 準備註冊
-            //移入輸入暱稱面板
-            SignUpPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+            //server 錯誤
+            //要顯示讓使用者知道
             Debug.Log(w.error);
+            notifyScript.SetText("伺服器出現錯誤，請稍後再試");
+            notifyScript.Show();
         }
         loadingPanel.EndLoading();
     }
 
     private IEnumerator WaitForSignUp()
     {
-        WWWForm form2 = new WWWForm();
-        form2.AddField("token", token); //用token登入，deviceID or FB
-        form2.AddField("name", NameInput.transform.FindChild("Text").gameObject.GetComponent<Text>().text);
+        WWWForm form = new WWWForm();
+        form.AddField("token", token); //用token登入，deviceID or FB
+        form.AddField("name", NameInput.transform.FindChild("Text").gameObject.GetComponent<Text>().text);
         string requestUrl = Constant.SERVER_URL;
         if (type == "local")
         {
@@ -145,22 +177,36 @@ public class login : MonoBehaviour {
         }
         else if (type == "facebook")
         {
-            form2.AddField("fbid", fbid); //多需要FBID
+            form.AddField("fbid", fbid); //多需要FBID
             requestUrl += "/signupFacebook";
         }
-        WWW w2 = new WWW(requestUrl, form2);
-        yield return w2;
-        if (string.IsNullOrEmpty(w2.error))
+        WWW w = new WWW(requestUrl, form);
+        yield return w;
+        if (string.IsNullOrEmpty(w.error))
         {
-            //註冊成功
-            SetUserData(w2);
-            //進入選partner畫面
-            SceneManager.LoadScene("SelectScene");
+            JSONObject response = new JSONObject(w.text);
+            if (response["ok"].b)
+            {
+                //註冊成功
+                SetUserData(w);
+                //進入選partner畫面
+                SceneManager.LoadScene("SelectScene");
+            }
+            else
+            {
+                signUpPanel.Hide();
+                string message = response["message"].str;
+                //show特殊錯誤訊息
+                Debug.LogError(message);
+                notifyScript.SetText(message);
+                notifyScript.Show();
+            }
         }
         else
         {
             //註冊失敗
-            Debug.Log("註冊失敗喔!" + w2.error);
+            //server錯誤
+            Debug.LogError(w.error);
         }
         loadingPanel.EndLoading();
     }

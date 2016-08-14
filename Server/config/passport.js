@@ -7,6 +7,14 @@ var User = require('../app/models/user');
 //跟FB驗證需要的
 var request = require('request');
 
+var Response = {
+  ACCOUNT_ALREADY_EXISTS: "帳號已經存在!",
+  SIGNUP_FAILED: "註冊失敗，請稍後再試",
+  LOGIN_FAILED: "登入失敗，請稍後再試",
+  USER_NOT_FOUND: "找不到此帳號，請先註冊",
+  SERVER_ERROR: "伺服器發生錯誤，請聯絡開發者"
+}
+
 // expose this function to our app using module.exports
 module.exports = (passport) => {
   // user變cookie
@@ -22,8 +30,8 @@ module.exports = (passport) => {
     //搜尋這個使用者是否在資料庫內
     User.findOne({ 'token': req.body.token }, (err, user) => {
       // if there are any errors, return the error
-      if (err) throw err;
-      if (user) return done(null, false, "You already have an account!");
+      if (err) return done(err, false, Response.SERVER_ERROR);
+      if (user) return done(null, false, Response.ACCOUNT_ALREADY_EXISTS);
       else {
         var newUser = new User();
         newUser.game.name = req.body.name;
@@ -31,7 +39,7 @@ module.exports = (passport) => {
         newUser.provider = "local";
         // save the user
         newUser.save((err) => {
-          if (err) throw err;
+          if (err) return done(err, false, Response.SERVER_ERROR);
           console.log(newUser.game.name + "created!");
           return done(null, newUser);
         });
@@ -54,19 +62,20 @@ module.exports = (passport) => {
             newUser.provider = "facebook";
             // save the user
             newUser.save((err) => {
-              if (err) throw err;
+              if (err) return done(err, false, Response.SERVER_ERROR);
               console.log(newUser.game.name + "created!(Facebook)");
               return done(null, newUser);
             });
           }
           else{
             console.log(fbid + "FB註冊失敗!");
-            return done(null, false, "Signup failed!");
+            return done(null, false, Response.SIGNUP_FAILED);
           }
         });
       }
       else{
-        return done(null, false, "Account already exists!");
+        console.log(fbid + "帳號已經存在!");
+        return done(null, false, Response.ACCOUNT_ALREADY_EXISTS);
       }
     });
   }
@@ -83,19 +92,19 @@ module.exports = (passport) => {
               user.token = req.body.token;
               // save the user
               user.save((err) => {
-                if (err) throw err;
+                if (err) return done(err, false, Response.SERVER_ERROR);
                 console.log(user.game.name + "Logged in!(Facebook)");
                 return done(null, user);
               });
             }
             else{
-              console.log(fbid + "FB註冊失敗!");
-              return done(null, false, "Login failed!");
+              console.log(fbid + "FB登入失敗!");
+              return done(null, false, Response.LOGIN_FAILED);
             }
           });
         }
         else{
-          return done(null, false, "User not found!");
+          return done(null, false, Response.USER_NOT_FOUND);
         }
       });
     }
@@ -104,19 +113,21 @@ module.exports = (passport) => {
   //本地資料庫登入
   passport.use('local-login', new CustomStrategy((req, done) => {
       // asynchronous
-      process.nextTick(() => {
+      /*process.nextTick(() => {
         //同上搜尋資料庫
-        User.findOne({'token': req.body.token }, (err, user) => {
+        
+      });*/
+      User.findOne({'token': req.body.token }, (err, user) => {
           // if there are any errors, return the error
-          if (err) return done(err);
+          if (err) return done(err, false, Response.SERVER_ERROR);
           // check to see if theres already a user with that email
           if (user) {
             console.log(user.game.name + " logged in!");
             return done(null, user);
-          } else {
-            return done(null, false, "Account not found");
+          } 
+          else {
+            return done(null, false, Response.USER_NOT_FOUND);
           }
         });
-      });
     }));
 };

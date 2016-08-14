@@ -44,14 +44,10 @@ public class BattlePhase {
         {
 			case Movement.Attack:
                 roundResult.enemyStatusText = "The enemy attacked!";
-                //暫時這樣如果有迴避掉下面會改 其他情況寫在這比較方便
-                //roundResult.enemyResultType = ResultType.AttackAndBeingAttacked;
-                //yourEvadeNumber = Random.Range(0, 100);
                 /* See Enemy's attack below */
                 break;
             case Movement.Defense:
                 roundResult.enemyStatusText = "The enemy tried to defend your attack.";
-                //roundResult.enemyResultType = ResultType.Defensed;
                 break;
             case Movement.Evade:
                 roundResult.enemyStatusText = "The enemy tried to evade your attack.";
@@ -60,7 +56,6 @@ public class BattlePhase {
                 if (enemy.IsSkillReady)
                 {
                     enemy.Skill(ref partner);
-                    //EnemySkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;
                     roundResult.isEnemySkillActivated = true;
                     enemyMovement = Movement.Skill;
                     roundResult.enemyStatusText = "敵人使用了技能!";
@@ -81,7 +76,7 @@ public class BattlePhase {
                 {
                     defense *= 2;
                     int damage = attack - defense;
-                    if (damage < 0)
+                    if (damage <= 0)
                         damage = 1;
                     enemy.TakeDamage(damage);
                     roundResult.enemyDamageTake = damage;
@@ -97,7 +92,7 @@ public class BattlePhase {
                     if (evade < evadeNumber)//update messageBox text
                     {
                         int damage = attack - defense;
-                        if (damage < 0)
+                        if (damage <= 0)
                             damage = 1;
                         enemy.TakeDamage(damage);
                         roundResult.enemyDamageTake = damage;
@@ -124,7 +119,6 @@ public class BattlePhase {
                 }
                 break;
 			case Movement.Evade:
-				//partnerMovement = Movement.Evade;
                 //nothing happened
                 break;
 			case Movement.Charge:
@@ -153,7 +147,7 @@ public class BattlePhase {
             {
                 defense *= 2;
                 int damage = attack - defense;
-                if (damage < 0)
+                if (damage <= 0)
                     damage = 1;
                 partner.TakeDamage(damage);
                 roundResult.partnerDamageTake = damage;
@@ -169,7 +163,7 @@ public class BattlePhase {
                 {
                     //迴避失敗
                     int damage = attack - partner.Defense;
-                    if (damage < 0)
+                    if (damage <= 0)
                         damage = 1;
                     roundResult.partnerDamageTake = damage;
                     partner.TakeDamage(damage);
@@ -199,8 +193,6 @@ public class BattlePhase {
 		enemy.Burn ();
         roundResult.isPartnerNextCritical = partner.IsNextCritical;
         roundResult.isEnemyNextCritical = enemy.IsNextCritical;
-        //roundResult.isPartnerDefenseDropped = partner.IsDenfenseDropped;
-        //roundResult.isEnemyDefenseDropped = enemy.IsDenfenseDropped;
         roundResult.enemyDefense = enemy.Defense;
         roundResult.partnerDefense = partner.Defense;
         roundResult.isEnemyOnfire = enemy.IsOnFire;
@@ -266,7 +258,6 @@ public class BattlePhase {
         {
             Debug.Log(w.text);
             PlayerPrefs.SetString("BattleResult", w.text);
-            //SceneManager.LoadScene("BattleroundResult");
         }
         else
         {

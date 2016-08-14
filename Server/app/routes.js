@@ -87,7 +87,7 @@ module.exports = (app, passport) => {
 
     app.get('/isLoggedIn', isLoggedIn, (req, res) => {
       console.log(req.user.game.name + "LOGGED IN!");
-      res.send(req.user.game);
+      res.send({ ok: true, data: req.user.game });
       res.end();
     });
 
@@ -96,40 +96,94 @@ module.exports = (app, passport) => {
         req.logout();
         res.send('你已經成功登出');
     });
-
-    //local登入
-    app.post('/login', passport.authenticate('local-login') ,(req, res) => {
-        if(req.user){
-          res.send(req.user.game); //登入成功
-        }
-        else{
-          res.send("Account not found"); //你誰
-        }
-      });
-
-    //local註冊
-    app.post('/signup', passport.authenticate('local-signup') ,(req, res) => {
-        if(req.user){
-          res.send(req.user.game); //註冊成功
-        }
-        else{
-          res.send("Account already exists"); //你已經註冊過了!
-        }
-      });
-
-    //facebook註冊
-    app.post('/signupFacebook', passport.authenticate('facebook-signup') ,(req, res) => {
-      if(req.user){
-        res.send(req.user.game); //註冊成功
+  
+  //local登入
+  app.post('/login', (req, res, next) => {
+    passport.authenticate('local-login', (err, user, info) => {
+      if(err){
+        console.error(err);
+        return res.send({ ok: false, message: info });
       }
-    });
-
-    //facebook登入
-    app.post('/loginFacebook', passport.authenticate('facebook-login') ,(req, res) => {
-      if(req.user){
-        res.send(req.user.game); //登入成功
+      if(!user){
+        console.log("Someone login failed");
+        return res.send({ ok: false, message: info });
       }
-    });
+      else{
+        req.login(user, (loginErr) => {
+          //登入user
+          if (loginErr) return res.send({ ok: false, message: "未知錯誤!" });
+          return res.send({ ok: true, data: req.user.game });
+        });
+      }
+    })(req, res, next);
+    //res.end();
+  });
+  
+  //local註冊
+  app.post('/signup', (req, res,next) => {
+    passport.authenticate('local-signup', (err, user, info) => {
+      if(err){
+        console.error(err);
+        return res.send({ ok: false, message: info });
+      }
+      if(!user){
+        console.log("Someone login failed");
+        return res.send({ ok: false, message: info });
+      }
+      else{
+        req.login(user, (loginErr) => {
+          //登入user
+          if (loginErr) return res.send({ ok: false, message: "未知錯誤!" });
+          return res.send({ ok: true, data: req.user.game });
+        });
+      }
+    })(req, res ,next);
+    //res.end();
+  });
+
+  //facebook註冊
+  app.post('/signupFacebook', (req, res, next) => {
+    passport.authenticate('facebook-signup', (err, user, info) => {
+      if(err){
+        console.error(err);
+        return res.send({ ok: false, message: info });
+      }
+      if(!user){
+        console.log("Someone login failed");
+        return res.send({ ok: false, message: info });
+      }
+      else{
+        req.login(user, (loginErr) => {
+          //登入user
+          if (loginErr) return res.send({ ok: false, message: "未知錯誤!" });
+          return res.send({ ok: true, data: req.user.game });
+        });
+      }
+    })(req, res ,next);
+    //res.end();
+  });
+  
+  //facebook登入
+  app.post('/loginFacebook', (req, res,next) => {
+    passport.authenticate('facebook-login', (err, user, info) => {
+      if(err){
+        console.error(err);
+        return res.send({ ok: false, message: info });
+      }
+      if(!user){
+        console.log("Someone login failed");
+        return res.send({ ok: false, message: info });
+      }
+      else{
+        req.login(user, (loginErr) => {
+          //登入user
+          if (loginErr) return res.send({ ok: false, message: "未知錯誤!" });
+          return res.send({ ok: true, data: req.user.game });
+        });
+      }
+    })(req, res ,next);
+    //res.end();
+  });
 
     //註冊一開始不會有寵物資訊 post這個決定
     app.post('/setPartner', isLoggedIn, (req, res) => {
@@ -163,6 +217,7 @@ var isLoggedIn = (req, res, next) => {
     if (req.isAuthenticated())
         return next();
     //如果他沒登入就告訴他沒登入
-    res.status(401);
-    res.send('You are not logged in!');
+    //res.status(401);
+    res.send({ ok: false, message: "You are not logged in!" });
+    res.end();
 }

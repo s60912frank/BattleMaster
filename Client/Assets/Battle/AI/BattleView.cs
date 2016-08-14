@@ -3,10 +3,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
 
-public class BattleView : MonoBehaviour {
-    //public GameObject PartnerSkillEffect;
-    //public GameObject EnemySkillEffect;//<---
-        
+public class BattleView : MonoBehaviour {        
     //Enemy顯示
     public Text messageEnemyMove;
     public GameObject enemyStatus;
@@ -28,10 +25,14 @@ public class BattleView : MonoBehaviour {
     private Click click;
     private StatusScript partnerBar;
     private StatusScript enemyBar;
+    private ResultPanelController victoryPanel;
+    private ResultPanelController defeatPanel;
     void Awake()
     {
         partnerBar = partnerStatus.GetComponent<StatusScript>();
         enemyBar = enemyStatus.GetComponent<StatusScript>();
+        victoryPanel = VictoryPanel.GetComponent<ResultPanelController>();
+        defeatPanel = DefeatPanel.GetComponent<ResultPanelController>();
     }
 
     // Use this for initialization
@@ -90,19 +91,19 @@ public class BattleView : MonoBehaviour {
         switch (isGameOver)
         {
             case "even":
-                VictoryPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                victoryPanel.Show();
                 yield return battlePhase.WaitForBattleResult(isGameOver);
-                SceneManager.LoadScene("BattleResult");
+                victoryPanel.SetButtonInteractable(true);
                 break;
             case "win":
-                VictoryPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                victoryPanel.Show();
                 yield return battlePhase.WaitForBattleResult(isGameOver);
-                SceneManager.LoadScene("BattleResult");
+                victoryPanel.SetButtonInteractable(true);
                 break;
             case "lose":
-                DefeatPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+                defeatPanel.Show();
                 yield return battlePhase.WaitForBattleResult(isGameOver);
-                SceneManager.LoadScene("BattleResult");
+                defeatPanel.SetButtonInteractable(true);
                 break;
             default:
                 click.SetBtnsEnabled(true);

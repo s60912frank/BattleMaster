@@ -11,14 +11,18 @@ public class Panel : MonoBehaviour {
     private System.Action callback;
 	// Use this for initialization
 
-	void Start () {
+    void Awake()
+    {
         rect = gameObject.GetComponent<RectTransform>();
         animator = gameObject.GetComponent<Animator>();
         Transform innerPanel = transform.Find("ConfirmExit");
         ContentText = innerPanel.Find("ContentText").GetComponent<Text>();
         NoButton = innerPanel.Find("NoButton").GetComponent<Button>();
-        NoButton.onClick.AddListener(delegate { Hide(); });
         ConfirmButton = innerPanel.Find("ConfirmButton").GetComponent<Button>();
+    }
+
+	void Start () {
+        NoButton.onClick.AddListener(() => { Hide(); });
     }
 	
 	// Update is called once per frame

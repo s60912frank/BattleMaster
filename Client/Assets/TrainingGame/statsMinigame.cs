@@ -18,7 +18,6 @@ public class statsMinigame : MonoBehaviour {
 
     void Start() {
         confirmScript = ConfirmPanel.GetComponent<Panel>();
-        //confirmScript.OnHideCallback(ConfirmExitButtonClicked);
         confirmScript.SetNoListener(ConfirmNoButtonClicked);
         confirmScript.SetConfirmListener(ConfirmExitButtonClicked);
         PauseButtonText = PauseButton.GetComponentInChildren<Text>();

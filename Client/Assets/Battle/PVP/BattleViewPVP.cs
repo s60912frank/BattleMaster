@@ -8,9 +8,6 @@ using SocketIO;
 public class BattleViewPVP : MonoBehaviour {
     private SocketIOComponent socket;
     private GameObject SocketIOObj;
-
-    //public GameObject PartnerSkillEffect;
-    //public GameObject EnemySkillEffect;//<---
         
     //Enemy顯示
     public Text messageEnemyMove;
@@ -33,11 +30,15 @@ public class BattleViewPVP : MonoBehaviour {
     private ClickPVP click;
     private StatusScript partnerBar;
     private StatusScript enemyBar;
+    private ResultPanelController victoryPanel;
+    private ResultPanelController defeatPanel;
 
     void Awake()
     {
         partnerBar = partnerStatus.GetComponent<StatusScript>();
         enemyBar = enemyStatus.GetComponent<StatusScript>();
+        victoryPanel = VictoryPanel.GetComponent<ResultPanelController>();
+        defeatPanel = DefeatPanel.GetComponent<ResultPanelController>();
     }
 
     // Use this for initialization
@@ -113,19 +114,19 @@ public class BattleViewPVP : MonoBehaviour {
     {
         messageEnemyMove.text = "The Enemy leave the battle...";
         Debug.Log("ENEMY LEAVED!");
-        VictoryPanel.SetActive(true);
+        victoryPanel.Show();
     }
 
 
     //戰鬥整個結束的時候
     private void OnBattleResult(SocketIOEvent e)
     {
-        //JSONObject result = e.data;
         PlayerPrefs.SetString("BattleResult", e.data.ToString());
         Debug.Log(e.data.ToString());
         socket.Close();
         Destroy(GameObject.Find("SocketIO"));
-        SceneManager.LoadScene("BattleResult");
+        victoryPanel.SetButtonInteractable(true);
+        defeatPanel.SetButtonInteractable(true);
     }
 
     public void SetMyMovement(BattlePhase.Movement myMovement)
@@ -156,13 +157,9 @@ public class BattleViewPVP : MonoBehaviour {
 
         //顯示Partner結果
         messageBoxText.text = result.partnerStatusText;
-        /*if (result.isEnemySkillActivated)
-            EnemySkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;*/
 
         //顯示Enemy結果
         messageEnemyMove.text = result.enemyStatusText;
-        /*if (result.isPartnerSkillActivated)
-            PartnerSkillEffect.GetComponent<PartnerSkillEffectEntry>().activated = true;*/
 
         CheckGameOver();
     }
@@ -175,18 +172,15 @@ public class BattleViewPVP : MonoBehaviour {
         switch (isGameOver)
         {
             case "even":
-                VictoryPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-                //yield return battlePhase.WaitForBattleResult(isGameOver);
+                victoryPanel.Show();
                 socket.Emit("battleEnd", result);
                 break;
             case "win":
-                VictoryPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-                //yield return battlePhase.WaitForBattleResult(isGameOver);
+                victoryPanel.Show();
                 socket.Emit("battleEnd", result);
                 break;
             case "lose":
-                DefeatPanel.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
-                //yield return battlePhase.WaitForBattleResult(isGameOver);
+                defeatPanel.Show();
                 socket.Emit("battleEnd", result);
                 break;
             default:
