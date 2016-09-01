@@ -25,55 +25,8 @@ public class CamController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        /*if (Input.GetMouseButtonUp(0) && MouseRay)
-        {
-            bool found = false;
-            RaycastHit[] hits = Physics.RaycastAll(Camera.main.ScreenPointToRay(Input.mousePosition));
-            foreach(RaycastHit hit in hits)
-            {
-                if(hit.transform.tag == "Area")
-                {
-                    //showMonsterData
-                    MouseRay = false;
-                    map.ShowEnemyData(hit.transform);
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                map.ShowEnemyData();
-                MouseRay = false;
-            }
-        }*/
         Debug.Log("MOUSERAY:" + MouseRay);
-        //方向建移動cam
-        if (Input.GetKey(KeyCode.UpArrow))
-        {
-            trans.Translate(Vector3.up * 0.5f);
-        }
-        else if (Input.GetKey(KeyCode.DownArrow))
-        {
-            trans.Translate(Vector3.down * 0.5f);
-        }
-        else if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            trans.Translate(Vector3.left * 0.5f);
-        }
-        else if (Input.GetKey(KeyCode.RightArrow))
-        {
-            trans.Translate(Vector3.right * 0.5f);
-        }
-
-        //滑鼠滾輪縮放
-        if (Input.GetAxis("Mouse ScrollWheel") > 0)
-        {
-            trans.position += Vector3.forward * 0.4f;
-        }
-        else if (Input.GetAxis("Mouse ScrollWheel") < 0)
-        {
-            trans.position -= Vector3.forward * 0.4f;
-        }
+        MouseKeyboardControl();
 
         if(Input.touchCount == 1)
         {
@@ -155,25 +108,42 @@ public class CamController : MonoBehaviour {
         }
 	}
 
-    private void RequestNewZoomMap(int diff)
+    private void MouseKeyboardControl()
     {
-        //清空地圖
-        GameObject[] gos = GameObject.FindGameObjectsWithTag("MapObj");
-        foreach (GameObject go in gos)
+        //方向建移動cam
+        if (Input.GetKey(KeyCode.UpArrow))
         {
-            Destroy(go);
+            trans.Translate(Vector3.up * 0.5f);
         }
-        //cam z變回-10
-        trans.position = new Vector3(trans.position.x, trans.position.y, -10);
-        //request
-        //map.BroadcastMessage("GetNewZoomTile", new object[] { new Vector2(trans.position.x, trans.position.y), diff });
+        else if (Input.GetKey(KeyCode.DownArrow))
+        {
+            trans.Translate(Vector3.down * 0.5f);
+        }
+        else if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            trans.Translate(Vector3.left * 0.5f);
+        }
+        else if (Input.GetKey(KeyCode.RightArrow))
+        {
+            trans.Translate(Vector3.right * 0.5f);
+        }
+
+        //滑鼠滾輪縮放
+        if (Input.GetAxis("Mouse ScrollWheel") > 0)
+        {
+            trans.position += Vector3.forward * 0.4f;
+        }
+        else if (Input.GetAxis("Mouse ScrollWheel") < 0)
+        {
+            trans.position -= Vector3.forward * 0.4f;
+        }
     }
 
     private IEnumerator LessFreqRaycast()
     {
         while (rayCasting)
         {
-            yield return new WaitForSeconds(0.1f); //每300ms就raycast一次
+            yield return new WaitForSeconds(0.2f); //每200ms就raycast一次
             //Debug.Log("HELLO");
             Ray left = Camera.main.ViewportPointToRay(new Vector3(0, 0.5f, 0));
             Ray right = Camera.main.ViewportPointToRay(new Vector3(1, 0.5f, 0));

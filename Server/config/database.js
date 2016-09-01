@@ -11,7 +11,7 @@ var getDBAddr = () => {
   else{
     //本地的DB
     //return 'mongodb://localhost:27017/battlemaster';
-	  return 'mongodb://192.168.1.7:27017/battlemaster';
+	  return 'mongodb://192.168.1.5:27017/battlemaster';
   }
 }
 

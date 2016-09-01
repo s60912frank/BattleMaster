@@ -30,7 +30,7 @@ public class MapProcessor2{
         foreach (JSONObject obj in buildings.list) //讀取這個節點的陣列
         {
             List<Vector2> coords = new List<Vector2>();
-            string type = obj["geometry"]["type"].ToString().Replace("\"", ""); //因為type讀出來會有兩個雙引號，所以去掉再判斷
+            string type = obj["geometry"]["type"].str;
             switch (type)
             {
                 case "Point":
@@ -39,7 +39,8 @@ public class MapProcessor2{
                 case "Polygon":
                     foreach (JSONObject co in obj["geometry"]["coordinates"].list[0].list) //polygon的座標陣列存在陣列[0]的陣列中
                     {
-                        coords.Add(new Vector2(float.Parse(co[0].ToString()), float.Parse(co[1].ToString()))); //加到list中          
+                        //coords.Add(new Vector2(float.Parse(co[0].ToString()), float.Parse(co[1].ToString()))); //加到list中 
+                        coords.Add(new Vector2(co[0].f, co[1].f)); //TEST!
                     }
                     break;
                 default:
@@ -59,14 +60,15 @@ public class MapProcessor2{
         foreach (JSONObject obj in roads.list)
         {
             //List<Vector2> coords = new List<Vector2>();
-            string type = obj["geometry"]["type"].ToString().Replace("\"", "");
+            string type = obj["geometry"]["type"].str;
             switch (type)
             {
                 case "LineString":
                     List<Vector2> coords = new List<Vector2>();
                     foreach (JSONObject co in obj["geometry"]["coordinates"].list) //lineString的座標陣列存在陣列中
                     {
-                        coords.Add(new Vector2(float.Parse(co[0].ToString()), float.Parse(co[1].ToString())));
+                        //coords.Add(new Vector2(float.Parse(co[0].ToString()), float.Parse(co[1].ToString())));
+                        coords.Add(new Vector2(co[0].f, co[1].f)); //TEST!
                     }
                     //StartCoroutine(DrawMapObj("LineString", mapTiles[mapTileIndex].CoordTransform(coords)));
                     //outputData.Add("LineString", CoordTransform(coords));
@@ -78,7 +80,8 @@ public class MapProcessor2{
                         List<Vector2> smallLine = new List<Vector2>(); //看名稱就知道啦這個一個就有很多條線，所以一條線就丟去畫
                         foreach (JSONObject co2 in co.list)
                         {
-                            smallLine.Add(new Vector2(float.Parse(co2[0].ToString()), float.Parse(co2[1].ToString())));
+                            //smallLine.Add(new Vector2(float.Parse(co2[0].ToString()), float.Parse(co2[1].ToString())));
+                            smallLine.Add(new Vector2(co2[0].f, co2[1].f)); //TEST!
                         }
                         //存入該mapTile的點List
                         //mapTiles[mapTileIndex].AddMapObj("LineString", smallLine);
