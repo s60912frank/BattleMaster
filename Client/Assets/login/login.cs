@@ -223,6 +223,6 @@ public class login : MonoBehaviour {
             Debug.Log(data[0]);
         }
         Debug.Log("登入成功");
-        PlayerPrefs.SetString("userData", response.ToString()); //將使用者資料與cookie存入playerPrefs
+        PlayerPrefs.SetString("userData", response["data"].ToString()); //將使用者資料與cookie存入playerPrefs
     }
 }

@@ -62,11 +62,12 @@ public class GPS {
             Debug.Log("起始OK");
             GPSStatus = "GPS OK";
             //臭爆
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(1);
             lonOrigin = Input.location.lastData.longitude;
             latOrigin = Input.location.lastData.latitude;
             //更新里程
-            UpdateMileage(Location);
+            if (Input.location.lastData.timestamp != 0)
+                UpdateMileage(Location);
             location(Location);
             yield break;
         }
