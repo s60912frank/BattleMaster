@@ -8,6 +8,10 @@ public class ShowUserInfo : MonoBehaviour {
     // Use this for initialization
     void Start ()
     {
+        //開啟particle system if之前有關
+        var particleEmission = GameObject.Find("Particle System").GetComponent<ParticleSystem>().emission;
+        particleEmission.enabled = true;
+
         JSONObject data = new JSONObject(PlayerPrefs.GetString("userData"));
         UserNameText.text = data["name"].str;
         //顯示里程

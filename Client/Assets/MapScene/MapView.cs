@@ -13,6 +13,12 @@ public class MapView : MonoBehaviour {
 	IEnumerator Start () {
         //LoadingPanel.GetComponent<LoadingScript>().Start();
         //LoadingPanel.GetComponent<LoadingScript>().StartLoading();
+        //關閉particle system因為不需要
+        var particleSys = GameObject.Find("Particle System").GetComponent<ParticleSystem>();
+        var particleEmission = particleSys.emission;
+        particleEmission.enabled = false;
+        particleSys.Clear(true);
+
         model = new MapModel();
         yield return model.MapInit();
         MapProcessor2 result = model.GetMapResult();

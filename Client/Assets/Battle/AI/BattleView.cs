@@ -37,6 +37,10 @@ public class BattleView : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        //開啟particle system if之前有關
+        var particleEmission = GameObject.Find("Particle System").GetComponent<ParticleSystem>().emission;
+        particleEmission.enabled = true;
+
         animationController = SpriteMgr.GetComponent<AnimationController>();
         JSONObject partnerData = new JSONObject(PlayerPrefs.GetString("userData"))["pet"];
         JSONObject enemyData = new JSONObject(PlayerPrefs.GetString("enemyAI"));

@@ -10,8 +10,14 @@ public class entry : MonoBehaviour {
     public GameObject entryText;
     private int retryCount = 0;
     private JSONObject userData;
+    private GameObject particleSys;
 	// Use this for initialization
 	void Start () {
+        particleSys = GameObject.Find("Particle System");
+        //particle system在每一個畫面都要有
+        DontDestroyOnLoad(particleSys);
+        Debug.Log(RenderSettings.skybox.GetColor("_Tint"));
+        RenderSettings.skybox.SetColor("_Tint", Random.ColorHSV());
         StartCoroutine(CheckServerAlive());
 	}
 

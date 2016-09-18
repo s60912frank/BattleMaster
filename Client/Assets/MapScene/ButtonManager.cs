@@ -14,9 +14,4 @@ public class ButtonManager : MonoBehaviour {
         GameObject.Find("Map").GetComponent<MapView>().StopGps();
         SceneManager.LoadScene("Status");
     }
-
-    public void whee()
-    {
-        //GameObject.Find("Map").GetComponent<MapView>().model.gps.whee();
-    }
 }

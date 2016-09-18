@@ -17,6 +17,12 @@ public class statsMinigame : MonoBehaviour {
     // Use this for initialization
 
     void Start() {
+        //關閉particle system 不然很花
+        var particleSys = GameObject.Find("Particle System").GetComponent<ParticleSystem>();
+        var particleEmission = particleSys.emission;
+        particleEmission.enabled = false;
+        particleSys.Clear(true);
+
         confirmScript = ConfirmPanel.GetComponent<Panel>();
         confirmScript.SetNoListener(ConfirmNoButtonClicked);
         confirmScript.SetConfirmListener(ConfirmExitButtonClicked);
