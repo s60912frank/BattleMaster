@@ -24,8 +24,12 @@ public class SetResult : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
-	}
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            //使用者按了返回鍵
+            BackToStatusClicked();
+        }
+    }
 
     public void BackToStatusClicked()
     {

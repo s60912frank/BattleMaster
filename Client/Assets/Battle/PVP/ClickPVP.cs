@@ -31,7 +31,6 @@ public class ClickPVP : MonoBehaviour
         AttackBtn.colors = color;
 
         exitPanel = GameObject.Find("ConfirmExitPanel").GetComponent<Panel>();
-        
     }
 
     public void SetBtnsEnabled(bool status)
@@ -46,6 +45,11 @@ public class ClickPVP : MonoBehaviour
     void Update()
     {
         SkillBtnText.text = battleView.GetSkillBtnText();
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            //使用者按了返回鍵
+            LeaveBattleClicked();
+        }
     }
 
     public void action_4_btnSkill()
@@ -95,6 +99,7 @@ public class ClickPVP : MonoBehaviour
         {
             battleView.LeaveBattle();
             //這裡會有里程不更新的問題
+            //好像解決了
             SceneManager.LoadScene("Status");
         });
         exitPanel.Show();

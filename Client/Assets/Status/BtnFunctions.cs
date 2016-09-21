@@ -6,24 +6,34 @@ using System.Collections.Generic;
 public class BtnFunctions : MonoBehaviour {
     public GameObject LoadingPanel;
     public GameObject NotifyPanelObj;
-    private NotifyPanel notify;
+    public GameObject ConfirmExitPanel;
+
+    private NotifyPanel notifyScript;
     private LoadingScript panelScript;
+    private Panel confirmExitScript;
     // Use this for initialization
 
     void Awake()
     {
         NotifyPanelObj = GameObject.Find("NotifyPanel");
-        notify = NotifyPanelObj.GetComponent<NotifyPanel>();
+        notifyScript = NotifyPanelObj.GetComponent<NotifyPanel>();
         panelScript = LoadingPanel.GetComponent<LoadingScript>();
+        confirmExitScript = ConfirmExitPanel.GetComponent<Panel>();
     }
 
     IEnumerator Start () {
+        confirmExitScript.SetText("確定要離開遊戲?");
+        confirmExitScript.SetConfirmListener(() => { Application.Quit(); });
         yield return CheckForUpdateToSend(false);
     }
 	
 	// Update is called once per frame
 	void Update () {
-        
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            //使用者按了返回鍵
+            confirmExitScript.Show();
+        }
 	}
 
     public void GoToMap()
@@ -40,10 +50,10 @@ public class BtnFunctions : MonoBehaviour {
         yield return gps.GPSInit((loc) => { });
         if (gps.GPSStatus != "GPS OK")
         {
-            notify.SetText(gps.GPSStatus);
+            notifyScript.SetText(gps.GPSStatus);
             panelScript.OnHidedCallback(() =>
             {
-                notify.Show();
+                notifyScript.Show();
             });
         }
         else
@@ -82,6 +92,8 @@ public class BtnFunctions : MonoBehaviour {
         {
             //出去走走好嗎
             //顯示錯誤訊息
+            notifyScript.SetText("里程不足!出去走走吧!");
+            notifyScript.Show();
         }
     }
 
@@ -116,9 +128,10 @@ public class BtnFunctions : MonoBehaviour {
             //你4不4偷改數據
             Debug.Log(w.error);
             //顯示錯誤訊息
+            notifyScript.SetText("你.....偷改數據喔");
+            notifyScript.Show();
         }
         panelScript.EndLoading();
-        //SceneManager.LoadScene("StatsTraining");
     }
 
     public void LocationUpdateClicked()
@@ -133,13 +146,13 @@ public class BtnFunctions : MonoBehaviour {
         yield return gps.GPSInit((loc) => { });
         if (gps.GPSStatus != "GPS OK")
         {
-            notify.SetText(gps.GPSStatus);
+            notifyScript.SetText(gps.GPSStatus);
         }
         else
         {
             yield return CheckForUpdateToSend(true);
         }
-        notify.Show();
+        notifyScript.Show();
         gps.StopGPS();
         LoadingPanel.GetComponent<LoadingScript>().EndLoading();
     }
@@ -152,15 +165,15 @@ public class BtnFunctions : MonoBehaviour {
             if (gain > 0)
             {
                 yield return SendMileageGain((int)gain);
-                notify.SetText("你獲得了" + gain.ToString() + "點里程");
-                notify.Show();
+                notifyScript.SetText("你獲得了" + gain.ToString() + "點里程");
+                notifyScript.Show();
             }
             else
             {
                 if (showNoGain)
                 {
-                    notify.SetText("你沒有獲得里程");
-                    notify.Show();
+                    notifyScript.SetText("你沒有獲得里程");
+                    notifyScript.Show();
                 }
             }
             PlayerPrefs.SetFloat("MileageGainToUpdate", 0);

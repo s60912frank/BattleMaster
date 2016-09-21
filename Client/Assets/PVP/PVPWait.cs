@@ -12,11 +12,12 @@ public class PVPWait : MonoBehaviour {
     public Text RivalIDText;
     public Text OwnerReadyText;
     public Text RivalReadyText;
+    public Button ReadyButton;
     public GameObject LoadingPanel;
     private GameObject socketIOObj;
     private SocketIOComponent socket;
     private JSONObject roomInfo;
-    private bool amIready = false;
+    //private bool amIready = false;
     private LoadingScript panelScript;
 	// Use this for initialization
 	void Start () {
@@ -65,8 +66,12 @@ public class PVPWait : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	
-	}
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            //使用者按了返回鍵
+            LeaveButtonClicked();
+        }
+    }
 
     private void OnReady(SocketIOEvent e)
     {
@@ -130,7 +135,7 @@ public class PVPWait : MonoBehaviour {
 
     public void ReadyButtonClicked()
     {
-        if (amIready)
+        /*if (amIready)
         {
             socket.Emit("unReady");
             amIready = false;
@@ -139,7 +144,9 @@ public class PVPWait : MonoBehaviour {
         {
             socket.Emit("ready");
             amIready = true;
-        }
+        }*/
+        ReadyButton.interactable = false;
+        socket.Emit("ready");
     }
 
     public void LeaveButtonClicked()

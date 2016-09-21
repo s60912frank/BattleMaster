@@ -9,6 +9,15 @@ public class ButtonManager : MonoBehaviour {
         
 	}
 
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            //使用者按了返回鍵
+            GoBackScene();
+        }
+    }
+
     public void GoBackScene()
     {
         GameObject.Find("Map").GetComponent<MapView>().StopGps();

@@ -2,6 +2,12 @@ var loki = require('lokijs'); //in memory db
 var db = new loki('rooms.db');
 var rooms = db.addCollection('rooms',{ unique: ["id"] });
 var shortid = require('shortid');
+var ERROR = {
+	DUPLICATE_ROOM: "重複開房!",
+	JOIN_MISSING_ROOM: "加入房間失敗!因為找不到這個房間!",
+	CREATE_AND_JOIN_ROOM: "加入房間失敗!因為創房又加房",
+	USER_COUNT_INVAILD: "人數錯誤!"
+}
 
 module.exports = (io) => {
 	io.on('connection', (socket) => {
@@ -35,9 +41,10 @@ module.exports = (io) => {
 			}
 			else{
 				socket.emit('joinResult', {
-					"success": false
+					"success": false,
+					"message": ERROR.DUPLICATE_ROOM
 				});
-				console.log("不能重複開房!");
+				console.log(ERROR.DUPLICATE_ROOM);
 			}
 		});
 
@@ -89,23 +96,26 @@ module.exports = (io) => {
 					}
 					else{
 						socket.emit('joinResult', {
-							"success": false
+							"success": false,
+							"message": ERROR.USER_COUNT_INVAILD
 						});
-						console.log("加入房間失敗!因為人數錯誤")
+						console.log(ERROR.USER_COUNT_INVAILD)
 					}
 				}
 				else{
 					socket.emit('joinResult', {
-						"success": false
+						"success": false,
+						"message": ERROR.CREATE_AND_JOIN_ROOM
 					});
-					console.log("加入房間失敗!因為創房又加房");
+					console.log(ERROR.CREATE_AND_JOIN_ROOM);
 				}
 			}
 			else{
 				socket.emit('joinResult', {
-					"success": false
+					"success": false,
+					"message": ERROR.JOIN_MISSING_ROOM
 				});
-				console.log("加入房間失敗!因為找不到這個房間")
+				console.log(ERROR.JOIN_MISSING_ROOM);
 			}
 		});
 
@@ -119,6 +129,9 @@ module.exports = (io) => {
 		      		clients.push(io.sockets.adapter.nsp.connected[id]);
 		    	}
 		   	}
+			else{
+				//error handling
+			}
 			if(clients.length == 2){
 				if(clients[0].ready && clients[1].ready){
 					var room = rooms.findOne({ "id": socket.room });
@@ -130,10 +143,10 @@ module.exports = (io) => {
 			}
 		});
 
-		socket.on('unReady', () => {
+		/*socket.on('unReady', () => {
 			socket['ready'] = false;
 			io.to(socket.room).emit("unReady", { "id": socket.request.user._id });
-		});
+		});*/
 
 		socket.on('disconnect', () => { //client離線時觸發
 			console.log(socket.request.user.game.name + " disconnected!");
@@ -157,7 +170,7 @@ module.exports = (io) => {
 		  	battlePhase(clients[1], clients[0]);
 		}
 		else{
-			console.log("準備進入戰鬥可是人數錯了嗚嗚");
+			console.log(ERROR.USER_COUNT_INVAILD);
 		}
 	}
 

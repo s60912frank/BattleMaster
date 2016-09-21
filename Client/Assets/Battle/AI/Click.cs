@@ -43,7 +43,12 @@ public class Click : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         SkillBtnText.text = battleView.GetSkillBtnText();
-	}
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            //使用者按了返回鍵
+            LeaveBattleClicked();
+        }
+    }
 
 	public void action_4_btnSkill()
 	{

@@ -12,12 +12,12 @@ public class entry : MonoBehaviour {
     private JSONObject userData;
     private GameObject particleSys;
 	// Use this for initialization
+
 	void Start () {
         particleSys = GameObject.Find("Particle System");
         //particle system在每一個畫面都要有
         DontDestroyOnLoad(particleSys);
-        Debug.Log(RenderSettings.skybox.GetColor("_Tint"));
-        RenderSettings.skybox.SetColor("_Tint", Random.ColorHSV());
+        RandomSkyboxColor();
         StartCoroutine(CheckServerAlive());
 	}
 
@@ -116,6 +116,12 @@ public class entry : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            //使用者按了返回鍵
+            Application.Quit();
+        }
+
         switch (isLoaded)
         {
             case "":
@@ -149,4 +155,11 @@ public class entry : MonoBehaviour {
                 throw null;
         }
 	}
+
+    private void RandomSkyboxColor()
+    {
+        Color[] colorList = new Color[] { Color.blue, Color.green, Color.yellow, Color.red, Color.magenta, Color.cyan };
+        Debug.Log(RenderSettings.skybox.GetColor("_Tint"));
+        RenderSettings.skybox.SetColor("_Tint", colorList[Random.Range(0, colorList.Length)]);
+    }
 }
