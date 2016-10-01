@@ -7,7 +7,7 @@ using System.IO;
 
 public class entry : MonoBehaviour {
     private string isLoaded = "";
-    public GameObject entryText;
+    public Text entryText;
     private int retryCount = 0;
     private JSONObject userData;
     private GameObject particleSys;
@@ -129,27 +129,27 @@ public class entry : MonoBehaviour {
             case "login":
                 if (Input.GetMouseButtonDown(0))
                     SceneManager.LoadScene("login");
-                entryText.GetComponentInChildren<Text>().text = "點擊螢幕進入遊戲";
+                entryText.text = "點擊螢幕進入遊戲";
                 break;
             case "status":
                 if (Input.GetMouseButtonDown(0))
                     SceneManager.LoadScene("Status");
-                entryText.GetComponentInChildren<Text>().text = "點擊螢幕進入遊戲";
+                entryText.text = "點擊螢幕進入遊戲";
                 break;
             case "SelectScene":
                 if (Input.GetMouseButtonDown(0))
                     SceneManager.LoadScene("SelectScene");
-                entryText.GetComponentInChildren<Text>().text = "點擊螢幕進入遊戲";
+                entryText.text = "點擊螢幕進入遊戲";
                 break;
             case "connectionRefused":
                 if (Input.GetMouseButtonDown(0))
                 {
-                    entryText.GetComponentInChildren<Text>().text = "載入中...";
+                    entryText.text = "載入中...";
                     Start();
                     isLoaded = "";
                 }
                 else
-                    entryText.GetComponentInChildren<Text>().text = "無法連接伺服器,點擊重試";
+                    entryText.text = "無法連接伺服器,點擊重試";
                 break;
             default:
                 throw null;
@@ -158,6 +158,7 @@ public class entry : MonoBehaviour {
 
     private void RandomSkyboxColor()
     {
+        //隨機底色
         Color[] colorList = new Color[] { Color.blue, Color.green, Color.yellow, Color.red, Color.magenta, Color.cyan };
         Debug.Log(RenderSettings.skybox.GetColor("_Tint"));
         RenderSettings.skybox.SetColor("_Tint", colorList[Random.Range(0, colorList.Length)]);
