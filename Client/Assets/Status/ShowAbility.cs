@@ -21,12 +21,12 @@ public class ShowAbility : MonoBehaviour {
         Debug.Log(petData);
 
         
-        StaminaText.text = string.Format("血量:{0}", petData["stamina"].f);
-        AttackText.text = string.Format("攻擊:{0}", petData["attack"].f);
-        DefenseText.text = string.Format("防禦:{0}", petData["defense"].f);
-        EvadeText.text = string.Format("迴避:{0}", petData["evade"].f);
-        SkillText.text = string.Format("技能:{0}", petData["skill"]["SkillDesc"].str);
-        SkillCDText.text = string.Format("技能CD:{0}", petData["skill"]["CD"].f);
+        StaminaText.text = string.Format("血量: {0}", petData["stamina"].f);
+        AttackText.text = string.Format("攻擊: {0}", petData["attack"].f);
+        DefenseText.text = string.Format("防禦: {0}", petData["defense"].f);
+        EvadeText.text = string.Format("迴避: {0}", petData["evade"].f);
+        SkillText.text = string.Format("技能: \n{0}", petData["skill"]["SkillDesc"].str);
+        SkillCDText.text = string.Format("技能CD: {0}", petData["skill"]["CD"].f);
     }
 	
 	// Update is called once per frame

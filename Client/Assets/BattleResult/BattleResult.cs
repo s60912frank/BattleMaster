@@ -22,7 +22,7 @@ public class BattleResult : MonoBehaviour {
         {
             ResultText.text = "平手";
         }
-        MileageText.text = battleResult["mileage"].f.ToString() + "(+" + battleResult["mileageIncrease"].f.ToString() + ")";
+        MileageText.text = "里程: " + battleResult["mileage"].f.ToString() + "(+" + battleResult["mileageIncrease"].f.ToString() + ")";
         //update userdata
         JSONObject userData = new JSONObject(PlayerPrefs.GetString("userData"));
         userData["mileage"] = battleResult["mileage"];

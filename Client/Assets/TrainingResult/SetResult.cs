@@ -16,10 +16,10 @@ public class SetResult : MonoBehaviour {
 
         JSONObject petData = new JSONObject(PlayerPrefs.GetString("userData"))["pet"];
         JSONObject traningResult = new JSONObject(PlayerPrefs.GetString("trainingResult"));
-        StaminaText.text = string.Format("血量:{0}(+{1})", petData["stamina"].f, traningResult["staminaIncrease"].f);
-        AttackText.text = string.Format("攻擊:{0}(+{1})", petData["attack"].f, traningResult["attackIncrease"].f);
-        DefenseText.text = string.Format("防禦:{0}(+{1})", petData["defense"].f, traningResult["defenseIncrease"].f);
-        EvadeText.text = string.Format("迴避:{0}(+{1})", petData["evade"].f, traningResult["evadeIncrease"].f);
+        StaminaText.text = string.Format("血量: {0}(+{1})", petData["stamina"].f, traningResult["staminaIncrease"].f);
+        AttackText.text = string.Format("攻擊: {0}(+{1})", petData["attack"].f, traningResult["attackIncrease"].f);
+        DefenseText.text = string.Format("防禦: {0}(+{1})", petData["defense"].f, traningResult["defenseIncrease"].f);
+        EvadeText.text = string.Format("迴避: {0}(+{1})", petData["evade"].f, traningResult["evadeIncrease"].f);
     }
 	
 	// Update is called once per frame
