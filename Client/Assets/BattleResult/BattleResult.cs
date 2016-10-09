@@ -10,7 +10,6 @@ public class BattleResult : MonoBehaviour {
 	void Start () {
         //換音樂
         AudioSource bgm = GameObject.Find("Audio Source").GetComponent<AudioSource>();
-        bgm.clip = Resources.Load<AudioClip>("music/Menu");
 
         JSONObject battleResult = new JSONObject(PlayerPrefs.GetString("BattleResult"));
         PlayerPrefs.DeleteKey("BattleResult");

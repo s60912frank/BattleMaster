@@ -23,9 +23,14 @@ public class ExplainPanel : MonoBehaviour {
 		rt.anchoredPosition = Vector2.zero;
 	}
 
-	public void Hide(){
+	public void Hide(string type){
 		rt.anchoredPosition = new Vector2(1000, 0);
-		PlayerPrefs.SetInt("showTutorial", toggle.isOn ? 0:1);
+		PlayerPrefs.SetInt("type", toggle.isOn ? 0:1);
 		print(toggle.isOn);
+
+		//臭
+		if(type == "showMiniGameTutorial"){
+			Time.timeScale = 1;
+		}
 	}
 }

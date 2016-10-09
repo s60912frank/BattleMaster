@@ -14,6 +14,7 @@ public class statsMinigame : MonoBehaviour {
     public GameObject ConfirmPanel;
     private Panel confirmScript;
     private Text PauseButtonText;
+    public ExplainPanel expPanel;
     // Use this for initialization
 
     void Start() {
@@ -39,6 +40,13 @@ public class statsMinigame : MonoBehaviour {
             GameObject.Find("defenseStat")
         };
         pauseables = new List<Pauseable>();
+
+        if(!PlayerPrefs.HasKey("showMiniGameTutorial") || PlayerPrefs.GetInt("showMiniGameTutorial") == 1){
+            expPanel.Show();
+            //PauseClicked();
+            Time.timeScale = 0;
+        }
+
         //每0.8秒一個disk
         StartCoroutine(GenerateDisk(DISK_INTERVAL));
     }
