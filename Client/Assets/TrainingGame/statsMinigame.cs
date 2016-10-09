@@ -17,6 +17,11 @@ public class statsMinigame : MonoBehaviour {
     // Use this for initialization
 
     void Start() {
+        //換音樂
+        AudioSource bgm = GameObject.Find("Audio Source").GetComponent<AudioSource>();
+        bgm.clip = Resources.Load<AudioClip>("music/Minigame");
+        bgm.Play();
+
         //關閉particle system 不然很花
         var particleSys = GameObject.Find("Particle System").GetComponent<ParticleSystem>();
         var particleEmission = particleSys.emission;

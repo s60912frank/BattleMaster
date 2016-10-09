@@ -22,6 +22,11 @@ public class BtnFunctions : MonoBehaviour {
     }
 
     IEnumerator Start () {
+        //換音樂
+        AudioSource bgm = GameObject.Find("Audio Source").GetComponent<AudioSource>();
+        bgm.clip = Resources.Load<AudioClip>("music/Menu");
+        bgm.Play();
+        
         confirmExitScript.SetText("確定要離開遊戲?");
         confirmExitScript.SetConfirmListener(() => { Application.Quit(); });
         yield return CheckForUpdateToSend(false);

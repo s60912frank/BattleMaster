@@ -11,8 +11,11 @@ public class MapView : MonoBehaviour {
     private MapModel model;
 	// Use this for initialization
 	IEnumerator Start () {
-        //LoadingPanel.GetComponent<LoadingScript>().Start();
-        //LoadingPanel.GetComponent<LoadingScript>().StartLoading();
+        //換音樂
+        AudioSource bgm = GameObject.Find("Audio Source").GetComponent<AudioSource>();
+        bgm.clip = Resources.Load<AudioClip>("music/map");
+        bgm.Play();
+
         //關閉particle system因為不需要
         var particleSys = GameObject.Find("Particle System").GetComponent<ParticleSystem>();
         var particleEmission = particleSys.emission;

@@ -43,6 +43,11 @@ public class BattleViewPVP : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        //換音樂
+        AudioSource bgm = GameObject.Find("Audio Source").GetComponent<AudioSource>();
+        bgm.clip = Resources.Load<AudioClip>("music/BattlePVP");
+        bgm.Play();
+
         animationController = SpriteMgr.GetComponent<AnimationController>();
         SocketIOObj = GameObject.Find("SocketIO");
         socket = SocketIOObj.GetComponent<SocketIOComponent>();

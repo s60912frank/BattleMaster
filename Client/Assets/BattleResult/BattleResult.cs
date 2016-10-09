@@ -8,20 +8,28 @@ public class BattleResult : MonoBehaviour {
     public Text MileageText;
 	// Use this for initialization
 	void Start () {
+        //換音樂
+        AudioSource bgm = GameObject.Find("Audio Source").GetComponent<AudioSource>();
+        bgm.clip = Resources.Load<AudioClip>("music/Menu");
+
         JSONObject battleResult = new JSONObject(PlayerPrefs.GetString("BattleResult"));
         PlayerPrefs.DeleteKey("BattleResult");
         if (battleResult["result"].str == "win")
         {
             ResultText.text = "勝利";
+            bgm.clip = Resources.Load<AudioClip>("music/win");
         }
         else if(battleResult["result"].str == "lose")
         {
             ResultText.text = "失敗";
+            //bgm.clip = Resources.Load<AudioClip>("music/lose");
         }
         else if (battleResult["result"].str == "even")
         {
             ResultText.text = "平手";
+            //bgm.clip = Resources.Load<AudioClip>("music/even");
         }
+        bgm.Play();
         MileageText.text = "里程: " + battleResult["mileage"].f.ToString() + "(+" + battleResult["mileageIncrease"].f.ToString() + ")";
         //update userdata
         JSONObject userData = new JSONObject(PlayerPrefs.GetString("userData"));

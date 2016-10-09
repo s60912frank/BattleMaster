@@ -10,6 +10,11 @@ public class SetResult : MonoBehaviour {
     public Text EvadeText;
     // Use this for initialization
     void Start () {
+        //換音樂
+        AudioSource bgm = GameObject.Find("Audio Source").GetComponent<AudioSource>();
+        bgm.clip = Resources.Load<AudioClip>("music/Minigame_Result");
+        bgm.Play();
+
         //開啟particle system if之前有關
         var particleEmission = GameObject.Find("Particle System").GetComponent<ParticleSystem>().emission;
         particleEmission.enabled = true;

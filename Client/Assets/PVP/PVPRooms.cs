@@ -24,6 +24,11 @@ public class PVPRooms : MonoBehaviour {
     #endregion
     // Use this for initialization
     void Start () {
+        //換音樂
+        AudioSource bgm = GameObject.Find("Audio Source").GetComponent<AudioSource>();
+        bgm.clip = Resources.Load<AudioClip>("music/Room system");
+        bgm.Play();
+
         panelScript = LoadingPanel.GetComponent<LoadingScript>();
         notifyScript = NotifyPanel.GetComponent<NotifyPanel>();
 
