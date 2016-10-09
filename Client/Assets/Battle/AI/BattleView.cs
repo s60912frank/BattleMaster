@@ -19,6 +19,7 @@ public class BattleView : MonoBehaviour {
     public GameObject VictoryPanel;
     public GameObject DefeatPanel;
     public GameObject SpriteMgr;
+    public GameObject TutorialPanel;
 
     private BattlePhase battlePhase;
     private AnimationController animationController;
@@ -27,12 +28,15 @@ public class BattleView : MonoBehaviour {
     private StatusScript enemyBar;
     private ResultPanelController victoryPanel;
     private ResultPanelController defeatPanel;
+    private ExplainPanel tutPanel;
+
     void Awake()
     {
         partnerBar = partnerStatus.GetComponent<StatusScript>();
         enemyBar = enemyStatus.GetComponent<StatusScript>();
         victoryPanel = VictoryPanel.GetComponent<ResultPanelController>();
         defeatPanel = DefeatPanel.GetComponent<ResultPanelController>();
+        tutPanel = TutorialPanel.GetComponent<ExplainPanel>();
     }
 
     // Use this for initialization
@@ -41,6 +45,10 @@ public class BattleView : MonoBehaviour {
         AudioSource bgm = GameObject.Find("Audio Source").GetComponent<AudioSource>();
         bgm.clip = Resources.Load<AudioClip>("music/battleAI");
         bgm.Play();
+
+        if(!PlayerPrefs.HasKey("showTutorial") || PlayerPrefs.GetInt("showTutorial") == 1){
+            tutPanel.Show();
+        }
 
         //開啟particle system if之前有關
         var particleEmission = GameObject.Find("Particle System").GetComponent<ParticleSystem>().emission;

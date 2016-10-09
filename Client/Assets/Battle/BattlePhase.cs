@@ -271,11 +271,11 @@ public class BattlePhase {
         {
             if (partner.IsSkillReady)
             {
-                return "Skill";
+                return "技能";
             }
             else
             {
-                return "Charge" + partner.NowCharge + "/" + partner._skillCD;
+                return "集氣(" + partner.NowCharge + "/" + partner._skillCD + ")";
             }
         }
         catch

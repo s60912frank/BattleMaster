@@ -24,6 +24,7 @@ public class BattleViewPVP : MonoBehaviour {
     public GameObject VictoryPanel;
     public GameObject DefeatPanel;
     public GameObject SpriteMgr;
+    public GameObject TutorialPanel;
 
     private BattlePhase battlePhase;
     private AnimationController animationController;
@@ -32,6 +33,7 @@ public class BattleViewPVP : MonoBehaviour {
     private StatusScript enemyBar;
     private ResultPanelController victoryPanel;
     private ResultPanelController defeatPanel;
+    private ExplainPanel tutPanel;
 
     void Awake()
     {
@@ -39,6 +41,7 @@ public class BattleViewPVP : MonoBehaviour {
         enemyBar = enemyStatus.GetComponent<StatusScript>();
         victoryPanel = VictoryPanel.GetComponent<ResultPanelController>();
         defeatPanel = DefeatPanel.GetComponent<ResultPanelController>();
+        tutPanel = TutorialPanel.GetComponent<ExplainPanel>();
     }
 
     // Use this for initialization
@@ -47,6 +50,10 @@ public class BattleViewPVP : MonoBehaviour {
         AudioSource bgm = GameObject.Find("Audio Source").GetComponent<AudioSource>();
         bgm.clip = Resources.Load<AudioClip>("music/BattlePVP");
         bgm.Play();
+
+        if(!PlayerPrefs.HasKey("showTutorial") || PlayerPrefs.GetInt("showTutorial") == 1){
+            tutPanel.Show();
+        }
 
         animationController = SpriteMgr.GetComponent<AnimationController>();
         SocketIOObj = GameObject.Find("SocketIO");

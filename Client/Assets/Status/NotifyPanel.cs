@@ -5,6 +5,7 @@ using System.Collections;
 public class NotifyPanel : MonoBehaviour {
     private RectTransform rt;
     private Animator animator;
+    private AudioSource sound;
     private Text ContentText;
     private Button ConfirmButton;
 
@@ -13,6 +14,7 @@ public class NotifyPanel : MonoBehaviour {
         Debug.Log("AWAKE!");
         animator = gameObject.GetComponent<Animator>();
         rt = gameObject.GetComponent<RectTransform>();
+        sound = gameObject.GetComponent<AudioSource>();
         ContentText = transform.FindChild("Panel").FindChild("ContentText").GetComponent<Text>();
         ConfirmButton = transform.FindChild("Panel").FindChild("ConfirmButton").GetComponent<Button>();
         
@@ -41,6 +43,7 @@ public class NotifyPanel : MonoBehaviour {
     {
         Debug.Log("SHOW!");
         rt.anchoredPosition = new Vector2(0, 0);
+        sound.Play();
         animator.SetTrigger("StartShow");
     }
 
