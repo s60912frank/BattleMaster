@@ -4,10 +4,12 @@ using System.Collections;
 public class SpriteController : MonoBehaviour {
     //private System.Action callback;
     private Animator animator;
+    private AudioSource audio;
     private int baseLayerIndex;
 	// Use this for initialization
 	void Start () {
         animator = gameObject.GetComponent<Animator>();
+        audio = gameObject.GetComponent<AudioSource>();
         baseLayerIndex = animator.GetLayerIndex("Base Layer");
 	}
 	
@@ -19,7 +21,7 @@ public class SpriteController : MonoBehaviour {
     public void HideSprite()
     {
         transform.position = new Vector2(0, -100);
-        Debug.Log(gameObject.name + " hide sprite!");
+        //Debug.Log(gameObject.name + " hide sprite!");
         //isFinished = true;
     }
 
@@ -37,14 +39,14 @@ public class SpriteController : MonoBehaviour {
         }
         while (!animator.GetCurrentAnimatorStateInfo(baseLayerIndex).IsName("Idle"))
         {
-            Debug.Log(gameObject.name + " is waiting for finish!");
+            //Debug.Log(gameObject.name + " is waiting for finish!");
             yield return null;
         }
     }
 
     public void SetTrigger(string trigger)
     {
-        Debug.Log(gameObject.name + ":set trigger for " + trigger);
+        //Debug.Log(gameObject.name + ":set trigger for " + trigger);
         animator.SetTrigger(trigger);
     }
 
@@ -53,4 +55,10 @@ public class SpriteController : MonoBehaviour {
         animator.SetBool(property, value);
         //isFinished = false;
     }
+
+    public void PlaySoundEffect(AudioClip sound){
+		audio.clip = sound;
+		audio.Play();
+		print("WHEEEEEEEEEEEEEEEEEEEE");
+	}
 }
