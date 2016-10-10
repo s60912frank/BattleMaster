@@ -13,6 +13,7 @@ public class GPS {
         get
         {
             return new Vector2(lonOrigin, latOrigin);
+            //return new Vector2(121.445644f, 25.049070f);
         }
     }
 
@@ -22,7 +23,7 @@ public class GPS {
         if (!Input.location.isEnabledByUser)
         {
             Debug.Log("GPS沒開");
-            GPSStatus = "GPS沒開";
+            GPSStatus = "請開啟GPS";
             location(Location);
             yield break;
         }
@@ -42,7 +43,7 @@ public class GPS {
         if (maxWait < 1)
         {
             Debug.Log("GPS逾時");
-            GPSStatus = "GPS逾時";
+            GPSStatus = "GPS逾時，請稍後再試";
             Input.location.Stop();
             location(Location);
             yield break;
@@ -52,7 +53,7 @@ public class GPS {
         if (Input.location.status == LocationServiceStatus.Failed)
         {
             Debug.Log("GPS錯誤");
-            GPSStatus = "GPS錯誤";
+            GPSStatus = "GPS發生錯誤，請稍後再試";
             Input.location.Stop();
             location(Location);
             yield break;

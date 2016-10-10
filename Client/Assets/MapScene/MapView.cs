@@ -50,10 +50,10 @@ public class MapView : MonoBehaviour {
     private IEnumerator MoveCamToPlayer()
     {
         Transform cam = Camera.main.transform;
-        while(cam.position.x != Player.transform.position.x && cam.position.y != Player.transform.position.y)
+        while(cam.position.x != Player.transform.position.x || cam.position.y != Player.transform.position.y)
         {
-            cam.position = new Vector3(Mathf.MoveTowards(cam.position.x, Player.transform.position.x, 0.1f),
-                                   Mathf.MoveTowards(cam.position.y, Player.transform.position.y, 0.1f),
+            cam.position = new Vector3(Mathf.MoveTowards(cam.position.x, Player.transform.position.x, 0.5f),
+                                   Mathf.MoveTowards(cam.position.y, Player.transform.position.y, 0.5f),
                                    cam.position.z);
             yield return new WaitForEndOfFrame();
         }
@@ -112,33 +112,83 @@ public class MapView : MonoBehaviour {
 
     private void DrawMapObj(string type, Vector2[] vertices2D) //畫地圖物件
     {
-        //yield return false;
-        //Debug.Log(vertices2D[0]);
+        int verticesLength = vertices2D.Length;
+        if(verticesLength == 0) return;
+        Debug.Log("LENGTH!" + verticesLength);
         GameObject obj = new GameObject(); //創個新物體
         obj.tag = "MapObj"; //方便清掉
-        Vector3[] vertices = new Vector3[vertices2D.Length];
+        Vector3[] vertices = new Vector3[verticesLength];
         for (int i = 0; i < vertices.Length; i++) //就只是2D轉3D
         {
             vertices[i] = new Vector3(vertices2D[i].x, vertices2D[i].y, -0.1f); //一樣設0會有問題
-        }
+        }        
         switch (type)
         {
             case "Polygon":
+                Vector3[] vertices2 = new Vector3[verticesLength * 2];
+                for (int i = 0; i < verticesLength; i++)        
+                    vertices2[i] = new Vector3(vertices2D[i].x, vertices2D[i].y, -2f);//高度.高度.高度.高度.高度.高度.
+                for (int i = 0; i < verticesLength; i++)
+                    vertices2[i+ verticesLength] = new Vector3(vertices2D[i].x, vertices2D[i].y, -0.1f);
+
                 // Use the triangulator to get indices for creating triangles
                 Triangulator tr = new Triangulator(vertices2D);
                 int[] indices = tr.Triangulate();
+                Debug.Log(indices.Length + (verticesLength-1)*6);
+                int[] HeightIndices = new int[indices.Length + (verticesLength-1)*6];
+
+                for (int i = 0; i < indices.Length; i++)
+                    HeightIndices[i] = indices[i];
+                for (int i = 0; i < verticesLength - 1; i++)
+                {
+                    HeightIndices[i*6 + indices.Length] = i + 1;
+                    HeightIndices[i*6 + indices.Length + 1] = i;
+                    HeightIndices[i*6 + indices.Length + 2] = i + verticesLength;
+                    HeightIndices[i*6 + indices.Length + 3] = i + verticesLength;
+                    HeightIndices[i*6 + indices.Length + 4] = i + verticesLength + 1;
+                    HeightIndices[i*6 + indices.Length + 5] = i + 1;
+                }
+
                 //Create the mesh
                 Mesh msh = new Mesh();
-                msh.vertices = vertices;
-                msh.triangles = indices;
+                msh.vertices = vertices2;
+                msh.triangles = HeightIndices;
                 msh.RecalculateNormals();
                 msh.RecalculateBounds();
 
                 // Set up game object with mesh;
                 MeshRenderer msgr = obj.AddComponent<MeshRenderer>();
-                msgr.material = Resources.Load("building") as Material;
+                msgr.material = new Material(Shader.Find("Diffuse"));
                 MeshFilter filter = obj.AddComponent<MeshFilter>() as MeshFilter;
                 filter.mesh = msh;
+
+                GameObject[] buildingLine = new GameObject[verticesLength * 2];
+                for (int i = 0; i < verticesLength - 1; i++)
+                {
+                    buildingLine[i] = new GameObject();
+                    buildingLine[i].tag = "MapObj";
+                    LineRenderer Line2 = buildingLine[i].AddComponent<LineRenderer>();
+                    Line2.SetVertexCount(2);
+                    Line2.SetPosition(0, vertices2[i]);
+                    Line2.SetPosition(1, vertices2[i + 1]);
+                    Line2.SetWidth(0.03f, 0.03f);
+                    Line2.material = Resources.Load("black") as Material;
+                    Line2.useWorldSpace = false;
+                    obj.SetActive(true);
+                }
+                for (int i = 0; i < verticesLength; i++)
+                {
+                    buildingLine[i + verticesLength] = new GameObject();
+                    buildingLine[i + verticesLength].tag = "MapObj";
+                    LineRenderer Line2 = buildingLine[i + verticesLength].AddComponent<LineRenderer>();
+                    Line2.SetVertexCount(2);
+                    Line2.SetPosition(0, vertices2[i]);
+                    Line2.SetPosition(1, vertices2[i + verticesLength]);
+                    Line2.SetWidth(0.03f, 0.03f);
+                    Line2.material = Resources.Load("black") as Material;
+                    Line2.useWorldSpace = false;
+                    obj.SetActive(true);
+                }
                 break;
             case "Point":
                 //還是不知怎畫
