@@ -11,6 +11,13 @@ public class SpriteController : MonoBehaviour {
         animator = gameObject.GetComponent<Animator>();
         audio = gameObject.GetComponent<AudioSource>();
         baseLayerIndex = animator.GetLayerIndex("Base Layer");
+
+        if(PlayerPrefs.GetInt("SoundEffectOn") == 1){
+            audio.volume = 0.75f;
+        }
+        else{
+            audio.volume = 0f;
+        }
 	}
 	
 	// Update is called once per frame
@@ -59,6 +66,5 @@ public class SpriteController : MonoBehaviour {
     public void PlaySoundEffect(AudioClip sound){
 		audio.clip = sound;
 		audio.Play();
-		print("WHEEEEEEEEEEEEEEEEEEEE");
 	}
 }

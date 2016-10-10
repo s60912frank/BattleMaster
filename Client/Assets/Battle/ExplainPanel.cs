@@ -25,7 +25,7 @@ public class ExplainPanel : MonoBehaviour {
 
 	public void Hide(string type){
 		rt.anchoredPosition = new Vector2(1000, 0);
-		PlayerPrefs.SetInt("type", toggle.isOn ? 0:1);
+		PlayerPrefs.SetInt(type, toggle.isOn ? 0:1);
 		print(toggle.isOn);
 
 		//臭

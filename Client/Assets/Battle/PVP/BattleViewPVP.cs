@@ -51,7 +51,7 @@ public class BattleViewPVP : MonoBehaviour {
         bgm.clip = Resources.Load<AudioClip>("music/BattlePVP");
         bgm.Play();
 
-        if(!PlayerPrefs.HasKey("showTutorial") || PlayerPrefs.GetInt("showTutorial") == 1){
+        if(!PlayerPrefs.HasKey("showBattleTutorial") || PlayerPrefs.GetInt("showBattleTutorial") == 1){
             tutPanel.Show();
         }
 

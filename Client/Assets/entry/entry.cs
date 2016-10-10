@@ -20,6 +20,12 @@ public class entry : MonoBehaviour {
 
         //所有場景共用一個AudioSource就好
         AudioSource bgm = GameObject.Find("Audio Source").GetComponent<AudioSource>();
+        if(PlayerPrefs.GetInt("BgmOn") == 1){
+            bgm.volume = 0.75f;
+        }
+        else{
+            bgm.volume = 0f;
+        }
         bgm.clip = Resources.Load<AudioClip>("music/Login");
         bgm.Play();
         DontDestroyOnLoad(GameObject.Find("Audio Source"));
