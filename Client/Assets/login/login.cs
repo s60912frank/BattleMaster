@@ -26,11 +26,6 @@ public class login : MonoBehaviour {
         loadingPanel = LoadingPanel.GetComponent<LoadingScript>();
         notifyScript = NotifyPanel.GetComponent<NotifyPanel>();
         signUpPanel = SignUpPanel.GetComponent<SignUpPanelController>();
-        //初始設定
-        PlayerPrefs.SetInt("SoundEffectOn", 1);
-		PlayerPrefs.SetInt("BgmOn", 1);
-		PlayerPrefs.SetInt("showBattleTutorial", 1);
-		PlayerPrefs.SetInt("showMiniGameTutorial", 1);
     }
 	
 	// Update is called once per frame

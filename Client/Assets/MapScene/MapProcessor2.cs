@@ -39,20 +39,13 @@ public class MapProcessor2{
                 case "Polygon":
                     foreach (JSONObject co in obj["geometry"]["coordinates"].list[0].list) //polygon的座標陣列存在陣列[0]的陣列中
                     {
-                        //coords.Add(new Vector2(float.Parse(co[0].ToString()), float.Parse(co[1].ToString()))); //加到list中 
-                        coords.Add(new Vector2(co[0].f, co[1].f)); //TEST!
+                        coords.Add(new Vector2(co[0].f, co[1].f));
                     }
                     break;
                 default:
                     Debug.Log(type);
                     break;
             }
-            //存入該mapTile的點List
-            //mapTiles[mapTileIndex].AddMapObj(type, coords);
-            //不存了直接畫
-
-            //StartCoroutine(DrawMapObj("Polygon", mapTiles[mapTileIndex].CoordTransform(coords)));
-            //outputData.Add("Polygon", CoordTransform(coords));
             outputData["Polygon"].Add(CoordTransform(coords));
         }
 
@@ -67,11 +60,8 @@ public class MapProcessor2{
                     List<Vector2> coords = new List<Vector2>();
                     foreach (JSONObject co in obj["geometry"]["coordinates"].list) //lineString的座標陣列存在陣列中
                     {
-                        //coords.Add(new Vector2(float.Parse(co[0].ToString()), float.Parse(co[1].ToString())));
-                        coords.Add(new Vector2(co[0].f, co[1].f)); //TEST!
+                        coords.Add(new Vector2(co[0].f, co[1].f));
                     }
-                    //StartCoroutine(DrawMapObj("LineString", mapTiles[mapTileIndex].CoordTransform(coords)));
-                    //outputData.Add("LineString", CoordTransform(coords));
                     outputData["LineString"].Add(CoordTransform(coords));
                     break;
                 case "MultiLineString":
@@ -84,9 +74,6 @@ public class MapProcessor2{
                             smallLine.Add(new Vector2(co2[0].f, co2[1].f)); //TEST!
                         }
                         //存入該mapTile的點List
-                        //mapTiles[mapTileIndex].AddMapObj("LineString", smallLine);
-                        //StartCoroutine(DrawMapObj("LineString", mapTiles[mapTileIndex].CoordTransform(smallLine)));
-                        //outputData.Add("LineString", CoordTransform(smallLine));
                         outputData["LineString"].Add(CoordTransform(smallLine));
                     }
                     break;

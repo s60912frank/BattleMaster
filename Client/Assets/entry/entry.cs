@@ -31,6 +31,7 @@ public class entry : MonoBehaviour {
         DontDestroyOnLoad(GameObject.Find("Audio Source"));
 
         RandomSkyboxColor();
+        CheckSettings();
         StartCoroutine(CheckServerAlive());
 	}
 
@@ -175,5 +176,13 @@ public class entry : MonoBehaviour {
         Color[] colorList = new Color[] { Color.blue, Color.green, Color.yellow, Color.red, Color.magenta, Color.cyan };
         Debug.Log(RenderSettings.skybox.GetColor("_Tint"));
         RenderSettings.skybox.SetColor("_Tint", colorList[Random.Range(0, colorList.Length)]);
+    }
+
+    private void CheckSettings(){
+        //初始設定
+        if(!PlayerPrefs.HasKey("SoundEffectOn")) PlayerPrefs.SetInt("SoundEffectOn", 1);
+        if(!PlayerPrefs.HasKey("BgmOn")) PlayerPrefs.SetInt("BgmOn", 1);
+        if(!PlayerPrefs.HasKey("showBattleTutorial")) PlayerPrefs.SetInt("showBattleTutorial", 1);
+        if(!PlayerPrefs.HasKey("showMiniGameTutorial")) PlayerPrefs.SetInt("showMiniGameTutorial", 1);
     }
 }

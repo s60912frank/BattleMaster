@@ -6,7 +6,6 @@ using System.Collections.Generic;
 public class MapView : MonoBehaviour {
     //public GameObject LoadingPanel;
     public GameObject EnemyDataPanel;
-    public Text GPSText;
     public GameObject Player;
     private MapModel model;
 	// Use this for initialization
@@ -33,7 +32,6 @@ public class MapView : MonoBehaviour {
             }
         }
         SetPlane(result);
-        //LoadingPanel.GetComponent<LoadingScript>().EndLoading();
         yield return UpdateGPS();
     }
 	
@@ -65,9 +63,7 @@ public class MapView : MonoBehaviour {
         {
             yield return new WaitForSeconds(1);
             Vector2 newPos = model.PlayerLocation;
-            //Player.transform.position.Set(newPos.x, newPos.y, Player.transform.position.z);
             Player.transform.position = new Vector3(newPos.x, newPos.y, Player.transform.position.z);
-            GPSText.text = model.GPSStatus;
         }
     }
 
