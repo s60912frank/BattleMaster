@@ -100,12 +100,6 @@ module.exports = (app, passport) => {
       res.send({ ok: true, data: req.user.game });
       res.end();
     });
-
-    //登出
-    app.get('/logout', (req, res) => {
-        req.logout();
-        res.send('你已經成功登出');
-    });
   
   //local登入
   app.post('/login', (req, res, next) => {

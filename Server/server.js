@@ -5,7 +5,7 @@ var ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
 var mongoose = require('mongoose');
 var passport = require('passport');
 
-var morgan = require('morgan');
+
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
@@ -15,6 +15,14 @@ var passportSocketIo = require("passport.socketio");
 var io = require('socket.io')(app.server);//client跟server連接
 
 var configDB = require('./config/database.js'); //db位置
+
+var DEBUG = false;
+if(!DEBUG){
+  console.log = () => {};
+}
+else{
+  app.use(require('morgan')('dev')); // log every request to the console
+}
 
 //public
 app.use('/public', express.static(__dirname + '/public'));
@@ -26,7 +34,6 @@ var msInstance = new mongoStore({ mongooseConnection: mongoose.connection }); //
 require('./config/passport')(passport); // pass passport for configuration
 
 // set up our express application
-app.use(morgan('dev')); // log every request to the console
 app.use(cookieParser()); // read cookies (needed for auth)
 app.use(bodyParser.urlencoded({ extended: true })); //讀取請求的body資料
 app.use(bodyParser.json());

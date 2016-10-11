@@ -17,6 +17,7 @@ public class entry : MonoBehaviour {
         //particle system在每一個畫面都要有
         particleSys = GameObject.Find("Particle System");
         DontDestroyOnLoad(particleSys);
+        CheckSettings();
 
         //所有場景共用一個AudioSource就好
         AudioSource bgm = GameObject.Find("Audio Source").GetComponent<AudioSource>();
@@ -31,7 +32,6 @@ public class entry : MonoBehaviour {
         DontDestroyOnLoad(GameObject.Find("Audio Source"));
 
         RandomSkyboxColor();
-        CheckSettings();
         StartCoroutine(CheckServerAlive());
 	}
 
