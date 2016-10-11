@@ -43,8 +43,18 @@ public class BtnFunctions : MonoBehaviour {
 
     public void GoToMap()
     {
-        //SceneManager.LoadScene("map");//移到地圖
-        StartCoroutine(CheckGPS());
+        //移到地圖
+        JSONObject data = new JSONObject(PlayerPrefs.GetString("userData"));
+        if(data["mileage"].f >= 100)
+        {
+            StartCoroutine(CheckGPS());
+        }
+        else
+        {
+            //顯示錯誤訊息
+            notifyScript.SetText("需要100里程才能與野怪對戰，出去走走吧!");
+            notifyScript.Show();
+        }
     }
 
     private IEnumerator CheckGPS()
@@ -89,7 +99,7 @@ public class BtnFunctions : MonoBehaviour {
     public void TrainingClicked()
     {
         JSONObject data = new JSONObject(PlayerPrefs.GetString("userData"));
-        if(data["mileage"].f > 100)
+        if(data["coin"].f >= 1000)
         {
             StartCoroutine(EnterTraningGame());
         }
@@ -97,7 +107,7 @@ public class BtnFunctions : MonoBehaviour {
         {
             //出去走走好嗎
             //顯示錯誤訊息
-            notifyScript.SetText("里程不足!出去走走吧!");
+            notifyScript.SetText("需要1000金幣才能訓練，去地圖上與野怪對戰吧!");
             notifyScript.Show();
         }
     }

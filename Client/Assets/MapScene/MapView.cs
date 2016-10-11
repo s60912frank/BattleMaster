@@ -122,15 +122,16 @@ public class MapView : MonoBehaviour {
         {
             case "Polygon":
                 Vector3[] vertices2 = new Vector3[verticesLength * 2];
+                float randomHeight = -Random.Range(0.8f,3);
                 for (int i = 0; i < verticesLength; i++)        
-                    vertices2[i] = new Vector3(vertices2D[i].x, vertices2D[i].y, -2f);//高度.高度.高度.高度.高度.高度.
+                    vertices2[i] = new Vector3(vertices2D[i].x, vertices2D[i].y, randomHeight);//高度.高度.高度.高度.高度.高度.
                 for (int i = 0; i < verticesLength; i++)
                     vertices2[i+ verticesLength] = new Vector3(vertices2D[i].x, vertices2D[i].y, -0.1f);
 
                 // Use the triangulator to get indices for creating triangles
                 Triangulator tr = new Triangulator(vertices2D);
                 int[] indices = tr.Triangulate();
-                Debug.Log(indices.Length + (verticesLength-1)*6);
+                //ebug.Log(indices.Length + (verticesLength-1)*6);
                 int[] HeightIndices = new int[indices.Length + (verticesLength-1)*6];
 
                 for (int i = 0; i < indices.Length; i++)
@@ -205,7 +206,6 @@ public class MapView : MonoBehaviour {
                 obj.SetActive(true);
                 break;
         }
-        //yield return false;
     }
 
     //這裡有點臭

@@ -37,6 +37,7 @@ public class MapModel {
 
     private string MapUrl(int x, int y)
     {
+        Debug.Log(MAPZEN_URL + MAP_TYPE + "/" + ZOOM + "/" + x + "/" + y + ".json?api_key=" + API_KEY);
         return MAPZEN_URL + MAP_TYPE + "/" + ZOOM + "/" + x + "/" + y + ".json?api_key=" + API_KEY;
     }
 

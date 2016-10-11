@@ -21,25 +21,25 @@ module.exports = (app, passport) => {
       var battleResult = {};
       battleResult.result = req.body.result;
       if(req.body.result == 'win')
-        battleResult["mileageIncrease"] = enemy.reward;
+        battleResult["coinIncrease"] = enemy.reward;
       else if(req.body.result == 'lose')
-        battleResult["mileageIncrease"] = Math.round(enemy.reward / 10);
+        battleResult["coinIncrease"] = 0;
       else if(req.body.result == 'even')
-        battleResult["mileageIncrease"] = Math.round(enemy.reward / 2);
-      req.user.game.mileage = req.user.game.mileage + battleResult["mileageIncrease"];
-      battleResult["mileage"] = req.user.game.mileage;
+        battleResult["coinIncrease"] = Math.round(enemy.reward / 4);
+      req.user.game.coin += battleResult["coinIncrease"];
+      battleResult["coin"] = req.user.game.coin;
       console.log(battleResult);
       req.user.save((err) =>{
         if(err){
           console.log(err);
         }
-        console.log(req.user.game.name + "BattleAI SAVED!");
+        console.log(req.user.game.name + "  " + battleResult);
       });
       res.send(battleResult);
     });
   });
 
-    var consume100Mileage = (req, res) => {
+    app.get('/battleWithAI', isLoggedIn, (req, res) => {
       if(req.user.game.mileage >= 100){
         req.user.game.mileage -= 100;
         req.user.save((err) => {
@@ -51,11 +51,21 @@ module.exports = (app, passport) => {
       else{
         res.status(401);
       }
-    }
+    });
 
-    app.get('/battleWithAI', isLoggedIn, consume100Mileage);
-
-    app.get('/enterTraning', isLoggedIn, consume100Mileage);
+    app.get('/enterTraning', isLoggedIn, (req, res) => {
+      if(req.user.game.coin >= 1000){
+        req.user.game.coin -= 1000;
+        req.user.save((err) => {
+          if(err) throw err;
+          console.log(req.user.game.name + " coin - 1000!");
+        });
+        res.send(req.user.game);
+      }
+      else{
+        res.status(401);
+      }
+    });
 
     app.post('/mileageGain', isLoggedIn, (req, res) => {
       req.user.game.mileage += parseInt(req.body.mileageGain);

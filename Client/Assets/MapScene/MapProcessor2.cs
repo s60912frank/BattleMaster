@@ -52,7 +52,6 @@ public class MapProcessor2{
         JSONObject roads = data["roads"]["features"]; //讀取資料中的"roads"節點下的"features"節點
         foreach (JSONObject obj in roads.list)
         {
-            //List<Vector2> coords = new List<Vector2>();
             string type = obj["geometry"]["type"].str;
             switch (type)
             {
@@ -70,8 +69,7 @@ public class MapProcessor2{
                         List<Vector2> smallLine = new List<Vector2>(); //看名稱就知道啦這個一個就有很多條線，所以一條線就丟去畫
                         foreach (JSONObject co2 in co.list)
                         {
-                            //smallLine.Add(new Vector2(float.Parse(co2[0].ToString()), float.Parse(co2[1].ToString())));
-                            smallLine.Add(new Vector2(co2[0].f, co2[1].f)); //TEST!
+                            smallLine.Add(new Vector2(co2[0].f, co2[1].f));
                         }
                         //存入該mapTile的點List
                         outputData["LineString"].Add(CoordTransform(smallLine));
@@ -81,12 +79,7 @@ public class MapProcessor2{
                     Debug.Log(type);
                     break;
             }
-            //存入該mapTile的點List
-            //mapTiles[mapTileIndex].AddMapObj("LineString", coords);
         }
-        //mapTiles[mapTileIndex].SetPlane();
-        //loadingPanel.GetComponent<LoadingScript>().EndLoading();
-        //SetTileCenter();
         Debug.Log("Done drawing map.");
     }
 

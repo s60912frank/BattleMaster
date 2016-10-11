@@ -5,7 +5,7 @@ using System.Collections;
 
 public class BattleResult : MonoBehaviour {
     public Text ResultText;
-    public Text MileageText;
+    public Text IncreaseText;
 	// Use this for initialization
 	void Start () {
         //換音樂
@@ -29,10 +29,19 @@ public class BattleResult : MonoBehaviour {
             //bgm.clip = Resources.Load<AudioClip>("music/even");
         }
         bgm.Play();
-        MileageText.text = "里程: " + battleResult["mileage"].f.ToString() + "(+" + battleResult["mileageIncrease"].f.ToString() + ")";
         //update userdata
         JSONObject userData = new JSONObject(PlayerPrefs.GetString("userData"));
-        userData["mileage"] = battleResult["mileage"];
+        if(battleResult.HasField("mileageIncrease")){
+            IncreaseText.text = string.Format("里程: {0}(+{1})", battleResult["mileage"].f, battleResult["mileageIncrease"].f);
+            userData["mileage"] = battleResult["mileage"];
+        }
+        else if(battleResult.HasField("coinIncrease")){
+            IncreaseText.text = string.Format("金幣: {0}(+{1})", battleResult["coin"].f, battleResult["coinIncrease"].f);
+            userData["coin"] = battleResult["coin"];
+        }
+        else{
+            IncreaseText.text = "出錯啦!";
+        }
         PlayerPrefs.SetString("userData", userData.ToString());
     }
 	
@@ -40,11 +49,6 @@ public class BattleResult : MonoBehaviour {
 	void Update () {
 	
 	}
-
-    public void PVPButtonClicked()
-    {
-        SceneManager.LoadScene("PVPRooms");
-    }
 
     public void StatusButtonClicked()
     {

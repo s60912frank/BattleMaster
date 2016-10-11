@@ -1,10 +1,7 @@
 var mongoose = require('mongoose');
 var configDB = require('./config/database.js');
 mongoose.connect(configDB.url);
-/*
-CP?
-CP=stamina+attack*5+defense*2+evade*3
-*/
+
 var enemy = (name,reward,stamina,attack,defense,evade) => {
   var Enemy = require('./app/models/enemy'); //資料庫ENEMY的shema
     var newEnemy = new Enemy(
@@ -38,5 +35,5 @@ var enemy = (name,reward,stamina,attack,defense,evade) => {
 }
 
 enemy("Charmander",200,60,10,2,20);
-enemy("Augu",2000,100,40,5,5);
-enemy("V",800,20,20,2,45);
+enemy("Augu",1000,100,40,5,5);
+enemy("V",500,20,20,2,45);

@@ -15,6 +15,7 @@ var userSchema = mongoose.Schema({
   game: {
     name: String,
     mileage: { type: Number, 'default': 500 },
+    coin: { type: Number, 'default': 0 },
     pet: {
       name: String,
       level: Number,

@@ -247,17 +247,16 @@ module.exports = (io) => {
 
 //會把戰鬥結束的里程存到資料庫，並且return戰鬥結果
 var MileageProcess = (user, result) => {
-	console.log("HELLO! " + result);
 	var battleResult = {};
 	battleResult["result"] = result;
 	if(result == 'win')
-		battleResult["mileageIncrease"] = 500;
+		battleResult["mileageIncrease"] = 150;
 	else if(result == 'lose')
-		battleResult["mileageIncrease"] = 50;
+		battleResult["mileageIncrease"] = 0;
 	else if(result == 'even')
-		battleResult["mileageIncrease"] = 250;
+		battleResult["mileageIncrease"] = 50;
 
-	user.game.mileage = user.game.mileage + battleResult.mileageIncrease;
+	user.game.mileage += battleResult.mileageIncrease;
 	battleResult["mileage"] = user.game.mileage;
 	user.save((err) => {
 		if(err) console.log(err);

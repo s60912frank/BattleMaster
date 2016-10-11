@@ -12,8 +12,8 @@ public class GPS {
     {
         get
         {
-            //return new Vector2(lonOrigin, latOrigin);
-            return new Vector2(121.445644f, 25.049070f);
+            return new Vector2(lonOrigin, latOrigin);
+            //return new Vector2(121.445644f, 25.049070f);
         }
     }
 
@@ -117,7 +117,7 @@ public class GPS {
                 const float times = 3276.8f;
                 float newX = (Input.location.lastData.longitude - lonOrigin) * times;
                 float newY = (Input.location.lastData.latitude - latOrigin) * times;
-                GPSStatus = "longitude:" + Input.location.lastData.longitude + "    latitude:" + Input.location.lastData.latitude;
+                GPSStatus = "經度: " + Input.location.lastData.longitude + "    緯度: " + Input.location.lastData.latitude;
                 return new Vector2(newX, newY);
             }
             else
