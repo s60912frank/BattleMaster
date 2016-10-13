@@ -7,6 +7,11 @@ module.exports = (app, passport) => {
     res.end();
   });
 
+  app.get('/download', (req, res) => {
+    res.redirect('https://onedrive.live.com/download?cid=3421EEFA705700D7&resid=3421EEFA705700D7%2127696&authkey=AJKWYZy3_OcYIC0');
+    res.end();
+  });
+
   //跟AI打
   app.post('/battle', isLoggedIn, (req, res) => {
     //收到怪物類型，伺服器回傳怪物資訊，在client上打
