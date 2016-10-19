@@ -12,12 +12,15 @@ public class SpriteController : MonoBehaviour {
         audio = gameObject.GetComponent<AudioSource>();
         baseLayerIndex = animator.GetLayerIndex("Base Layer");
 
-        if(PlayerPrefs.GetInt("SoundEffectOn") == 1){
-            audio.volume = 0.75f;
+        try{
+            if(PlayerPrefs.GetInt("SoundEffectOn") == 1){
+                audio.volume = 0.75f;
+            }
+            else{
+                audio.volume = 0f;
+            }
         }
-        else{
-            audio.volume = 0f;
-        }
+        catch(System.Exception e){}
 	}
 	
 	// Update is called once per frame
@@ -28,13 +31,6 @@ public class SpriteController : MonoBehaviour {
     public void HideSprite()
     {
         transform.position = new Vector2(0, -100);
-        //Debug.Log(gameObject.name + " hide sprite!");
-        //isFinished = true;
-    }
-
-    public void AnimationFinished()
-    {
-
     }
 
     public IEnumerator WaitForFinish()
@@ -46,21 +42,18 @@ public class SpriteController : MonoBehaviour {
         }
         while (!animator.GetCurrentAnimatorStateInfo(baseLayerIndex).IsName("Idle"))
         {
-            //Debug.Log(gameObject.name + " is waiting for finish!");
             yield return null;
         }
     }
 
     public void SetTrigger(string trigger)
     {
-        //Debug.Log(gameObject.name + ":set trigger for " + trigger);
         animator.SetTrigger(trigger);
     }
 
     public void SetBool(string property, bool value)
     {
         animator.SetBool(property, value);
-        //isFinished = false;
     }
 
     public void PlaySoundEffect(AudioClip sound){

@@ -89,20 +89,20 @@ public class CamController : MonoBehaviour {
 
             // Find the difference in the distances between each frame.
             float deltaMagnitudeDiff = (prevTouchDeltaMag - touchDeltaMag) * 0.08f;
-            Debug.Log("PANDIFF:" + deltaMagnitudeDiff);
+            //Debug.Log("PANDIFF:" + deltaMagnitudeDiff);
             trans.position = new Vector3(trans.position.x, trans.position.y, trans.position.z - deltaMagnitudeDiff);
         }
 
         //起始y=-10,-5時可視面積1/4所以zoom+1,-20時可視面積4倍所以zoom-1
         if (trans.position.z > -3f)
         {
-            Debug.Log("太大啦!");
+            //Debug.Log("太大啦!");
             //RequestNewZoomMap(1);
             trans.position = new Vector3(trans.position.x, trans.position.y, -3);
         }
         if (trans.position.z < -40)
         {
-            Debug.Log("太小啦!");
+            //Debug.Log("太小啦!");
             //RequestNewZoomMap(-1);     
             trans.position = new Vector3(trans.position.x, trans.position.y, -40);
         }
@@ -144,7 +144,7 @@ public class CamController : MonoBehaviour {
         while (rayCasting)
         {
             yield return new WaitForSeconds(0.2f); //每200ms就raycast一次
-            //Debug.Log("HELLO");
+            Debug.Log("HELLO");
             Ray left = Camera.main.ViewportPointToRay(new Vector3(0, 0.5f, 0));
             Ray right = Camera.main.ViewportPointToRay(new Vector3(1, 0.5f, 0));
             Ray top = Camera.main.ViewportPointToRay(new Vector3(0.5f, 1, 0));

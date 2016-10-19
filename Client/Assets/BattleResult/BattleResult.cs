@@ -17,18 +17,16 @@ public class BattleResult : MonoBehaviour {
         {
             ResultText.text = "勝利";
             bgm.clip = Resources.Load<AudioClip>("music/win");
+            bgm.Play();
         }
         else if(battleResult["result"].str == "lose")
         {
             ResultText.text = "失敗";
-            //bgm.clip = Resources.Load<AudioClip>("music/lose");
         }
         else if (battleResult["result"].str == "even")
         {
             ResultText.text = "平手";
-            //bgm.clip = Resources.Load<AudioClip>("music/even");
         }
-        bgm.Play();
         //update userdata
         JSONObject userData = new JSONObject(PlayerPrefs.GetString("userData"));
         if(battleResult.HasField("mileageIncrease")){

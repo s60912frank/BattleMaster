@@ -11,7 +11,7 @@ public class MapView : MonoBehaviour {
 	// Use this for initialization
 	IEnumerator Start () {
         //換音樂
-        /*AudioSource bgm = GameObject.Find("Audio Source").GetComponent<AudioSource>();
+        AudioSource bgm = GameObject.Find("Audio Source").GetComponent<AudioSource>();
         bgm.clip = Resources.Load<AudioClip>("music/map");
         bgm.Play();
 
@@ -19,7 +19,7 @@ public class MapView : MonoBehaviour {
         var particleSys = GameObject.Find("Particle System").GetComponent<ParticleSystem>();
         var particleEmission = particleSys.emission;
         particleEmission.enabled = false;
-        particleSys.Clear(true);*/
+        particleSys.Clear(true);
 
         model = new MapModel();
         yield return model.MapInit();
@@ -110,7 +110,6 @@ public class MapView : MonoBehaviour {
     {
         int verticesLength = vertices2D.Length;
         if(verticesLength == 0) return;
-        Debug.Log("LENGTH!" + verticesLength);
         GameObject obj = new GameObject(); //創個新物體
         obj.tag = "MapObj"; //方便清掉
         Vector3[] vertices = new Vector3[verticesLength];

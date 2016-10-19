@@ -53,35 +53,35 @@ public class Click : MonoBehaviour {
 	public void action_4_btnSkill()
 	{
         movement = BattlePhase.Movement.Charge;
-        if (battleView.IsPartnerSkillReady()) 
+        /*if (battleView.IsPartnerSkillReady()) 
 		{
-			messageBoxText.text = "Confirm to Activate Skill.";
+			messageBoxText.text = "確認發動";
 		}
 		else
 		{
 			messageBoxText.text = "Confirm to Activate Charge.";
-		}
+		}*/
         SetColor(SkillBtn);
 	}
 
 	public void action_4_btnAttack()
 	{
         movement = BattlePhase.Movement.Attack;
-		messageBoxText.text = "Confirm to Activate Attack.";
+		//messageBoxText.text = "Confirm to Activate Attack.";
         SetColor(AttackBtn);
 	}
 
 	public void action_4_btnDefend()
 	{
         movement = BattlePhase.Movement.Defense;
-		messageBoxText.text = "Confirm to Activate Defend.";
+		//messageBoxText.text = "Confirm to Activate Defend.";
         SetColor(DefendBtn);
 	}
 
 	public void action_4_btnEvade()
 	{
         movement = BattlePhase.Movement.Evade;
-		messageBoxText.text = "Confirm to Activate Evade.";
+		//messageBoxText.text = "Confirm to Activate Evade.";
         SetColor(EvadeBtn);
 	}
 

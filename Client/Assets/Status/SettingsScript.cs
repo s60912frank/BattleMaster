@@ -4,6 +4,7 @@ using System.Collections;
 
 public class SettingsScript : MonoBehaviour {
 	private RectTransform rt;
+	private Animator animator;
 	public Toggle SoundEffectToggle;
 	public Toggle BgmToggle;
 	public Toggle BattleTutToggle;
@@ -11,6 +12,7 @@ public class SettingsScript : MonoBehaviour {
 	// Use this for initialization
 	void Awake(){
 		rt = gameObject.GetComponent<RectTransform>();
+		animator = gameObject.GetComponent<Animator>();
 	}
 
 	void Start () {
@@ -27,14 +29,15 @@ public class SettingsScript : MonoBehaviour {
 		BattleTutToggle.isOn = (PlayerPrefs.GetInt("showBattleTutorial") == 1);
 		MiniGameTutToggle.isOn = (PlayerPrefs.GetInt("showMiniGameTutorial") == 1);
 		rt.anchoredPosition = Vector2.zero;
+		animator.SetTrigger("StartShow");
 	}
 
 	public void ExitClicked(){
+		animator.SetTrigger("StartHide");
 		PlayerPrefs.SetInt("SoundEffectOn", SoundEffectToggle.isOn ? 1 : 0);
 		PlayerPrefs.SetInt("BgmOn", BgmToggle.isOn ? 1 : 0);
 		PlayerPrefs.SetInt("showBattleTutorial", BattleTutToggle.isOn ? 1 : 0);
 		PlayerPrefs.SetInt("showMiniGameTutorial", MiniGameTutToggle.isOn ? 1 : 0);
-		rt.anchoredPosition = new Vector2(1000, 0);
 
 		AudioSource bgm = GameObject.Find("Audio Source").GetComponent<AudioSource>();
 		if(BgmToggle.isOn){
@@ -43,5 +46,9 @@ public class SettingsScript : MonoBehaviour {
         else{
             bgm.volume = 0f;
         }
+	}
+
+	public void FullyHide(){
+		rt.anchoredPosition = new Vector2(1000, 0);
 	}
 }

@@ -5,8 +5,8 @@ using System.IO;
 
 public class MapModel {
     private const string API_KEY = "vector-tiles-vxQ7SnN";
-    private const string MAP_TYPE = "boundaries,buildings,roads";
-    private const string MAPZEN_URL = "https://vector.mapzen.com/osm/";
+    private const string MAP_TYPE = "buildings,roads";
+    private const string MAPZEN_URL = "http://tile.mapzen.com/mapzen/vector/v1/";
     private const int ZOOM = 15;
     private const float TIMES = 3276.8f;
     public Rect mapBoundry;
@@ -37,6 +37,7 @@ public class MapModel {
 
     private string MapUrl(int x, int y)
     {
+        //http://tile.mapzen.com/mapzen/vector/v1/buildings,roads/15/27438/14027.json?api_key=vector-tiles-vxQ7SnN
         Debug.Log(MAPZEN_URL + MAP_TYPE + "/" + ZOOM + "/" + x + "/" + y + ".json?api_key=" + API_KEY);
         return MAPZEN_URL + MAP_TYPE + "/" + ZOOM + "/" + x + "/" + y + ".json?api_key=" + API_KEY;
     }
@@ -62,6 +63,7 @@ public class MapModel {
         Debug.Log(lon + "/" + lat);
         TileNum = WorldToTilePos(lon, lat);
         string filePath = Application.persistentDataPath + "/" + ZOOM.ToString() + "_" + TileNum.x.ToString() + "_" + TileNum.y.ToString() + ".json";
+        Debug.Log(filePath);
         if (File.Exists(filePath))
         {
             process.JsonProcessor(File.ReadAllText(filePath));

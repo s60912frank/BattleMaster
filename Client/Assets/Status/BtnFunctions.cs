@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,6 +9,11 @@ public class BtnFunctions : MonoBehaviour {
     public GameObject NotifyPanelObj;
     public GameObject ConfirmExitPanel;
 
+    public Button MapButton;
+    public Button UpdateMileageButton;
+    public Button TrainingButton;
+    public Button PVPButton;
+
     private NotifyPanel notifyScript;
     private LoadingScript panelScript;
     private Panel confirmExitScript;
@@ -15,6 +21,11 @@ public class BtnFunctions : MonoBehaviour {
 
     void Awake()
     {
+        MapButton.onClick.AddListener(() => GoToMap());
+        UpdateMileageButton.onClick.AddListener(() => LocationUpdateClicked());
+        TrainingButton.onClick.AddListener(() => TrainingClicked());
+        PVPButton.onClick.AddListener(() => SearchEnemy());
+
         NotifyPanelObj = GameObject.Find("NotifyPanel");
         notifyScript = NotifyPanelObj.GetComponent<NotifyPanel>();
         panelScript = LoadingPanel.GetComponent<LoadingScript>();
@@ -44,6 +55,7 @@ public class BtnFunctions : MonoBehaviour {
     public void GoToMap()
     {
         //移到地圖
+        MapButton.interactable = false;
         JSONObject data = new JSONObject(PlayerPrefs.GetString("userData"));
         if(data["mileage"].f >= 100)
         {
@@ -54,6 +66,7 @@ public class BtnFunctions : MonoBehaviour {
             //顯示錯誤訊息
             notifyScript.SetText("需要100里程才能與野怪對戰，出去走走吧!");
             notifyScript.Show();
+            MapButton.interactable = true;
         }
     }
 
@@ -69,6 +82,7 @@ public class BtnFunctions : MonoBehaviour {
             panelScript.OnHidedCallback(() =>
             {
                 notifyScript.Show();
+                MapButton.interactable = true;
             });
         }
         else
@@ -98,6 +112,7 @@ public class BtnFunctions : MonoBehaviour {
 
     public void TrainingClicked()
     {
+        TrainingButton.interactable = false;
         JSONObject data = new JSONObject(PlayerPrefs.GetString("userData"));
         if(data["coin"].f >= 1000)
         {
@@ -109,6 +124,7 @@ public class BtnFunctions : MonoBehaviour {
             //顯示錯誤訊息
             notifyScript.SetText("需要1000金幣才能訓練，去地圖上與野怪對戰吧!");
             notifyScript.Show();
+            TrainingButton.interactable = true;
         }
     }
 
@@ -151,12 +167,13 @@ public class BtnFunctions : MonoBehaviour {
 
     public void LocationUpdateClicked()
     {
+        UpdateMileageButton.interactable = false;
         StartCoroutine(GetMileageGain());
     }
 
     private IEnumerator GetMileageGain()
     {
-        LoadingPanel.GetComponent<LoadingScript>().StartLoading();
+        panelScript.StartLoading();
         GPS gps = new GPS();
         yield return gps.GPSInit((loc) => { });
         if (gps.GPSStatus != "GPS OK")
@@ -169,7 +186,8 @@ public class BtnFunctions : MonoBehaviour {
         }
         notifyScript.Show();
         gps.StopGPS();
-        LoadingPanel.GetComponent<LoadingScript>().EndLoading();
+        panelScript.EndLoading();
+        UpdateMileageButton.interactable = true;
     }
 
     private IEnumerator CheckForUpdateToSend(bool showNoGain)

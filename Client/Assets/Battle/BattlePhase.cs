@@ -58,11 +58,12 @@ public class BattlePhase {
                     enemy.Skill(ref partner);
                     roundResult.isEnemySkillActivated = true;
                     enemyMovement = Movement.Skill;
-                    roundResult.enemyStatusText = "敵人發動了技能！";
+                    roundResult.enemyStatusText = "敵人發動了技能！" + enemy.SkillDescription;
                 }
-                else
+                else{
                     enemy.Charge();
-                roundResult.enemyStatusText = "敵人正在蓄能！";
+                    roundResult.enemyStatusText = "敵人正在蓄能！";
+                }
                 break;
         }
 
@@ -172,7 +173,7 @@ public class BattlePhase {
                 else
                 {
                     //迴避成功
-                    roundResult.partnerStatusText = "成功迴避敵方攻擊！握有會心一擊優勢！";
+                    roundResult.partnerStatusText = "成功迴避敵方攻擊！";
                     roundResult.isPartnerEvaded = true;
                     if (partnerMovement == Movement.Evade)
                     {

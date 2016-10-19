@@ -58,10 +58,6 @@ public class EnemyPanel : MonoBehaviour {
     public void Hide()
     {
         gameObject.GetComponent<Animator>().SetTrigger("StartHide");
-        //gameObject.GetComponent<Animator>().
-        //gameObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(-1000, 0);
-        //e臭
-        //StartCoroutine(Dirty());
     }
 
     public void HideAndSetMouseRay()
@@ -98,7 +94,10 @@ public class EnemyPanel : MonoBehaviour {
             while(load.progress < 0.9f){
                 yield return null;
             }
-            load.allowSceneActivation = true;
+            loadingScript.OnHidedCallback(() => {
+                load.allowSceneActivation = true;
+            });
+            loadingScript.EndLoading();
         }
         else
         {

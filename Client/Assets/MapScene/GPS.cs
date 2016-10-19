@@ -12,8 +12,8 @@ public class GPS {
     {
         get
         {
-            //return new Vector2(lonOrigin, latOrigin);
-            return new Vector2(121.445644f, 25.049070f);
+            return new Vector2(lonOrigin, latOrigin);
+            //return new Vector2(121.445644f, 25.049070f);
         }
     }
 
