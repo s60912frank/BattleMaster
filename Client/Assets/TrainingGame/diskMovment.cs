@@ -73,24 +73,12 @@ public class diskMovment : Pauseable {
 
     void OnMouseEnter()
     {
-        Debug.Log("ENTAR!KL!BNWJKL!WN");
         if (inPanel && run)
         {
             swipedInPanel = true;
             mouseEnterPos = Input.mousePosition;
         }
     }
-
-    /*void OnGUI()
-    {
-        if (Input.GetMouseButtonUp(0) && swipedInPanel && run)
-        {
-            Vector2 mouseEndPosition = Input.mousePosition;
-            swipeForce = 3 * (mouseEndPosition - mouseEnterPos);
-            forceGet = true;
-            Debug.Log(transform.name + "get" + swipeForce);
-        }
-    }*/
 
     void OnMouseUp(){
         if (swipedInPanel && run)

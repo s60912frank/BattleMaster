@@ -112,30 +112,12 @@ public class GPS {
     {
         get
         {
-            if(Input.location.status == LocationServiceStatus.Running)
-            {
-                const float times = 3276.8f;
-                float newX = (Input.location.lastData.longitude - lonOrigin) * times;
-                float newY = (Input.location.lastData.latitude - latOrigin) * times;
-                GPSStatus = "經度: " + Input.location.lastData.longitude + "    緯度: " + Input.location.lastData.latitude;
-                return new Vector2(newX, newY);
-            }
-            else
-            {
-                //Input.location.lastData.
-                //debug only
-                Vector2 whee = new Vector2(lonOrigin, latOrigin);
-                //return new Vector2(lonOrigin + 0.1f, latOrigin+0.1f);
-                //Debug.Log(whee);
-                return whee;
-            }
+            const float times = 3276.8f;
+            float newX = (Input.location.lastData.longitude - lonOrigin) * times;
+            float newY = (Input.location.lastData.latitude - latOrigin) * times;
+            GPSStatus = "經度: " + Input.location.lastData.longitude + "    緯度: " + Input.location.lastData.latitude;
+            return new Vector2(newX, newY);
         }
-    }
-
-    public void whee()
-    {
-        lonOrigin += 0.3f;
-        latOrigin += 0.3f;
     }
 
     public float HaversineDistance(Vector2 pos1, Vector2 pos2)
@@ -146,7 +128,6 @@ public class GPS {
         float h1 = Mathf.Sin(lat / 2) * Mathf.Sin(lat / 2) +
                       Mathf.Cos(pos1.y * Mathf.Deg2Rad) * Mathf.Cos(pos2.y * Mathf.Deg2Rad) *
                       Mathf.Sin(lng / 2) * Mathf.Sin(lng / 2);
-        //float h2 = 2 * Mathf.Asin(Mathf.Min(1, Mathf.Sqrt(h1)));
         float h2 = 2 * Mathf.Atan2(Mathf.Sqrt(h1), Mathf.Sqrt(1 - h1));
         return R * h2 * 1000;
     }
