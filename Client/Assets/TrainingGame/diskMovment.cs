@@ -36,6 +36,14 @@ public class diskMovment : Pauseable {
                 GetComponent<Rigidbody2D>().AddForce(swipeForce);
                 swipedInPanel = false;
             }
+
+            if (Input.GetMouseButtonUp(0) && swipedInPanel)
+            {
+                Vector2 mouseEndPosition = Input.mousePosition;
+                swipeForce = 3 * (mouseEndPosition - mouseEnterPos);
+                forceGet = true;
+                Debug.Log(transform.name + "get" + swipeForce);
+            }
         }
     }
 
@@ -65,6 +73,7 @@ public class diskMovment : Pauseable {
 
     void OnMouseEnter()
     {
+        Debug.Log("ENTAR!KL!BNWJKL!WN");
         if (inPanel && run)
         {
             swipedInPanel = true;
@@ -72,9 +81,19 @@ public class diskMovment : Pauseable {
         }
     }
 
-    void OnGUI()
+    /*void OnGUI()
     {
-        if (Event.current.type == EventType.MouseUp && swipedInPanel && run)
+        if (Input.GetMouseButtonUp(0) && swipedInPanel && run)
+        {
+            Vector2 mouseEndPosition = Input.mousePosition;
+            swipeForce = 3 * (mouseEndPosition - mouseEnterPos);
+            forceGet = true;
+            Debug.Log(transform.name + "get" + swipeForce);
+        }
+    }*/
+
+    void OnMouseUp(){
+        if (swipedInPanel && run)
         {
             Vector2 mouseEndPosition = Input.mousePosition;
             swipeForce = 3 * (mouseEndPosition - mouseEnterPos);

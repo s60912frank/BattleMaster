@@ -52,7 +52,7 @@ public class CamController : MonoBehaviour {
                     RaycastHit hit;
                     Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit);
                     Debug.Log("HIT:" + hit.transform.tag);
-                    if (hit.transform.tag == "Area")
+                    if (hit.transform.tag == "Area" && !UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
                     {
                         //showMonsterData
                         MouseRay = false;

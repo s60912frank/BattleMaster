@@ -3,8 +3,13 @@ using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class ButtonManager : MonoBehaviour {
+    public GameObject NPanel;
+	private NotifyPanel notifyScript;
 
-	// Use this for initialization
+    void Awake(){
+        notifyScript = NPanel.GetComponent<NotifyPanel>();
+    }
+
 	void Start () {
         
 	}
@@ -22,5 +27,9 @@ public class ButtonManager : MonoBehaviour {
     {
         GameObject.Find("Map").GetComponent<MapView>().StopGps();
         SceneManager.LoadScene("Status");
+    }
+
+    public void ShowExplain(){
+        notifyScript.Show();
     }
 }
