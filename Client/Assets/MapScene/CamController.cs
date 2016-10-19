@@ -28,7 +28,7 @@ public class CamController : MonoBehaviour {
         Debug.Log("MOUSERAY:" + MouseRay);
         MouseKeyboardControl();
 
-        if(Input.touchCount == 1)
+        /*if(Input.touchCount == 1)
         {
             Touch touch = Input.GetTouch(0);
             if(touch.phase == TouchPhase.Began)
@@ -91,7 +91,7 @@ public class CamController : MonoBehaviour {
             float deltaMagnitudeDiff = (prevTouchDeltaMag - touchDeltaMag) * 0.08f;
             //Debug.Log("PANDIFF:" + deltaMagnitudeDiff);
             trans.position = new Vector3(trans.position.x, trans.position.y, trans.position.z - deltaMagnitudeDiff);
-        }
+        }*/
 
         //起始y=-10,-5時可視面積1/4所以zoom+1,-20時可視面積4倍所以zoom-1
         if (trans.position.z > -3f)
@@ -136,6 +136,28 @@ public class CamController : MonoBehaviour {
         else if (Input.GetAxis("Mouse ScrollWheel") < 0)
         {
             trans.position -= Vector3.forward * 0.4f;
+        }
+
+        if (MouseRay && Input.GetMouseButtonUp(0))
+        {
+            RaycastHit2D btnHit = Physics2D.Raycast(this.transform.position, Input.mousePosition);
+            if(btnHit.collider == null)
+            {
+                RaycastHit hit;
+                Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit);
+                Debug.Log("HIT:" + hit.transform.tag);
+                if (hit.transform.tag == "Area")
+                {
+                   //showMonsterData
+                    MouseRay = false;
+                    map.ShowEnemyData(hit.transform);
+                }
+                else if (hit.transform.tag == "MapPlane")
+                {
+                    map.ShowEnemyData();
+                    MouseRay = false;
+                }
+            }
         }
     }
 

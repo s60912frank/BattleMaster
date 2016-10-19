@@ -14,6 +14,7 @@ public class entry : MonoBehaviour {
 	// Use this for initialization
 
 	void Start () {
+        //PlayerPrefs.DeleteAll();
         //particle system在每一個畫面都要有
         particleSys = GameObject.Find("Particle System");
         DontDestroyOnLoad(particleSys);

@@ -174,18 +174,13 @@ public class BtnFunctions : MonoBehaviour {
     private IEnumerator GetMileageGain()
     {
         panelScript.StartLoading();
-        GPS gps = new GPS();
+        /*GPS gps = new GPS();
         yield return gps.GPSInit((loc) => { });
-        if (gps.GPSStatus != "GPS OK")
-        {
-            notifyScript.SetText(gps.GPSStatus);
-        }
-        else
-        {
-            yield return CheckForUpdateToSend(true);
-        }
+        yield return CheckForUpdateToSend(true);
         notifyScript.Show();
-        gps.StopGPS();
+        gps.StopGPS();*/
+        PlayerPrefs.SetFloat("MileageGainToUpdate", 200);
+        yield return CheckForUpdateToSend(true);
         panelScript.EndLoading();
         UpdateMileageButton.interactable = true;
     }

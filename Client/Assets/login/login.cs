@@ -37,7 +37,8 @@ public class login : MonoBehaviour {
     {
         //本地登入 使用DeviceID
         type = "local";
-        token = SystemInfo.deviceUniqueIdentifier;
+        //token = SystemInfo.deviceUniqueIdentifier;
+        token = "DEBUG2";
         StartCoroutine(WaitForLogin());
     }
 

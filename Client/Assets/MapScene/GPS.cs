@@ -6,21 +6,21 @@ using System.Collections;
 public class GPS {
     private float latOrigin;
     private float lonOrigin;
-    public string GPSStatus = "";
+    public string GPSStatus = "GPS OK";
 
     private Vector2 Location
     {
         get
         {
-            return new Vector2(lonOrigin, latOrigin);
-            //return new Vector2(121.445644f, 25.049070f);
+            //return new Vector2(lonOrigin, latOrigin);
+            return new Vector2(121.533695f, 25.044093f);
         }
     }
 
     public IEnumerator GPSInit(System.Action<Vector2> location)
     {
         // First, check if user has location service enabled
-        if (!Input.location.isEnabledByUser)
+        /*if (!Input.location.isEnabledByUser)
         {
             Debug.Log("GPS沒開");
             GPSStatus = "請開啟GPS";
@@ -71,12 +71,14 @@ public class GPS {
                 UpdateMileage(Location);
             location(Location);
             yield break;
-        }
+        }*/
+        location(Location);
+        yield break;
     }
 
     private void UpdateMileage(Vector2 location)
     {
-        if (PlayerPrefs.HasKey("lastLongitude") && PlayerPrefs.HasKey("lastLatitude"))
+        /*if (PlayerPrefs.HasKey("lastLongitude") && PlayerPrefs.HasKey("lastLatitude"))
         {
 
             Vector2 lastPos = new Vector2(PlayerPrefs.GetFloat("lastLongitude"), PlayerPrefs.GetFloat("lastLatitude"));
@@ -98,21 +100,22 @@ public class GPS {
             PlayerPrefs.SetFloat("MileageGainToUpdate", 0);
         }
         PlayerPrefs.SetFloat("lastLongitude", location.x);
-        PlayerPrefs.SetFloat("lastLatitude", location.y);
+        PlayerPrefs.SetFloat("lastLatitude", location.y);*/
+        PlayerPrefs.SetFloat("MileageGainToUpdate", 150);
     }
 
     public void StopGPS()
     {
-        if(Input.location.lastData.timestamp != 0)
+        /*if(Input.location.lastData.timestamp != 0)
             UpdateMileage(new Vector2(Input.location.lastData.longitude, Input.location.lastData.latitude));
-        Input.location.Stop();
+        Input.location.Stop();*/
     }
 
     public Vector2 PlayerLocation
     {
         get
         {
-            if(Input.location.status == LocationServiceStatus.Running)
+            /*if(Input.location.status == LocationServiceStatus.Running)
             {
                 const float times = 3276.8f;
                 float newX = (Input.location.lastData.longitude - lonOrigin) * times;
@@ -128,14 +131,9 @@ public class GPS {
                 //return new Vector2(lonOrigin + 0.1f, latOrigin+0.1f);
                 //Debug.Log(whee);
                 return whee;
-            }
+            }*/
+            return Vector2.zero;
         }
-    }
-
-    public void whee()
-    {
-        lonOrigin += 0.3f;
-        latOrigin += 0.3f;
     }
 
     public float HaversineDistance(Vector2 pos1, Vector2 pos2)
@@ -146,7 +144,6 @@ public class GPS {
         float h1 = Mathf.Sin(lat / 2) * Mathf.Sin(lat / 2) +
                       Mathf.Cos(pos1.y * Mathf.Deg2Rad) * Mathf.Cos(pos2.y * Mathf.Deg2Rad) *
                       Mathf.Sin(lng / 2) * Mathf.Sin(lng / 2);
-        //float h2 = 2 * Mathf.Asin(Mathf.Min(1, Mathf.Sqrt(h1)));
         float h2 = 2 * Mathf.Atan2(Mathf.Sqrt(h1), Mathf.Sqrt(1 - h1));
         return R * h2 * 1000;
     }
