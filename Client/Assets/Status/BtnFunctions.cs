@@ -197,13 +197,21 @@ public class BtnFunctions : MonoBehaviour {
 
     private IEnumerator SendMileageGain(int gain)
     {
+        //在Request的header中加入先前已經存起來的Cookie
         Dictionary<string, string> headers = new Dictionary<string, string>();
-        headers.Add("Cookie", PlayerPrefs.GetString("Cookie")); //加入cookie
+        headers.Add("Cookie", PlayerPrefs.GetString("Cookie"));
+
+        //再利用WWWForm型態儲存要送出的資料
         WWWForm form = new WWWForm();
         form.AddField("mileageGain", gain);
+
+        //最後利用Uunity的WWW送出請求
+        //三個參數分別是網址、資料與headers
         WWW w = new WWW(Constant.SERVER_URL + "/mileageGain", form.data, headers);
         yield return w;
-        if (!string.IsNullOrEmpty(w.text))
+
+        //等待伺服器回應後check回應的內容
+        if (string.IsNullOrEmpty(w.error))
         {
             PlayerPrefs.SetString("userData", w.text);
         }

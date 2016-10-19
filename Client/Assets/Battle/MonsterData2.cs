@@ -51,7 +51,14 @@ public class MonsterData2 {
     public int SkillRecover;
     public int SkillAttIncrease;
     public int SkillBurn;
-    public string _textSkillDescription;
+    private string _textSkillDescription;
+    public string SkillDescription
+    {
+        get
+        {
+            return _textSkillDescription;
+        }
+    }
 
     public void SetNextCricical(bool status)
     {

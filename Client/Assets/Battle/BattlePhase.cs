@@ -43,14 +43,14 @@ public class BattlePhase {
         switch (enemyMovement)
         {
 			case Movement.Attack:
-                roundResult.enemyStatusText = "The enemy attacked!";
+                roundResult.enemyStatusText = "敵人發動攻擊！";
                 /* See Enemy's attack below */
                 break;
             case Movement.Defense:
-                roundResult.enemyStatusText = "The enemy tried to defend your attack.";
+                roundResult.enemyStatusText = "敵人擺出防禦架式！";
                 break;
             case Movement.Evade:
-                roundResult.enemyStatusText = "The enemy tried to evade your attack.";
+                roundResult.enemyStatusText = "敵人嘗試迴避！";
                 break;
 			case Movement.Charge:
                 if (enemy.IsSkillReady)
@@ -58,11 +58,11 @@ public class BattlePhase {
                     enemy.Skill(ref partner);
                     roundResult.isEnemySkillActivated = true;
                     enemyMovement = Movement.Skill;
-                    roundResult.enemyStatusText = "敵人使用了技能!";
+                    roundResult.enemyStatusText = "敵人發動了技能！";
                 }
                 else
                     enemy.Charge();
-                roundResult.enemyStatusText = "敵人正在蓄能!";
+                roundResult.enemyStatusText = "敵人正在蓄能！";
                 break;
         }
 
@@ -80,7 +80,7 @@ public class BattlePhase {
                         damage = 1;
                     enemy.TakeDamage(damage);
                     roundResult.enemyDamageTake = damage;
-                    roundResult.partnerStatusText = "Attack hit and dealt " + damage + " damage.";
+                    roundResult.partnerStatusText = "我方攻擊造成了 " + damage + " 點傷害！";
                     enemy.RecoverDefense();
                     enemy.Charge();
                     //enemy防禦力回復了 並且charge+1
@@ -96,11 +96,11 @@ public class BattlePhase {
                             damage = 1;
                         enemy.TakeDamage(damage);
                         roundResult.enemyDamageTake = damage;
-                        roundResult.partnerStatusText = "Attack hit and dealt " + damage + " damage.";
+                        roundResult.partnerStatusText = "我方攻擊造成了 " + damage + " 點傷害！";
                     }
                     else
                     {
-                        roundResult.partnerStatusText = "The Enemy evaded your attack...";
+                        roundResult.partnerStatusText = "敵人迴避了我方攻擊...";
                         roundResult.isEnemyEvaded = true;
                         if (enemyMovement == Movement.Evade)
                         {
@@ -115,7 +115,7 @@ public class BattlePhase {
                 {
 					partner.DropDefense ();
                     roundResult.partnerStatusText = "你的防禦降低了!";
-                    Debug.Log ("Parter的防禦降到" + partner.Defense + "了!");
+                    //Debug.Log ("Parter的防禦降到" + partner.Defense + "了!");
                 }
                 break;
 			case Movement.Evade:
@@ -151,7 +151,7 @@ public class BattlePhase {
                     damage = 1;
                 partner.TakeDamage(damage);
                 roundResult.partnerDamageTake = damage;
-                roundResult.enemyStatusText = "Attack hit and dealt " + damage + " damage.";
+                roundResult.enemyStatusText = "我方攻擊造成了 " + damage + " 點傷害！";
                 partner.RecoverDefense();
                 partner.Charge();
             }
@@ -167,12 +167,12 @@ public class BattlePhase {
                         damage = 1;
                     roundResult.partnerDamageTake = damage;
                     partner.TakeDamage(damage);
-                    roundResult.partnerStatusText = "You took " + damage + " damage";
+                    roundResult.partnerStatusText = "我方承受了 " + damage + " 點傷害！";
                 }
                 else
                 {
                     //迴避成功
-                    roundResult.partnerStatusText = "You dodged the enemy's attack.";
+                    roundResult.partnerStatusText = "成功迴避敵方攻擊！握有會心一擊優勢！";
                     roundResult.isPartnerEvaded = true;
                     if (partnerMovement == Movement.Evade)
                     {
@@ -275,7 +275,7 @@ public class BattlePhase {
             }
             else
             {
-                return "集氣(" + partner.NowCharge + "/" + partner._skillCD + ")";
+                return "蓄能(" + partner.NowCharge + "/" + partner._skillCD + ")";
             }
         }
         catch

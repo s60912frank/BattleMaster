@@ -104,7 +104,7 @@ public class BattleViewPVP : MonoBehaviour {
         JSONObject data = e.data;
         battlePhase.SetEnemyMovement((BattlePhase.Movement)(int.Parse(data["movement"].str)));
         Debug.Log("Enemy:" + data["movement"].str + "!");
-        messageEnemyMove.text = "Enemy is ready.";
+        messageEnemyMove.text = "敵人已經準備好了";
     }
 
     private void OnAttackStart(SocketIOEvent e)
@@ -124,8 +124,6 @@ public class BattleViewPVP : MonoBehaviour {
     private void OnEnemyLeave(SocketIOEvent e)
     //敵人離開時觸發
     {
-        messageEnemyMove.text = "The Enemy leave the battle...";
-        Debug.Log("ENEMY LEAVED!");
         victoryPanel.Show();
     }
 
