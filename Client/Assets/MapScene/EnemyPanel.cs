@@ -12,6 +12,14 @@ public class EnemyPanel : MonoBehaviour {
     public Text AttackText;
     public Text RewardText;
     public Button BattleButton;
+
+    public GameObject LoadingPanel;
+    private LoadingScript loadingScript;
+
+    void Awake(){
+        loadingScript = LoadingPanel.GetComponent<LoadingScript>();
+    }
+
 	// Use this for initialization
 	void Start () {
 	
@@ -72,6 +80,7 @@ public class EnemyPanel : MonoBehaviour {
     public void Battle()
     {
         //.GetComponent<LoadingScript>().EndLoading();
+        loadingScript.StartLoading();
         StartCoroutine(BattleWithAI());
     }
 
@@ -84,7 +93,12 @@ public class EnemyPanel : MonoBehaviour {
         if (string.IsNullOrEmpty(w.error))
         {
             PlayerPrefs.SetString("userData", w.text);
-            SceneManager.LoadScene("Battle2");
+            AsyncOperation load = SceneManager.LoadSceneAsync("Battle2");
+            load.allowSceneActivation = false;
+            while(load.progress < 0.9f){
+                yield return null;
+            }
+            load.allowSceneActivation = true;
         }
         else
         {
