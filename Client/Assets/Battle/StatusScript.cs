@@ -14,12 +14,12 @@ public class StatusScript : MonoBehaviour {
     private int maxDefense;
 	// Use this for initialization
 	void Start () {
-        healthBar = transform.FindChild("HealthBar").FindChild("InnerBackground").FindChild("Bar").GetComponent<RectTransform>();
+        healthBar = transform.Find("HealthBar").Find("InnerBackground").Find("Bar").GetComponent<RectTransform>();
         zeroHealthPos = healthBar.anchoredPosition.x - 0.5f * healthBar.rect.width;
-        energyBar = transform.FindChild("EnergyBar").FindChild("InnerBackground").FindChild("Bar").GetComponent<RectTransform>();
+        energyBar = transform.Find("EnergyBar").Find("InnerBackground").Find("Bar").GetComponent<RectTransform>();
         //+是因為一開始是0
         zeroEnergyPos = energyBar.anchoredPosition.x + 0.5f * energyBar.rect.width;
-        shieldBar = transform.FindChild("ShieldBar").FindChild("InnerBackground").FindChild("Bar").GetComponent<RectTransform>();
+        shieldBar = transform.Find("ShieldBar").Find("InnerBackground").Find("Bar").GetComponent<RectTransform>();
         zeroDefensePos = shieldBar.anchoredPosition.x - 0.5f * shieldBar.rect.width;
     }
 

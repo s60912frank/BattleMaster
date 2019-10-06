@@ -25,7 +25,7 @@ public class CamController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        Debug.Log("MOUSERAY:" + MouseRay);
+        //Debug.Log("MOUSERAY:" + MouseRay);
         MouseKeyboardControl();
 
         if(Input.touchCount == 1)
@@ -144,7 +144,7 @@ public class CamController : MonoBehaviour {
         while (rayCasting)
         {
             yield return new WaitForSeconds(0.2f); //每200ms就raycast一次
-            Debug.Log("HELLO");
+            // Debug.Log("HELLO");
             Ray left = Camera.main.ViewportPointToRay(new Vector3(0, 0.5f, 0));
             Ray right = Camera.main.ViewportPointToRay(new Vector3(1, 0.5f, 0));
             Ray top = Camera.main.ViewportPointToRay(new Vector3(0.5f, 1, 0));

@@ -16,8 +16,11 @@ public class SetResult : MonoBehaviour {
         bgm.Play();
 
         //開啟particle system if之前有關
-        var particleEmission = GameObject.Find("Particle System").GetComponent<ParticleSystem>().emission;
-        particleEmission.enabled = true;
+        var particleSys = GameObject.Find("Particle System").GetComponent<ParticleSystem>();
+        if (!particleSys.enableEmission) 
+        {
+            particleSys.enableEmission = true;
+        }
 
         JSONObject petData = new JSONObject(PlayerPrefs.GetString("userData"))["pet"];
         JSONObject traningResult = new JSONObject(PlayerPrefs.GetString("trainingResult"));

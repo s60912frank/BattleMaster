@@ -4,6 +4,9 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+#if PLATFORM_ANDROID
+using UnityEngine.Android;
+#endif
 
 public class entry : MonoBehaviour {
     private string isLoaded = "";
@@ -14,6 +17,14 @@ public class entry : MonoBehaviour {
 	// Use this for initialization
 
 	void Start () {
+        //向使用者請求位置權限
+        #if PLATFORM_ANDROID
+        if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
+        {
+            Permission.RequestUserPermission(Permission.FineLocation);
+        }
+        #endif
+
         //particle system在每一個畫面都要有
         particleSys = GameObject.Find("Particle System");
         DontDestroyOnLoad(particleSys);

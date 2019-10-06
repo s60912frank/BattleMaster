@@ -169,7 +169,7 @@ public class login : MonoBehaviour {
     {
         WWWForm form = new WWWForm();
         form.AddField("token", token); //用token登入，deviceID or FB
-        form.AddField("name", NameInput.transform.FindChild("Text").gameObject.GetComponent<Text>().text);
+        form.AddField("name", NameInput.transform.Find("Text").gameObject.GetComponent<Text>().text);
         string requestUrl = Constant.SERVER_URL;
         if (type == "local")
         {

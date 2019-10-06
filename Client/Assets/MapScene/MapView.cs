@@ -17,8 +17,7 @@ public class MapView : MonoBehaviour {
 
         //關閉particle system因為不需要
         var particleSys = GameObject.Find("Particle System").GetComponent<ParticleSystem>();
-        var particleEmission = particleSys.emission;
-        particleEmission.enabled = false;
+        particleSys.enableEmission = false;
         particleSys.Clear(true);
 
         model = new MapModel();

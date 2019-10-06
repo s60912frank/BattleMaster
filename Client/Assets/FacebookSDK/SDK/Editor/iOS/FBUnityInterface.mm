@@ -27,10 +27,10 @@
 #include "FBUnityUtility.h"
 #include "FBSDK+Internal.h"
 
-static FBUnityInterface *_instance = [FBUnityInterface sharedInstance];
-
 @interface FBUnityInterface()
+
 @property (nonatomic, copy) NSString *openURLString;
+
 @end
 
 @implementation FBUnityInterface
@@ -39,28 +39,20 @@ static FBUnityInterface *_instance = [FBUnityInterface sharedInstance];
 
 + (FBUnityInterface *)sharedInstance
 {
-  return _instance;
+  static dispatch_once_t pred;
+  static FBUnityInterface *shared = nil;
+
+  dispatch_once(&pred, ^{
+    shared = [[FBUnityInterface alloc] init];
+    shared.shareDialogMode = ShareDialogMode::AUTOMATIC;
+  });
+
+  return shared;
 }
 
-+ (void)initialize {
-  if(!_instance) {
-    _instance = [[FBUnityInterface alloc] init];
-  }
-}
-
-- (id)init
++ (void)load
 {
-  if(_instance != nil) {
-    return _instance;
-  }
-
-  if ((self = [super init])) {
-    _instance = self;
-    self.shareDialogMode = ShareDialogMode::AUTOMATIC;
-
-    UnityRegisterAppDelegateListener(self);
-  }
-  return self;
+  UnityRegisterAppDelegateListener([FBUnityInterface sharedInstance]);
 }
 
 #pragma mark - App (Delegate) Lifecycle
@@ -76,7 +68,7 @@ static FBUnityInterface *_instance = [FBUnityInterface sharedInstance];
 
 - (void)didBecomeActive:(NSNotification *)notification
 {
-  [FBSDKAppEvents activateApp];
+
 }
 
 - (void)onOpenURL:(NSNotification *)notification
@@ -151,15 +143,9 @@ isPublishPermLogin:(BOOL)isPublishPermLogin
   };
 
   FBSDKLoginManager *login = [[FBSDKLoginManager alloc] init];
-  if (isPublishPermLogin) {
-    [login logInWithPublishPermissions:permissions
-                    fromViewController:nil
-                               handler:loginHandler];
-  } else {
-    [login logInWithReadPermissions:permissions
-                 fromViewController:nil
-                            handler:loginHandler];
-  }
+  [login logInWithPermissions:permissions
+           fromViewController:nil
+                      handler:loginHandler];
 }
 
 - (void)logOut
@@ -209,20 +195,6 @@ isPublishPermLogin:(BOOL)isPublishPermLogin
   }
 }
 
-- (void)appInviteWithRequestId:(int)requestId
-                    appLinkUrl:(const char *)appLinkUrl
-               previewImageUrl:(const char *)previewImageUrl
-{
-  FBSDKAppInviteContent *content = [[FBSDKAppInviteContent alloc] init];
-  content.appLinkURL = [NSURL URLWithString:[FBUnityUtility stringFromCString:appLinkUrl]];
-  content.appInvitePreviewImageURL = [NSURL URLWithString:[FBUnityUtility stringFromCString:previewImageUrl]];
-  FBUnitySDKDelegate *delegate = [FBUnitySDKDelegate instanceWithRequestID:requestId];
-  [FBSDKAppInviteDialog showFromViewController:nil
-                                   withContent:content
-                                      delegate:delegate];
-}
-
-
 - (void)shareLinkWithRequestId:(int)requestId
                     contentURL:(const char *)contentURL
                   contentTitle:(const char *)contentTitle
@@ -234,21 +206,6 @@ isPublishPermLogin:(BOOL)isPublishPermLogin
   NSString *contentUrlStr = [FBUnityUtility stringFromCString:contentURL];
   if (contentUrlStr) {
     linkContent.contentURL = [NSURL URLWithString:contentUrlStr];
-  }
-
-  NSString *contentTitleStr = [FBUnityUtility stringFromCString:contentTitle];
-  if (contentTitleStr) {
-    linkContent.contentTitle = contentTitleStr;
-  }
-
-  NSString *contentDescStr = [FBUnityUtility stringFromCString:contentDescription];
-  if (contentDescStr) {
-    linkContent.contentDescription = contentDescStr;
-  }
-
-  NSString *imageURL = [FBUnityUtility stringFromCString:photoURL];
-  if (imageURL) {
-    linkContent.imageURL = [NSURL URLWithString:imageURL];
   }
 
   [self shareContentWithRequestId:requestId
@@ -269,21 +226,6 @@ isPublishPermLogin:(BOOL)isPublishPermLogin
   NSString *contentUrlStr = [FBUnityUtility stringFromCString:link];
   if (contentUrlStr) {
     linkContent.contentURL = [NSURL URLWithString:contentUrlStr];
-  }
-
-  NSString *contentTitleStr = [FBUnityUtility stringFromCString:linkName];
-  if (contentTitleStr) {
-    linkContent.contentTitle = contentTitleStr;
-  }
-
-  NSString *contentDescStr = [FBUnityUtility stringFromCString:linkDescription];
-  if (contentDescStr) {
-    linkContent.contentDescription = contentDescStr;
-  }
-
-  NSString *imageURL = [FBUnityUtility stringFromCString:picture];
-  if (imageURL) {
-    linkContent.imageURL = [NSURL URLWithString:imageURL];
   }
 
   NSMutableDictionary *feedParameters = [[NSMutableDictionary alloc] init];
@@ -344,48 +286,6 @@ isPublishPermLogin:(BOOL)isPublishPermLogin
   }
 }
 
-- (void)showJoinAppGroupDialogWithRequestId:(int) requestId
-                                    groupId:(const char *) groupId
-{
-  FBUnitySDKDelegate *delegate = [FBUnitySDKDelegate instanceWithRequestID:requestId];
-  [FBSDKAppGroupJoinDialog showWithGroupID:[FBUnityUtility stringFromCString:groupId] delegate:delegate];
-}
-
-- (void)showCreateAppGroupDialogWithRequestId:(int) requestId
-                                    groupName:(const char *) groupName
-                             groupDescription:(const char *) groupDescription
-                                 groupPrivacy:(const char *) groupPrivacy
-{
-  FBSDKAppGroupContent *content = [[FBSDKAppGroupContent alloc] init];
-  content.name = [FBUnityUtility stringFromCString:groupName];
-  content.groupDescription = [FBUnityUtility stringFromCString:groupDescription];
-
-  FBSDKAppGroupPrivacy privacy;
-  NSString *privacyStr = [FBUnityUtility stringFromCString:groupPrivacy];
-  if ([privacyStr caseInsensitiveCompare:@"closed"] == NSOrderedSame) {
-    privacy = FBSDKAppGroupPrivacyClosed;
-  } else if ([privacyStr caseInsensitiveCompare:@"open"] == NSOrderedSame) {
-    privacy = FBSDKAppGroupPrivacyOpen;
-  } else {
-    NSLog(@"Unexpced privacy type: %@", privacyStr);
-    privacy = FBSDKAppGroupPrivacyClosed;
-  }
-
-  content.privacy = privacy;
-
-  FBSDKAppGroupAddDialog *dialog = [[FBSDKAppGroupAddDialog alloc] init];
-  dialog.content = content;
-  dialog.delegate = [FBUnitySDKDelegate instanceWithRequestID:requestId];
-
-  NSError *error;
-  if (![dialog validateWithError:&error]) {
-    [FBUnityUtility sendErrorToUnity:FBUnityMessageName_OnGroupCreateComplete error:error requestId:requestId];
-  }
-  if (![dialog show]) {
-    [FBUnityUtility sendErrorToUnity:FBUnityMessageName_OnGroupCreateComplete errorMessage:@"Failed to show group create dialog" requestId:requestId];
-  }
-}
-
 - (BOOL)tryCompleteLoginWithRequestId:(int) requestId
 {
   NSDictionary *userData = [self getAccessTokenUserData];
@@ -424,7 +324,14 @@ isPublishPermLogin:(BOOL)isPublishPermLogin
 
 extern "C" {
 
-  void IOSInit(const char *_appId, bool _frictionlessRequests, const char *_urlSuffix, const char *_userAgentSuffix)
+  void IOSFBSendViewHierarchy(const char *_tree )
+  {
+    Class FBUnityUtility = NSClassFromString(@"FBSDKCodelessIndexer");
+    [FBUnityUtility performSelector:NSSelectorFromString(@"uploadIndexing:")
+                           withObject:[NSString stringWithUTF8String:_tree]];
+  }
+
+  void IOSFBInit(const char *_appId, bool _frictionlessRequests, const char *_urlSuffix, const char *_userAgentSuffix)
   {
     // Set the user agent before calling init to ensure that calls made during
     // init use the user agent suffix.
@@ -433,31 +340,38 @@ extern "C" {
     [[FBUnityInterface sharedInstance] configureAppId:_appId
                                  frictionlessRequests:_frictionlessRequests
                                             urlSuffix:_urlSuffix];
+    [FBSDKAppEvents setIsUnityInit:true];
+    [FBSDKAppEvents sendEventBindingsToUnity];
   }
 
-  void IOSLogInWithReadPermissions(int requestId,
+  void IOSFBLogInWithReadPermissions(int requestId,
                                    const char *scope)
   {
     [[FBUnityInterface sharedInstance] logInWithReadPermissions:requestId scope:scope];
   }
 
-  void IOSLogInWithPublishPermissions(int requestId,
+  void IOSFBLogInWithPublishPermissions(int requestId,
                                       const char *scope)
   {
     [[FBUnityInterface sharedInstance] logInWithPublishPermissions:requestId scope:scope];
   }
 
-  void IOSLogOut()
+  void IOSFBLogOut()
   {
     [[FBUnityInterface sharedInstance] logOut];
   }
 
-  void IOSSetShareDialogMode(int mode)
+  void IOSFBSetPushNotificationsDeviceTokenString(const char *token)
+  {
+    [FBSDKAppEvents setPushNotificationsDeviceTokenString:[FBUnityUtility stringFromCString:token]];
+  }
+
+  void IOSFBSetShareDialogMode(int mode)
   {
     [FBUnityInterface sharedInstance].shareDialogMode = static_cast<ShareDialogMode>(mode);
   }
 
-  void IOSAppRequest(int requestId,
+  void IOSFBAppRequest(int requestId,
                      const char *message,
                      const char *actionType,
                      const char *objectId,
@@ -482,16 +396,7 @@ extern "C" {
                                                          title: title];
   }
 
-  void IOSAppInvite(int requestId,
-                    const char *appLinkUrl,
-                    const char *previewImageUrl)
-  {
-    [[FBUnityInterface sharedInstance] appInviteWithRequestId:requestId
-                                                   appLinkUrl:appLinkUrl
-                                              previewImageUrl:previewImageUrl];
-  }
-
-  void IOSGetAppLink(int requestId)
+  void IOSFBGetAppLink(int requestId)
   {
     NSURL *url = [NSURL URLWithString:[FBUnityInterface sharedInstance].openURLString];
     [FBUnityUtility sendMessageToUnity:FBUnityMessageName_OnGetAppLinkComplete
@@ -500,7 +405,7 @@ extern "C" {
     [FBUnityInterface sharedInstance].openURLString = nil;
   }
 
-  void IOSShareLink(int requestId,
+  void IOSFBShareLink(int requestId,
                     const char *contentURL,
                     const char *contentTitle,
                     const char *contentDescription,
@@ -513,7 +418,7 @@ extern "C" {
                                                      photoURL:photoURL];
   }
 
-  void IOSFeedShare(int requestId,
+  void IOSFBFeedShare(int requestId,
                     const char *toId,
                     const char *link,
                     const char *linkName,
@@ -532,17 +437,7 @@ extern "C" {
                                                   mediaSource:mediaSource];
   }
 
-  void IOSJoinGameGroup(int requestId, const char *groupId)
-  {
-    [[FBUnityInterface sharedInstance] showJoinAppGroupDialogWithRequestId:requestId groupId:groupId];
-  }
-
-  void IOSCreateGameGroup(int requestId, const char *groupName, const char *groupDescription, const char *groupPrivacy)
-  {
-    [[FBUnityInterface sharedInstance] showCreateAppGroupDialogWithRequestId:requestId groupName:groupName groupDescription:groupDescription groupPrivacy:groupPrivacy];
-  }
-
-  void IOSFBSettingsActivateApp(const char *appId)
+  void IOSFBAppEventsActivateApp()
   {
     [FBSDKAppEvents activateApp];
   }
@@ -572,6 +467,16 @@ extern "C" {
     [FBSDKSettings setLimitEventAndDataUsage:limitEventUsage];
   }
 
+  void IOSFBAutoLogAppEventsEnabled(BOOL autoLogAppEventsEnabledID)
+  {
+    [FBSDKSettings setAutoLogAppEventsEnabled:autoLogAppEventsEnabledID];
+  }
+
+  void IOSFBAdvertiserIDCollectionEnabled(BOOL advertiserIDCollectionEnabledID)
+  {
+    [FBSDKSettings setAdvertiserIDCollectionEnabled:advertiserIDCollectionEnabledID];
+  }
+
   char* IOSFBSdkVersion()
   {
     const char* string = [[FBSDKSettings sdkVersion] UTF8String];
@@ -580,7 +485,32 @@ extern "C" {
     return res;
   }
 
-  void IOSFetchDeferredAppLink(int requestId)
+  void IOSFBSetUserID(const char *userID)
+  {
+    [FBSDKAppEvents setUserID:[FBUnityUtility stringFromCString:userID]];
+  }
+
+  char* IOSFBGetUserID()
+  {
+    NSString *userID = [FBSDKAppEvents userID];
+    if (!userID) {
+      return NULL;
+    }
+    const char* string = [userID UTF8String];
+    char* res = (char*)malloc(strlen(string) + 1);
+    strcpy(res, string);
+    return res;
+  }
+
+  void IOSFBUpdateUserProperties(int numParams,
+                                 const char **paramKeys,
+                                 const char **paramVals)
+  {
+    NSDictionary *params =  [FBUnityUtility dictionaryFromKeys:paramKeys values:paramVals length:numParams];
+    [FBSDKAppEvents updateUserProperties:params handler:NULL];
+  }
+
+  void IOSFBFetchDeferredAppLink(int requestId)
   {
     [FBSDKAppLinkUtility fetchDeferredAppLink:^(NSURL *url, NSError *error) {
       if (error) {
@@ -594,7 +524,7 @@ extern "C" {
     }];
   }
 
-  void IOSRefreshCurrentAccessToken(int requestId)
+  void IOSFBRefreshCurrentAccessToken(int requestId)
   {
     [FBSDKAccessToken refreshCurrentAccessToken:^(FBSDKGraphRequestConnection *connection, id result, NSError *error) {
       if (error) {
