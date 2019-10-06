@@ -7,8 +7,9 @@ var getDBAddr = () => {
     process.env.OPENSHIFT_MONGODB_DB_PORT + '/' +
     process.env.OPENSHIFT_APP_NAME;
     return connection_string;
-  }
-  else{
+  } else if (process.env.MONGO_ADDR) {
+    return `mongodb://${process.env.MONGO_ADDR}:27017/battlemaster`;
+  } else {
     //本地的DB
     return 'mongodb://localhost:27017/battlemaster';
 	  //return 'mongodb://192.168.1.5:27017/battlemaster';

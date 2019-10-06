@@ -1,0 +1,20 @@
+version: '3'
+services:
+  server: 
+    build: .
+    restart: unless-stopped
+    environment:
+      MONGO_ADDR: "db"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:battle-master.gmin.tk"
+      - "traefik.port=8080"
+  
+  db:
+    image: mvertes/alpine-mongo
+    restart: unless-stopped
+    volumes:
+      - db-data:/data/db
+
+volumes:
+  db-data:
