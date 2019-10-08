@@ -15,8 +15,8 @@ public class NotifyPanel : MonoBehaviour {
         animator = gameObject.GetComponent<Animator>();
         rt = gameObject.GetComponent<RectTransform>();
         sound = gameObject.GetComponent<AudioSource>();
-        ContentText = transform.FindChild("Panel").FindChild("ContentText").GetComponent<Text>();
-        ConfirmButton = transform.FindChild("Panel").FindChild("ConfirmButton").GetComponent<Button>();
+        ContentText = transform.Find("Panel").Find("ContentText").GetComponent<Text>();
+        ConfirmButton = transform.Find("Panel").Find("ConfirmButton").GetComponent<Button>();
         AudioSource se = gameObject.GetComponent<AudioSource>();
         if(PlayerPrefs.GetInt("SoundEffectOn") == 1){
             se.volume = 0.75f;

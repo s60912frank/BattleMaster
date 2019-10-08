@@ -37,8 +37,9 @@ public class login : MonoBehaviour {
     {
         //本地登入 使用DeviceID
         type = "local";
-        //token = SystemInfo.deviceUniqueIdentifier;
-        token = "DEBUG2";
+        var txt = Resources.Load<TextAsset>("demo_id");
+        Debug.Log(txt.text);
+        token = txt.text;
         StartCoroutine(WaitForLogin());
     }
 
@@ -170,7 +171,7 @@ public class login : MonoBehaviour {
     {
         WWWForm form = new WWWForm();
         form.AddField("token", token); //用token登入，deviceID or FB
-        form.AddField("name", NameInput.transform.FindChild("Text").gameObject.GetComponent<Text>().text);
+        form.AddField("name", NameInput.transform.Find("Text").gameObject.GetComponent<Text>().text);
         string requestUrl = Constant.SERVER_URL;
         if (type == "local")
         {
@@ -216,13 +217,21 @@ public class login : MonoBehaviour {
         //將server傳來的使用者資料儲存在本機
     {
         JSONObject response = new JSONObject(w.text);
-        string[] data = w.responseHeaders["SET-COOKIE"].Split(";"[0]); //取出登入後的cookie存起來
-        if (data.Length > 0)
+        foreach (string key in w.responseHeaders.Keys)
         {
-            //response.AddField("cookie", data[0]);
-            PlayerPrefs.SetString("Cookie", data[0]);
-            Debug.Log(data[0]);
+            Debug.Log(key);
         }
+        if (w.responseHeaders.ContainsKey("SET-COOKIE")) 
+        {
+            string[] data = w.responseHeaders["SET-COOKIE"].Split(";"[0]); //取出登入後的cookie存起來
+            if (data.Length > 0)
+            {
+                //response.AddField("cookie", data[0]);
+                PlayerPrefs.SetString("Cookie", data[0]);
+                Debug.Log(data[0]);
+            }
+        }
+        
         Debug.Log("登入成功");
         PlayerPrefs.SetString("userData", response["data"].ToString()); //將使用者資料與cookie存入playerPrefs
     }

@@ -28,7 +28,6 @@ NSString *const FBUnityMessageName_OnInitComplete = @"OnInitComplete";
 NSString *const FBUnityMessageName_OnLoginComplete = @"OnLoginComplete";
 NSString *const FBUnityMessageName_OnLogoutComplete = @"OnLogoutComplete";
 NSString *const FBUnityMessageName_OnShareLinkComplete = @"OnShareLinkComplete";
-NSString *const FBUnityMessageName_OnAppInviteComplete = @"OnAppInviteComplete";
 NSString *const FBUnityMessageName_OnFetchDeferredAppLinkComplete = @"OnFetchDeferredAppLinkComplete";
 NSString *const FBUnityMessageName_OnRefreshCurrentAccessTokenComplete = @"OnRefreshCurrentAccessTokenComplete";
 
@@ -58,46 +57,6 @@ static NSMutableArray *g_instances;
 - (void)complete
 {
   [g_instances removeObject:self];
-}
-
-#pragma mark - AppGroupAddDelegate
-
-- (void)appGroupAddDialog:(FBSDKAppGroupAddDialog *)appGroupAddDialog didCompleteWithResults:(NSDictionary *)results
-{
-  [FBUnityUtility sendMessageToUnity:FBUnityMessageName_OnGroupCreateComplete userData:results requestId:_requestID];
-  [self complete];
-}
-
-- (void)appGroupAddDialog:(FBSDKAppGroupAddDialog *)appGroupAddDialog didFailWithError:(NSError *)error
-{
-  [FBUnityUtility sendErrorToUnity:FBUnityMessageName_OnGroupCreateComplete error:error requestId:_requestID];
-  [self complete];
-}
-
-- (void)appGroupAddDialogDidCancel:(FBSDKAppGroupAddDialog *)appGroupAddDialog
-{
-  [FBUnityUtility sendCancelToUnity:FBUnityMessageName_OnGroupCreateComplete requestId:_requestID];
-  [self complete];
-}
-
-#pragma mark - AppGroupJoinDelegate
-
-- (void)appGroupJoinDialog:(FBSDKAppGroupJoinDialog *)appGroupJoinDialog didCompleteWithResults:(NSDictionary *)results
-{
-  [FBUnityUtility sendMessageToUnity:FBUnityMessageName_OnGroupJoinComplete userData:results requestId:_requestID];
-  [self complete];
-}
-
-- (void)appGroupJoinDialog:(FBSDKAppGroupJoinDialog *)appGroupJoinDialog didFailWithError:(NSError *)error
-{
-  [FBUnityUtility sendErrorToUnity:FBUnityMessageName_OnGroupJoinComplete error:error requestId:_requestID];
-  [self complete];
-}
-
-- (void)appGroupJoinDialogDidCancel:(FBSDKAppGroupJoinDialog *)appGroupJoinDialog
-{
-  [FBUnityUtility sendCancelToUnity:FBUnityMessageName_OnGroupJoinComplete requestId:_requestID];
-  [self complete];
 }
 
 #pragma mark - GameRequestDelegate
@@ -142,30 +101,6 @@ static NSMutableArray *g_instances;
 - (void)sharerDidCancel:(id<FBSDKSharing>)sharer
 {
   [FBUnityUtility sendCancelToUnity:FBUnityMessageName_OnShareLinkComplete requestId:_requestID];
-  [self complete];
-}
-
-#pragma mark - FBSDKAppInviteDialogDelegate
-
-- (void)appInviteDialog:(FBSDKAppInviteDialog *)appInviteDialog didCompleteWithResults:(NSDictionary *)results
-{
-  if (results.count == 0) {
-    // We no longer always send back a postId. In cases where the response is empty,
-    // stuff in a didComplete so that Unity doesn't treat it as a malformed response.
-    results = @{ @"didComplete" : @"1" };
-  } else if([[results objectForKey:@"completionGesture"] isEqualToString:@"cancel"]) {
-    // The app invitie dialog doesn't have a cancel but returns "completionGesture" "cancel"
-    [FBUnityUtility sendCancelToUnity:FBUnityMessageName_OnAppInviteComplete requestId:_requestID];
-    [self complete];
-  }
-
-  [FBUnityUtility sendMessageToUnity:FBUnityMessageName_OnAppInviteComplete userData:results requestId:_requestID];
-  [self complete];
-}
-
-- (void)appInviteDialog:(FBSDKAppInviteDialog *)appInviteDialog didFailWithError:(NSError *)error
-{
-  [FBUnityUtility sendErrorToUnity:FBUnityMessageName_OnAppInviteComplete error:error requestId:_requestID];
   [self complete];
 }
 

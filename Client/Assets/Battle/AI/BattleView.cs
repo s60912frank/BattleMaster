@@ -51,8 +51,11 @@ public class BattleView : MonoBehaviour {
         }
 
         //開啟particle system if之前有關
-        var particleEmission = GameObject.Find("Particle System").GetComponent<ParticleSystem>().emission;
-        particleEmission.enabled = true;
+        var particleSys = GameObject.Find("Particle System").GetComponent<ParticleSystem>();
+        if (!particleSys.enableEmission) 
+        {
+            particleSys.enableEmission = true;
+        }
 
         animationController = SpriteMgr.GetComponent<AnimationController>();
         JSONObject partnerData = new JSONObject(PlayerPrefs.GetString("userData"))["pet"];

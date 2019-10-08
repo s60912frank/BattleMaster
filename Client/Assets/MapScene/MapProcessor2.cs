@@ -29,24 +29,28 @@ public class MapProcessor2{
         JSONObject buildings = data["buildings"]["features"]; //讀取資料中的"building"節點下的"features"節點
         foreach (JSONObject obj in buildings.list) //讀取這個節點的陣列
         {
-            List<Vector2> coords = new List<Vector2>();
-            string type = obj["geometry"]["type"].str;
-            switch (type)
+            if (obj["geometry"]["type"].str == "Polygon") 
             {
-                case "Point":
-                    //點不知怎畫，然而好像也不是很重要
-                    break;
-                case "Polygon":
-                    foreach (JSONObject co in obj["geometry"]["coordinates"].list[0].list) //polygon的座標陣列存在陣列[0]的陣列中
+                List<Vector2> coords = new List<Vector2>();
+                foreach (JSONObject co in obj["geometry"]["coordinates"].list[0].list) //polygon的座標陣列存在陣列[0]的陣列中
+                {
+                    coords.Add(new Vector2(co[0].f, co[1].f));
+                }
+                outputData["Polygon"].Add(CoordTransform(coords));
+            }
+
+            if (obj["geometry"]["type"].str == "MultiPolygon") 
+            {
+                foreach (JSONObject poly in obj["geometry"]["coordinates"].list) //multi-polygon的座標有兩層
+                {
+                    List<Vector2> coords = new List<Vector2>();
+                    foreach (JSONObject co in poly[0].list) 
                     {
                         coords.Add(new Vector2(co[0].f, co[1].f));
                     }
-                    break;
-                default:
-                    Debug.Log(type);
-                    break;
+                    outputData["Polygon"].Add(CoordTransform(coords));
+                }
             }
-            outputData["Polygon"].Add(CoordTransform(coords));
         }
 
         JSONObject roads = data["roads"]["features"]; //讀取資料中的"roads"節點下的"features"節點

@@ -7,8 +7,8 @@ public class SetRoomButton : MonoBehaviour {
     private Text OwnerText;
     void Awake()
     {
-        RoomNameText = transform.FindChild("RoomNameText").GetComponent<Text>();
-        OwnerText = transform.FindChild("OwnerText").GetComponent<Text>();
+        RoomNameText = transform.Find("RoomNameText").GetComponent<Text>();
+        OwnerText = transform.Find("OwnerText").GetComponent<Text>();
     }
 
     // Use this for initialization

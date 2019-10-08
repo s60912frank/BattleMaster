@@ -12,8 +12,8 @@ public class AnimationController : MonoBehaviour {
     void Start () {
         partnerSkill = PartnerSkillEffect.GetComponent<SpriteController>();
         enemySkill = EnemySkillEffect.GetComponent<SpriteController>(); ;
-        partner = transform.FindChild("PartnerParent").FindChild("Partner").GetComponent<SpriteController>();
-        enemy = transform.FindChild("EnemyParent").FindChild("Enemy").GetComponent<SpriteController>();
+        partner = transform.Find("PartnerParent").Find("Partner").GetComponent<SpriteController>();
+        enemy = transform.Find("EnemyParent").Find("Enemy").GetComponent<SpriteController>();
     }
 	
 	// Update is called once per frame

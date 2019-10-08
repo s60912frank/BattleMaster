@@ -152,7 +152,7 @@ public class PVPRooms : MonoBehaviour {
 
 	public void SubmitCreateRoom()
 	{
-		string roomName = createRoomPanel.transform.FindChild ("RoomName").GetComponentInChildren<Text> ().text;
+		string roomName = createRoomPanel.transform.Find ("RoomName").GetComponentInChildren<Text> ().text;
 		Dictionary<string,string> data = new Dictionary<string, string> ();
 		data.Add ("name", roomName);
 		socket.Emit("createRoom", new JSONObject(data));

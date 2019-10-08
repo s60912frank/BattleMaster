@@ -16,6 +16,7 @@ public class ShowAbility : MonoBehaviour {
     void Start ()
     { 
         JSONObject data = new JSONObject(PlayerPrefs.GetString("userData"));
+        Debug.Log(data);
         JSONObject petData = data["pet"];
         SetPartnerIcon(petData["name"].str);
         Debug.Log(petData);

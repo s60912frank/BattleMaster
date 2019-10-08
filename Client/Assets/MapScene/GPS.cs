@@ -115,23 +115,6 @@ public class GPS {
     {
         get
         {
-            /*if(Input.location.status == LocationServiceStatus.Running)
-            {
-                const float times = 3276.8f;
-                float newX = (Input.location.lastData.longitude - lonOrigin) * times;
-                float newY = (Input.location.lastData.latitude - latOrigin) * times;
-                GPSStatus = "經度: " + Input.location.lastData.longitude + "    緯度: " + Input.location.lastData.latitude;
-                return new Vector2(newX, newY);
-            }
-            else
-            {
-                //Input.location.lastData.
-                //debug only
-                Vector2 whee = new Vector2(lonOrigin, latOrigin);
-                //return new Vector2(lonOrigin + 0.1f, latOrigin+0.1f);
-                //Debug.Log(whee);
-                return whee;
-            }*/
             return Vector2.zero;
         }
     }

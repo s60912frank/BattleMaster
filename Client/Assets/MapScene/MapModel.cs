@@ -4,9 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 
 public class MapModel {
-    private const string API_KEY = "vector-tiles-vxQ7SnN";
-    private const string MAP_TYPE = "buildings,roads";
-    private const string MAPZEN_URL = "http://tile.mapzen.com/mapzen/vector/v1/";
+    private const string API_KEY = "zYe7RESnRgm43d04Q4pjVg";
+    private const string MAPZEN_URL = "https://tile.nextzen.org/tilezen/vector/v1/256/all/";
     private const int ZOOM = 15;
     private const float TIMES = 3276.8f;
     public Rect mapBoundry;
@@ -38,8 +37,9 @@ public class MapModel {
     private string MapUrl(int x, int y)
     {
         //http://tile.mapzen.com/mapzen/vector/v1/buildings,roads/15/27438/14027.json?api_key=vector-tiles-vxQ7SnN
-        Debug.Log(MAPZEN_URL + MAP_TYPE + "/" + ZOOM + "/" + x + "/" + y + ".json?api_key=" + API_KEY);
-        return MAPZEN_URL + MAP_TYPE + "/" + ZOOM + "/" + x + "/" + y + ".json?api_key=" + API_KEY;
+        //https://tile.nextzen.org/tilezen/vector/v1/all/16/54878/28055.json?api_key=zYe7RESnRgm43d04Q4pjVg
+        Debug.Log(MAPZEN_URL + ZOOM + "/" + x + "/" + y + ".json?api_key=" + API_KEY);
+        return MAPZEN_URL + ZOOM + "/" + x + "/" + y + ".json?api_key=" + API_KEY;
     }
 
     public IEnumerator GetAllEnemyData()
