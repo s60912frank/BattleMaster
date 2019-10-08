@@ -37,9 +37,7 @@ public class login : MonoBehaviour {
     {
         //本地登入 使用DeviceID
         type = "local";
-        var txt = Resources.Load<TextAsset>("demo_id");
-        Debug.Log(txt.text);
-        token = txt.text;
+        token = "DEMO2";
         StartCoroutine(WaitForLogin());
     }
 
